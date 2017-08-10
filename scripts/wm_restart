@@ -1,0 +1,74 @@
+#!/bin/zsh
+
+wait_a_bit(){ sleep .2s; }
+soft_restart(){ [[ ${windowmanager} == "notion" ]] && restart_panel }
+
+function restart_panel() {
+    for i in admiral rofi dzen2; pkill "${i}"
+    ${SCRIPT_HOME}/panels
+}
+
+function notion_restart() {
+    restart_panel
+    if [[ ${1} != "soft" ]]; then
+        notionflux -e 'notioncore.restart()'
+    fi
+}
+
+function windowchef_restart(){
+    "${XDG_CONFIG_HOME}/windowchef/windowchefrc"
+    pkill -USR1 -x sxhkd
+}
+
+function i3::common_restart(){
+    ps -ef | awk -v name="bar" '$0 ~ name {print $2}' | xargs kill 2>/dev/null
+    polybar -q -c ${polybar_cfg} tiny &
+    while ! pgrep -f "polybar -q -c ${XDG_CONFIG_HOME}/polybar/main tiny"; do
+        wait_a_bit
+    done && sleep 1s && polybar -q -c ${polybar_cfg} main
+    ppi3 ${XDG_CONFIG_HOME}/i3/_config > ${XDG_CONFIG_HOME}/i3/config
+}
+
+function i3_restart(){
+    polybar_cfg=${XDG_CONFIG_HOME}/polybar/main
+    # kill any current poppers (thanks Dylan)
+    if [[  $(i3 --version|awk '{print $3}'|grep '^4.13' -ow) == "4.13" ]]; then
+        i3::common_restart
+        wait_a_bit
+        notify-send "[${wm_}] reload"
+        i3-msg reload
+    else
+        i3::common_restart
+        wait_a_bit
+        notify-send "[${wm_}] restart"
+        i3-msg restart
+    fi
+}
+
+function main() {
+    lockfile="${HOME}/tmp/$(basename $0).lock"
+    if (set -o noclobber && echo ":: Locked ::" > "${lockfile}") 2> /dev/null; then
+        zshexit() { sleep 2s && rm -f "${lockfile}"; exit $? }
+        echo "Locking succeeded" >&2
+        #----------------------------------------------
+        if [[ ${1} != "" ]]; then
+            if [[ ${1} == "soft" ]]; then
+                soft_restart
+            else
+                wm_="$1"
+                shift
+                eval "$(echo ${wm_}_restart) $@"
+            fi
+        else
+            wm_="${windowmanager}"
+            eval "$(echo ${wm_}_restart)"
+        fi
+        #----------------------------------------------
+    else
+        echo "Lock failed - exit" >&2
+        notify-send "Lock failed - exit" 
+        exit 1
+    fi
+}
+
+main "$@"

@@ -1,0 +1,94 @@
+#!/bin/zsh
+
+typeset -A conv_table
+
+generate_convert_table(){
+    for i in {900..989}; do
+        q=${i:1:5}
+        conv_table[1$i]="1x${q}"
+    done
+
+    for i in {990..999}; do
+        q=${i:2:5}
+        conv_table[1$i]="1x${q}"
+    done
+    
+    i="000"
+    num=$(sed "s/^000/0/" <<< $i)
+    conv_table[2$i]="2x${num}"
+    for i in {001..025}; do
+        num=$(sed "s/^0*//" <<< $i)
+        if [[ ${num} -lt 10 ]]; then
+            conv_table[2$i]="2x${num}"
+        else
+            j=10
+            for q in {A..Z}; do
+                if [[ $j == $num ]]; then
+                    conv_table[2$i]="2x${q}"
+                fi
+                ((j++))
+            done
+        fi
+    done
+}
+
+debug_print_convert_table(){
+    {for key in "${(@k)conv_table}"; do
+        builtin print "${key} -> ${conv_table[${key}]}" 
+    done}|sort -h
+}
+
+apply_rename_files(){
+    Data=$(albumdetails "$@" 2>/dev/null)
+    apply_rename_ "$@"
+}
+
+apply_rename_dir(){
+    Data=$(find "${1}" -exec albumdetails '{}' + 2>/dev/null)
+    apply_rename_ "$@"
+}
+
+apply_rename_(){
+    artist=$(builtin print "${Data}"|grep "Artist"| cut -d ':' -f 2-|xargs)
+    year=$(builtin print "${Data}"|grep "Year"| cut -d ':' -f 2-|xargs)
+
+    generate_convert_table
+
+    # take only first word from year
+    year=$(awk '{print $1}' <<< "${year}")
+    year=${year//$year/$conv_table[$year]}
+
+    album=$(builtin print "${Data}"|grep "Album"| cut -d ':' -f 2-|xargs)
+
+    if [[ -d "$1" ]]; then
+        src="$1"
+    else
+        src="$(builtin print "$(dirname ${1})")"
+    fi
+    
+    if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
+        result="$(dirname "${src}")/$(builtin print "${artist}-[${year}]-${album}")"
+        result="$(sed 's;/;.;g' <<< "$(basename "${result}")")"
+        mv -i "${src}" "${result}"
+        fix_names.pl -i "${result}"
+        rmdir "${src}" 2> /dev/null
+    fi
+}
+
+main(){
+    case "$1" in
+        "current")
+            dirname="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')/$(dirname "$(mpc -f '%file%'|head -1)")"
+            apply_rename_dir "${dirname}"
+        ;;
+        "files")
+            shift
+            apply_rename_files "$@"
+        ;;
+        *)
+            for d; apply_rename_dir "${d}"
+        ;;
+    esac
+}
+
+main "$@"

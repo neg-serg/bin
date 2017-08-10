@@ -1,0 +1,142 @@
+#!/bin/zsh
+
+summary_="$2" body_="$3" image_="$4" urgency_="$5"
+
+# There is no need to convert size of something anymore ...
+function conv_image_(){ 
+    convert -resize ${size_} "$1" "$2" 2>/dev/null 
+    cp "$2" "/tmp/dunst-images/audio-x-generic.png"
+}
+
+function wf_(){
+    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_} "
+}
+
+function get_pid_(){
+    local mpdsc_="$(which mpdscribble) --conf"
+    local mpdas_="${XDG_CONFIG_HOME}/mpdas"
+    pgrep -f "${mpdsc_} ${XDG_CONFIG_HOME}/mpdscribble/$1.conf --no-daemon" || \
+    pgrep -f "${mpdas_}/$1.rc"
+}
+
+function get_lastfm_(){
+    if [[ $(get_pid_ neg) != ""  ]]; then
+        builtin printf "$(wf_ "L")Neg last.fm"
+    elif [[ $(get_pid_ hextrick) != "" ]]; then
+        builtin printf "$(wf_ "L")Hextrick last.fm"
+    fi
+}
+
+function highlight_(){
+    local msg="$(xrq color$1)"
+    builtin print "<span weight='bold' color='${msg}'>"
+}
+
+function send_notify_(){ 
+    local st_=$(highlight_ 4)
+    local st2_=$(highlight_ 8)
+
+    local cl_="</span>"
+    local bold_="<span weight='bold'>"
+    local prefix_=$(wf_ "➣")
+    declare -a bodyarr_
+    local c=1
+    while read line; do
+        bodyarr_[$c]=${line}
+        c=$[c+1]
+    done <<< ${body_}
+
+    length_=(
+        ${#bodyarr_[1]} 
+        ${#bodyarr_[2]}
+        ${#bodyarr_[3]}
+        ${#bodyarr_[4]}
+        ${#bodyarr_[5]}
+        ${#bodyarr_[6]}
+    )
+    length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
+    length_=${(@)length_[1]}
+
+    bodyarr_[1]=$(wf_ '')"${bodyarr_[1]}\n"
+    bodyarr_[2]=$(wf_ '')"${bodyarr_[2]}\n"
+    bodyarr_[3]=$(wf_ '》')"${bodyarr_[3]}\n"
+    bodyarr_[4]=$(wf_ '')"${bodyarr_[4]}\n"
+
+    current_file="$(mpc -f '%file%'|head -1)"
+    mpd_music_dir="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
+    current_dirname="${mpd_music_dir}/$(dirname "${current_file}")"
+
+    albumdetails_metadata="$(find "${current_dirname}" -exec albumdetails '{}' + 2>&1 >/dev/null \
+        | awk -F ': ' '/Quality/{print $2}' \
+        | sed -e 's; / ;·;g' -e 's; channels;;')"
+    sox_metadata="$(sox --i "${mpd_music_dir}/${current_file}" 2> /dev/null)"
+    media_file_encoding="$(awk -F': ' '/Sample Encoding/{print $2}' <<< "${sox_metadata}")"
+
+    case "${media_file_encoding}" in
+        *FLAC*) file_enc="flac" ;;
+        *MPEG*) file_enc="mp3" ;;
+    esac
+    file_enc="${file_enc}:$(awk -F': ' '/Precision/{print $2}' <<< ${sox_metadata})"
+
+    bodyarr_[5]=$(wf_ '')"${file_enc}\n"
+    bodyarr_[6]=$(wf_ '')"${albumdetails_metadata}\n"
+
+    local output
+    for i in ${bodyarr_[@]}; do 
+        output="${output}${i}" 
+    done
+
+    summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
+    output="\n${output}$(get_lastfm_)\n\n${summary_}"
+
+    notify-send -a "prepare_image" -u "${urgency_}" -i "${new_image}" "${summary_}" "${output}"  
+}
+
+function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
+
+zshexit() { 
+    { sleep ${timeout_} && rm -f "${new_image}" } &
+    { sleep 900s && find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
+}
+
+function main(){
+    timeout_=40
+    tiny_timeout=0.4
+
+    dunst_pics_="/tmp/dunst-images"
+    [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
+    local previous_="${dunst_pics_}/prev.png"
+
+    file_name=$(basename "${image_}")                        
+    file_name=${file_name%.*}                                
+    [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
+
+    # if [[ $(xargs <<< ${image_}) == "info" || $(xargs <<< ${image_}) == "" ]]; then
+    image_="/tmp/.mpd-notification-artwork.png"
+    conv_image_ "${image_}" "${dunst_pics_}/cover_inter.png"
+    new_image="${dunst_pics_}/cover_inter.png"
+    # else
+    #     file_name=$(basename "${image_}")
+    #     file_name=${file_name%.*}
+    #     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
+    #     new_image="${dunst_pics_}"/"${file_name}.png"
+    #     conv_image_ "${image_}" "${new_image}"
+    # fi
+
+    # send notification with compatible image
+    if [[ ! -f "${previous_}" ]]; then
+        cp "${new_image}" "${previous_}"
+        send_notify_ 
+    else
+        local dunst_pics_list_=$(setopt nullglob dotglob; builtin print "${dunst_pics_}"/*)
+        if [[ $(compare_images_ ${new_image} "${previous_}") == "False" ]] \
+        && [[ ${#dunst_pics_list_[@]} -gt 1 ]]; then
+            cp "${new_image}" "${previous_}"
+            send_notify_ 
+        fi
+    fi
+}
+
+readonly size_=200
+
+main "$@"

@@ -1,0 +1,13 @@
+#!/bin/dash
+
+mail_dir=~/.local/mail/gmail
+c1=#fff
+ 
+colorm() {
+    echo %{F${c1}}$1%{F-}
+}
+ 
+m1=$(find $mail_dir/INBOX -type f | wc -l)
+m2=$(find $mail_dir/INBOX/new -type f | wc -l)
+
+[ $m1 != "0" ] && [ $m2 != "0" ] && echo "mail: $(colorm $m1)/$(colorm $m2)"

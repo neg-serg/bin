@@ -1,0 +1,37 @@
+#!/bin/zsh
+
+font="Pragmata Pro for Powerline"
+fontsize="17"
+act='onstart=uncollapse;button1=exit;button3=exit'
+
+fg="#a0a0a0" bg="#020202" hi="#ffffff" hi2="#3f3f3f"
+width=200 lines=8 xpos=1700 ypos=940
+
+pipe=/tmp/calendar_pipe
+
+today=$[$(date +'%d') + 0]
+month=$(date +'%m')
+year=$(date +'%Y')
+
+mm=${1:-"$month"}
+yy=${2:-"$year"}
+
+# generate calender
+if [[ "${mm}" == "${month}" && "${yy}" == "${year}" ]]; then  # current month, highlight header and date
+    cal=$(cal | sed -re "s/^(.*[A-Za-z][A-Za-z]*.*)$/^fg(${hi})\1^fg()/;s/(^|[ ])(${today})($|[ ])/\1^bg(${hi2})^fg(${hi})\2^fg()^bg()\3/")
+else  # another month, just highlight header
+    cal=$(cal "${mm}" "${yy}" | sed -re "s/^(.*[A-Za-z][A-Za-z]*.*)$/^fg(${hi})\1^fg()/")
+fi
+
+# read from pipe
+if [[ ! -e "${pipe}" ]]; then
+  mkfifo "${pipe}"
+  ( dzen2 -u -bg $bg -fg $fg -fn "${font}:pixelsize=${fontsize}" -x ${xpos} -y ${ypos} -w ${width} -l ${lines} -sa 'c' -e "$act" -title-name 'popup_calendar' < "$pipe"
+   rm -f "${pipe}") &
+fi
+
+# feed the pipe
+(
+    echo "${cal}"
+    sleep 7s
+) > "${pipe}"

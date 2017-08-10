@@ -1,0 +1,393 @@
+#!/usr/bin/env python3
+
+""" nwim runner
+
+ _ ____      _(_)_ __ ___
+| '_ \ \ /\ / / | '_ ` _ \
+| | | \ V  V /| | | | | | |
+|_| |_|\_/\_/ |_|_| |_| |_|
+
+Usage:
+  nwim.py
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+
+Created by :: Neg
+email :: <serg.zorg@gmail.com>
+github :: https://github.com/neg-serg?tab=repositories
+year :: 2017
+
+"""
+
+# --[ scripts interaction ]-------
+from psutil import net_connections
+import subprocess
+import time
+import os.path
+import errno
+
+import re
+
+# --[ shell interaction ]---------
+import shlex
+from pathlib import Path
+
+# --[ options ]-------------------
+import sys
+import docopt
+
+# --[ colors ]--------------------
+from colored import fg, bg, attr
+
+# --[ interact with redis ]-------
+import redis
+
+class pretty_printer(object):
+    def __init__(self):
+        self.darkblue=fg(4)
+        self.darkwhite=fg(7)
+        self.darkgray=fg(237)
+        self.cyberblue=fg(200)
+        self.default=fg(0)
+
+    # --[ generic string wrapper ]--
+    def wrap(self, str):
+        return self.darkblue  + "[" + self.darkwhite + str + self.darkblue + "]"
+
+    def size(self, sz):
+        return self.wrap(self.darkwhite + "sz" + self.darkgray + "~" + self.darkwhite + str(sz))
+
+    def filelen(self, len):
+        return self.wrap(self.darkwhite + "len" + self.darkgray + "=" + self.darkwhite + str(len))
+
+    def newfile(self, filename):
+        return self.wrap(filename)
+
+    def dir(self, filename):
+        return self.wrap(filename)
+
+    def prefix(self):
+        return self.wrap(">>")
+
+    def delim(self):
+        return (self.cyberblue + " :: " + self.default)
+
+    # --[ pretty printing for filename ]---------------------------
+    def fancy_file(self, filename):
+        filename=re.sub(os.environ["HOME"], fg(2) + "~" + fg(7), filename)
+        filename=re.sub("/", fg(4) + "/" + fg(7), filename)
+        return self.wrap(filename)
+
+# --[ file info printer ] -----------------------------------------
+class file_info_printer(object):
+    def __init__(self):
+        self.printer=pretty_printer()
+
+    # --[ counting with external wc is faster than everything else ]--
+    def wccount(self, filename):
+        out = subprocess.Popen(
+            ['wc', '-l', filename],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        ).communicate()[0]
+
+        return int(out.partition(b' ')[0])
+
+    def nonexistsfile(self, filename):
+        print(
+            self.printer.prefix() + \
+            self.printer.fancy_file(filename) + \
+            self.printer.delim() + \
+            self.printer.newfile(filename)
+        )
+
+    def existsfile(self, filename):
+        print(
+            self.printer.prefix() + \
+            self.printer.fancy_file(filename) + \
+            self.printer.delim() + \
+            self.printer.size(os.stat(filename).st_size) + \
+            self.printer.delim() + \
+            self.printer.filelen(self.wccount(filename))
+        )
+
+    def currentdir(self, filename):
+        print(
+            self.printer.prefix() + \
+            self.printer.wrap("current dir") + \
+            self.printer.delim() + \
+            self.printer.dir(filename)
+        )
+
+    def dir(self, filename):
+        print(
+            self.printer.prefix() + \
+            self.printer.fancy_file(filename) + \
+            self.printer.delim() + \
+            self.printer.dir(filename)
+        )
+
+class wim_runner(object):
+    def __init__(self):
+        self.settings={
+            "use_neovim":True,
+            "debug":False,
+        }
+
+        self.font="PragmataPro for Powerline"
+        self.fsize=20
+
+        self.unix_connections=net_connections(kind='unix')
+        self.sock_path=os.path.realpath(os.path.expandvars("$HOME/1st_level/nvim.socket"))
+        self.tmux_sock_path=os.path.realpath(os.path.expandvars("$HOME/1st_level/tmux_nvim.socket"))
+
+        self.args=sys.argv
+
+        if Path(self.sock_path).exists() and \
+        (list(filter(lambda i: i.laddr == self.sock_path, self.unix_connections)) == []):
+            os.remove(self.sock_path)
+
+        os.environ["NVIM_LISTEN_ADDRESS"]=self.sock_path
+
+        self.vim_commands={
+            "to_normal": "<C-\><C-N>:call<SPACE>foreground()<CR>",
+            "dir": "-c 'doautocmd BufEnter'",
+            "rsend":" --remote-send ",
+            "rwait":" --remote-tab-wait ",
+        }
+
+        self.default_cmd=self.vim_commands["rsend"]
+
+        self.timeout=.05
+
+        self.r=redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.cmd=""
+
+        if self.settings["use_neovim"]:
+            self.wim_name="nwim"
+        else:
+            self.wim_name="wim"
+
+        self.printer=file_info_printer()
+
+    def dprint(self, debug_string):
+        if self.settings["debug"]:
+            print(debug_string)
+
+    def dprint_with_args(self, debug_string):
+        def print_args(args):
+            self.dprint("[::] Printing args [::]")
+            for arg in args:
+                self.dprint("{ "+ arg +" }")
+
+        self.dprint("[ " + debug_string + " ]")
+        print_args(self.args)
+
+    def tmux_socket_is_in_use_(self):
+        return bool(list(filter(lambda i: i.laddr == self.tmux_sock_path, self.unix_connections)) != [])
+
+    def no_wim_x11_win_(self):
+        ret_=True
+        count_=(int(self.r.hmget('count_dict', 'wim')[0]))
+        if count_ > 0:
+            ret_=False
+        return ret_
+
+    # --[ print x11 windows hierarchy ]--
+    def print_windows(self, window, indent):
+        wins = window.query_tree().children
+        for win in wins:
+            self.dprint(indent, window.get_wm_class())
+            print_windows(win, indent+'-')
+
+    # --[ goto neovim window ]--
+    def wim_goto(self):
+        def there_is(wm_):
+            if not "DISPLAY" in os.environ:
+                return False
+            else:
+                pipe = subprocess.Popen('pidof {}'.format(wm_).split(), stdout=subprocess.PIPE)
+                pid, _ = pipe.communicate()
+                return pid != b''
+
+        if there_is("notion"):
+            self.dprint("[notion] :: go to win with it")
+            p=subprocess.Popen(["notionflux", "-e", "app.byclass('', '{}')".format(self.wim_name)], stdout=open(os.devnull, 'w'))
+        elif there_is("i3"):
+            self.dprint("[i3] :: go to win with it")
+            p=subprocess.Popen(["i3-msg", '[instance={}]'.format(self.wim_name), "focus"],
+                             stdout=open(os.devnull, 'w'),
+                             stderr=open(os.devnull, 'w')
+            )
+
+    # --[ check wim started or not by internal variable in nvim ]--------
+    def wim_is_started(self):
+        ret=remote_expr_pipe = subprocess.Popen(
+            shlex.split(""" nvr --remote-expr "printf(\\"%s\\", g:nvim_is_started)" """),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        ).communicate()[0].decode("utf-8").strip('\n')
+        self.dprint("nwim_started=[{}]".format(ret))
+        return ret == "on"
+
+    # --[ wait for run ]-------------------------------------------------
+    def wait_for_run(self):
+        while not len(self.nwim_wid_()):
+            self.dprint("wait st from scratch run")
+            time.sleep(self.timeout)
+        while not self.wim_is_started():
+            self.dprint("wait for nvim")
+            time.sleep(self.timeout)
+
+    # --[ it is the main function in the past, not sure for now ]--------
+    def V(self):
+        self.dprint_with_args("Run V")
+        del self.args[0]
+        self.wait_for_run()
+        self.dprint("wim is started")
+        self.wim_run()
+        self.wim_goto()
+
+    # It seems that only bash quoting works correctly
+    # Probably this stuff should be replaced with encodef and friends
+    def quotestr(self, string):
+        quoted_string=subprocess.Popen(
+            shlex.split("bash -c \"printf %q '" + string + "'\""),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        ).communicate()[0].decode("utf-8").strip('\n')
+        return quoted_string
+
+
+    # --[ Open file in daemon and print nice file info ]----------------------
+    # --[ Main function with several closures ]-------------------------------
+    def vim_file_open(self, line):
+        def remote_edit_file(filename, file):
+            # --[ helper for remote_send ]---------------------------------[1]
+            def remote_edit_file_():
+                self.dprint("[remote edit file]")
+                return subprocess.Popen(
+                    shlex.split(
+                        "nvr " + prefix_cmd + self.default_cmd + \
+                        "\"" + \
+                        self.vim_commands["to_normal"] + \
+                        ":silent edit " + \
+                        self.quotestr(filename) + \
+                        "<CR>" + \
+                        self.cmd + \
+                        "\""
+                    ),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT
+                )
+
+            prefix_cmd=""
+            if file.is_dir():
+                prefix_cmd+=self.vim_commands["dir"]
+
+            self.dprint("[remote send]")
+            if remote_edit_file_().returncode != 0:
+                remote_edit_file_()
+
+        def mainproc():
+            filename=os.path.normpath(os.path.realpath(line))
+
+            # --[ normalize path ]-----------------------------------------
+            file=Path(filename)
+
+            # Open target file / dir
+            remote_edit_file(filename, file)
+
+            if not file.exists():
+                self.printer.nonexistsfile(filename)
+            elif file.is_file() and not file.is_dir():
+                self.printer.existsfile(filename)
+            elif file.is_dir():
+                if filename == os.getcwd():
+                    self.printer.currentdir(filename)
+                else:
+                    self.printer.dir(filename)
+
+        try:
+            mainproc()
+        except:
+            pass
+
+    def process_list(self):
+        self.wim_goto()
+
+        self.cmd=self.vim_commands["to_normal"]
+
+        if self.cmd == self.vim_commands["to_normal"]:
+            for line in self.args:
+                self.vim_file_open(line)
+        else:
+            wim=subprocess.Popen(
+                shlex.split("nvr " + self.default_cmd + self.cmd),
+                stdout=subprocess.PIPE
+            )
+
+            for line in self.args:
+                self.vim_file_open(line)
+
+    def eprocess_list(self):
+        for line in self.args:
+            self.cmd="nvr " + self.default_cmd + line
+            subprocess.call(shlex.split(self.cmd))
+
+    def wim_run(self):
+        if self.mode == "default":
+            proc=self.process_list
+        elif self.mode == "embedded":
+            self.default_cmd=self.vim_commands["rwait"]
+            proc=self.eprocess_list
+
+        if len(self.args):
+            proc()
+
+    def attach_term_to_tmux_if_needed(self):
+        if self.tmux_socket_is_in_use_() and self.no_wim_x11_win_():
+            # do not wait for call result
+            # x11 window is closed, but tmux connection exists
+            subprocess.Popen([
+                "st",
+                "-f", "{}:pixelsize={}".format(self.font, self.fsize),
+                "-c", "{}".format(self.wim_name),
+                "-e", "tmux", "-S", self.tmux_sock_path, "attach-session", "-d", "-t", "nvim"
+            ])
+
+    def nwim_wid_(self):
+        return subprocess.Popen(
+            'xdotool search --classname {}'.format(self.wim_name).split(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        ).communicate()[0].decode("utf-8").strip('\n')
+
+    def create_nvim_server_if_needed(self):
+        wim=subprocess.Popen(
+            shlex.split("st " + "-f '{}:pixelsize={}' ".format(self.font, self.fsize) + \
+                        "-c " + self.wim_name + " -e sh -c \"tmux -S " + self.tmux_sock_path + \
+                        " new -s nvim -n nvim nvim\""), stdout=subprocess.PIPE)
+
+        while not len(self.nwim_wid_()):
+            self.dprint("wait st from scratch run")
+            time.sleep(self.timeout)
+
+    def main(self, mode="default"):
+        self.mode=mode
+
+        if not self.tmux_socket_is_in_use_():
+            self.create_nvim_server_if_needed()
+        self.attach_term_to_tmux_if_needed()
+
+        self.V()
+
+if __name__ == '__main__':
+    run_=wim_runner()
+
+    if "NWIM_STANDALONE" in os.environ and os.environ["NWIM_STANDALONE"]:
+        run_.main("embedded")
+    else:
+        run_.main()

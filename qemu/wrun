@@ -1,0 +1,131 @@
+#!/bin/zsh
+
+# Script to run windows 10 with geforce 980gtx gpu ;)
+
+function main(){
+    [[ $(id -u) != "0" ]] && echo "Should be runned from root" && exit 0
+
+    local user_=neg
+    local home_=/home/${user_}
+    local disk_name="w10"
+    local win10_iso="${home_}/1st_level/iso/en_windows_10_education_version_1607_updated_jul_2016_x64_dvd_9055880.iso"
+    local virtio_iso="${home_}/1st_level/iso/virtio-win-0.1.137.iso"
+    local smb_path="/mnt/qemu"
+    local qmp_socket_path="${home_}/1st_level/qmp.socket"
+    local qmp_sh_script="${home_}/bin/scripts/qmp/qmp-shell"
+    local install_iso="${win10_iso}"
+
+    local amount_of_mem_="$(free -m|awk '/Mem/{print $2}')"
+    local log_="$(builtin print "l(${amount_of_mem_})/l(2)" | bc -l)"
+    local mem_="$(builtin print "(${log_}+0.5)/1" | bc)"
+    local vm_memory="$(builtin print "2^${mem_}/2.0" | bc -l | xargs printf "%1.0f")"
+    local hugepagesize="$(awk '/Hugepagesize/{print $2}' /proc/meminfo)"
+    local hugepages_amount=$(printf '%.0f00\n' "$[${vm_memory}*1024./${hugepagesize}*1.075/100]")
+
+    local lscpu_info=("$(lscpu)")
+    local sockets_amount_="$(awk -F: '/Socket/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
+    local cores_amount_="$(awk -F: '/per socket/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
+    local threads_amount_="$(awk -F: '/Thread/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
+
+    local -a qemu_params=(
+        -enable-kvm
+        -m "${vm_memory}"
+        -smp sockets="${sockets_amount_}",cores="${cores_amount_}",threads="${threads_amount_}"
+        -cpu host,kvm=off
+        -device virtio-scsi-pci,id=scsi
+        -drive if=pflash,format=raw,readonly,file=/one/vm/ovmf_code_x64.bin
+        -drive if=pflash,format=raw,file=/one/vm/ovmf_vars_x64.bin
+        -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
+        -serial none
+        -parallel none
+        -balloon none # Windows wont support it
+    )
+
+    local -a qemu_source_params=(
+        -drive file="${install_iso},index=0,media=cdrom"
+        -drive file="${virtio_iso},index=1,media=cdrom"
+        -boot menu=on
+    )
+
+    local -a qemu_vga_none=(
+        -nographic
+        -vga none
+    )
+
+    local -a qemu_vga_spice=(
+        -vga qxl -spice port=5900,addr=127.0.0.1,disable-ticketing
+    )
+
+    local -a qemu_pass_video=(
+        -device vfio-pci,host=01:00.0,multifunction=on
+        -device vfio-pci,host=01:00.1
+    )
+
+    local -a qemu_pass_input=(
+        -usb
+        -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+        -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
+    )
+    # -usb
+    # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+    # -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
+    # -usbdevice host:1e7d:2e22 # Roccat kone rtd [ Mouse ]
+
+    local -a qemu_emulated_sound=(
+        -soundhw ac97
+    )
+
+    local -a qemu_share=(
+        -net nic -net user,smb="${smb_path}"
+    )
+
+    local -a qemu_separated_console=(
+        -qmp unix:"${qmp_socket_path}",server --monitor stdio \
+        "${qmp_sh_script}" "${qmp_socket_path}"
+    )
+
+    local -a qemu_network=(
+        -net nic -net tap,ifname=tap0,script=/home/neg/bin/qemu/qemu-ifup,downscript=/home/neg/bin/qemu/qemu-ifdown
+    )
+
+    local -a qemu_hugepages_stuff=(
+        -mem-prealloc 
+        -mem-path /dev/hugepages
+    )
+
+    if [[ ! $(pidof synergyc) ]]; then
+        sudo -u neg "synergy" > /dev/null &! print "Autostart synergy"
+    fi
+
+    # Setup hugepages
+    sudo sysctl -w vm.nr_hugepages="${hugepages_amount}"
+
+    QEMU_AUDIO_TIMER_PERIOD=150 \
+    QEMU_PA_SAMPLES=1024 \
+    QEMU_PA_SERVER=localhost \
+    PULSE_SERVER=localhost \
+    QEMU_AUDIO_DRV=pa \
+    qemu-system-x86_64 "${qemu_params[@]}" \
+        "${qemu_vga_none[@]}" \
+        "${qemu_emulated_sound[@]}" \
+        "${qemu_pass_video[@]}" \
+        "${qemu_pass_input[@]}" \
+        "${qemu_network[@]}" \
+        "${qemu_hugepages_stuff[@]}"
+
+    # Restore settings
+    killall synergy # Kill synergy client
+    killall synergyc # Kill synergy server
+    sudo sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
+    setxkbmap \
+        -option keypad:pointerkeys \
+        -layout 'us,ru' \
+        -option 'grp:alt_shift_toggle' \
+        -variant altgr-intl \
+        -option ctrl:nocaps
+
+    xset m 0 0 # Revert mouse settings
+    xset -b r rate 250 50 # Revert keyboard rate
+}
+
+main "$@"
