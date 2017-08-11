@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-sleep 0.05s
-xdotool key "Super+space" # force dunst to cleanup notification query
-sleep 0.05s
+# force dunst to cleanup notification query
+xdotool search --onlyvisible --class 'Dunst' \
+    | xargs -I{} xdotool  key "Super+space"
 
 summary_="$2" body_="$3" image_="$4" urgency_="$5"
 
