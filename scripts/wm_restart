@@ -37,6 +37,17 @@ function i3_restart(){
         wait_a_bit
         notify-send "[${wm_}] reload"
         i3-msg reload
+        sleep 3s
+
+        ps aux \
+            | grep python \
+            | grep i3 \
+            | awk '{print $2}' \
+            | xargs kill
+        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/disable-standby-fs.py"
+        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/nsd.py"
+        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/circled.py"
+        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/flastd.py"
     else
         i3::common_restart
         wait_a_bit
