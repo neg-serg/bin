@@ -95,8 +95,11 @@ function send_notify_(){
 function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
 
 zshexit() { 
-    { sleep ${timeout_} && rm -f "${new_image}" } &
-    { sleep 900s && find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
+    do_cleanup=false
+    if [[ $do_cleanup == true ]]; then
+        { sleep ${timeout_} && rm -f "${new_image}" } &
+        { sleep 900s && find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
+    fi
 }
 
 function main(){
