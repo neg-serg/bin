@@ -1,5 +1,9 @@
 #!/bin/zsh
 
+sleep 0.05s
+xdotool key "Super+space" # force dunst to cleanup notification query
+sleep 0.05s
+
 summary_="$2" body_="$3" image_="$4" urgency_="$5"
 
 # There is no need to convert size of something anymore ...
@@ -57,10 +61,10 @@ function send_notify_(){
     length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
     length_=${(@)length_[1]}
 
-    bodyarr_[1]=$(wf_ '')"${bodyarr_[1]}\n"
-    bodyarr_[2]=$(wf_ '')"${bodyarr_[2]}\n"
-    bodyarr_[3]=$(wf_ '》')"${bodyarr_[3]}\n"
-    bodyarr_[4]=$(wf_ '')"${bodyarr_[4]}\n"
+    [[ ${bodyarr_[1]} != "" ]] && bodyarr_[1]=$(wf_ '')"${bodyarr_[1]}\n" || bodyarr_[1]="\n"
+    [[ ${bodyarr_[2]} != "" ]] && bodyarr_[2]=$(wf_ '')"${bodyarr_[2]}\n" || bodyarr_[2]="\n"
+    [[ ${bodyarr_[3]} != "" ]] && bodyarr_[3]=$(wf_ '》')"${bodyarr_[3]}\n" || bodyarr_[3]="\n"
+    [[ ${bodyarr_[4]} != "" ]] && bodyarr_[4]=$(wf_ '')"${bodyarr_[4]}\n" || bodyarr_[4]="\n"
 
     current_file="$(mpc -f '%file%'|head -1)"
     mpd_music_dir="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
@@ -78,12 +82,18 @@ function send_notify_(){
     esac
     file_enc="${file_enc}:$(awk -F': ' '/Precision/{print $2}' <<< ${sox_metadata})"
 
-    bodyarr_[5]=$(wf_ '')"${file_enc}\n"
-    bodyarr_[6]=$(wf_ '')"${albumdetails_metadata}\n"
+    [[ ${file_enc} != "" ]] && \
+        bodyarr_[5]=$(wf_ '')"${file_enc}\n" || \
+        bodyarr_[5]="\n"
+    [[ ${albumdetails_metadata} != "" ]] && \
+        bodyarr_[6]=$(wf_ '')"${albumdetails_metadata}\n" || \
+        bodyarr_[6]="\n"
 
     local output
-    for i in ${bodyarr_[@]}; do 
-        output="${output}${i}" 
+    for i in ${bodyarr_[@]}; do
+        if [[ ${i} != "\n" ]]; then
+            output="${output}${i}"
+        fi
     done
 
     summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
@@ -96,7 +106,7 @@ function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
 
 zshexit() { 
     do_cleanup=false
-    if [[ $do_cleanup == true ]]; then
+    if [[ ${do_cleanup} == true ]]; then
         { sleep ${timeout_} && rm -f "${new_image}" } &
         { sleep 900s && find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
     fi
@@ -114,17 +124,9 @@ function main(){
     file_name=${file_name%.*}                                
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
 
-    # if [[ $(xargs <<< ${image_}) == "info" || $(xargs <<< ${image_}) == "" ]]; then
     image_="/tmp/.mpd-notification-artwork.png"
     conv_image_ "${image_}" "${dunst_pics_}/cover_inter.png"
     new_image="${dunst_pics_}/cover_inter.png"
-    # else
-    #     file_name=$(basename "${image_}")
-    #     file_name=${file_name%.*}
-    #     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
-    #     new_image="${dunst_pics_}"/"${file_name}.png"
-    #     conv_image_ "${image_}" "${new_image}"
-    # fi
 
     # send notification with compatible image
     if [[ ! -f "${previous_}" ]]; then
