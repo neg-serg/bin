@@ -37,8 +37,6 @@ function i3_restart(){
         wait_a_bit
         notify-send "[${wm_}] reload"
         i3-msg reload
-        sleep 3s
-
         ps aux \
             | grep python \
             | grep i3 \
