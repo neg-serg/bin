@@ -63,7 +63,7 @@ function send_notify_(){
         ${#bodyarr_[6]}
     )
     length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
-    length_=${(@)length_[1]}
+    length_=$[${(@)length_[1]}-4]
 
     [[ ${bodyarr_[1]} != "" ]] && bodyarr_[1]=$(wf_ '')"${bodyarr_[1]}\n" || bodyarr_[1]="\n"
     [[ ${bodyarr_[2]} != "" ]] && bodyarr_[2]=$(wf_ '')"${bodyarr_[2]}\n" || bodyarr_[2]="\n"
