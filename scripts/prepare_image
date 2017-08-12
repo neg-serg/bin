@@ -1,13 +1,5 @@
 #!/bin/zsh
 
-# force dunst to cleanup notification query
-while [[ $(xdotool search --onlyvisible --class 'Dunst') != "" ]]; do
-    xdotool search --onlyvisible --class 'Dunst' \
-        | xargs -I{} sh -c 'xdotool key "Super+space" && sleep 0.05'
-    xdotool search --onlyvisible --class 'Dunst' \
-        | xargs -I{} sh -c 'xdotool key "Super+space" && sleep 0.05'
-done
-
 summary_="$2" body_="$3" image_="$4" urgency_="$5"
 
 # There is no need to convert size of something anymore ...
@@ -103,7 +95,9 @@ function send_notify_(){
     summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
     output="\n${output}$(get_lastfm_)\n\n${summary_}"
 
-    notify-send -a "prepare_image" -u "${urgency_}" -i "${new_image}" "${summary_}" "${output}"  
+    notify-send -a "prepare_image" -u "${urgency_}" -i "${new_image}" "${summary_}" "${output}"
+
+    sleep 1s && exit 0
 }
 
 function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
@@ -117,8 +111,15 @@ zshexit() {
 }
 
 function main(){
+    # force dunst to cleanup notification query
+    while [[ $(xdotool search --onlyvisible --class 'Dunst') != "" ]]; do
+        xdotool search --onlyvisible --class 'Dunst' \
+            | xargs -I{} sh -c 'xdotool key "Super+space"' && sleep 0.05
+        xdotool search --onlyvisible --class 'Dunst' \
+            | xargs -I{} sh -c 'xdotool key "Super+space"' && sleep 0.05
+    done
+
     timeout_=40
-    tiny_timeout=0.4
 
     dunst_pics_="/tmp/dunst-images"
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
