@@ -46,14 +46,8 @@ function send_notify_(){
         c=$[c+1]
     done <<< ${body_}
 
-    length_=(
-        ${#bodyarr_[1]} 
-        ${#bodyarr_[2]}
-        ${#bodyarr_[3]}
-        ${#bodyarr_[4]}
-        ${#bodyarr_[5]}
-        ${#bodyarr_[6]}
-    )
+    length_=()
+    for i in {1..6}; length_+=${#bodyarr_[$i]};
     length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
     length_=$[${(@)length_[1]}-4]
 
@@ -103,10 +97,10 @@ function send_notify_(){
 function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
 
 zshexit() { 
-    do_cleanup=false
+    do_cleanup=true
     if [[ ${do_cleanup} == true ]]; then
         { sleep ${timeout_} && rm -f "${new_image}" } &
-        { sleep 900s && find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
+        { find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
     fi
 }
 
