@@ -96,22 +96,17 @@ function send_notify_(){
 
 function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
 
-zshexit() { 
-    do_cleanup=true
-    if [[ ${do_cleanup} == true ]]; then
-        { sleep ${timeout_} && rm -f "${new_image}" } &
-        { find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete } &
-    fi
-}
-
 function main(){
     # force dunst to cleanup notification query
     while [[ $(xdotool search --onlyvisible --class 'Dunst') != "" ]]; do
         xdotool search --onlyvisible --class 'Dunst' \
-            | xargs -I{} sh -c 'xdotool key "Super+space"' && sleep 0.01
+            | xargs -I{} sh -c 'xdotool key "Super+space"'
+        do_cleanup=true
+        [[ ${do_cleanup} == true ]] && {
+            rm -f "${new_image}"
+            find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
+        } &
     done
-
-    timeout_=40
 
     dunst_pics_="/tmp/dunst-images"
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
