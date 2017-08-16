@@ -62,14 +62,14 @@ function main(){
     )
 
     local -a qemu_pass_input=(
-        -usb
-        -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+        -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
         -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
     )
     # -usb
     # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
     # -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
     # -usbdevice host:1e7d:2e22 # Roccat kone rtd [ Mouse ]
+    # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
 
     local -a qemu_emulated_sound=(
         -soundhw ac97
