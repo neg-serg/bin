@@ -109,15 +109,15 @@ function send_notify(){
 }
 
 function main(){
+    dunst_x11_class="$(grep class ${XDG_CONFIG_HOME}/dunst/dunstrc|awk -F '=' '{print $2}'|tr -d '[[:space:]]')"
     # force dunst to cleanup notification query
-    while [[ $(xdotool search --onlyvisible --class 'Dunst') != "" ]]; do
-        xdotool search --onlyvisible --class 'Dunst' \
+    while [[ $(xdotool search --onlyvisible --class "${dunst_x11_class}") != "" ]]; do
+        xdotool search --onlyvisible --class "${dunst_x11_class}" \
             | xargs -I{} sh -c 'xdotool key "Super+space"'
-        do_cleanup=true
-        [[ ${do_cleanup} == true ]] && {
+        {
             rm -f "${new_image}"
             find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
-        } &
+        }
     done
 
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
