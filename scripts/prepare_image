@@ -109,7 +109,7 @@ function send_notify(){
 }
 
 function main(){
-    dunst_x11_class="$(grep class ${XDG_CONFIG_HOME}/dunst/dunstrc|awk -F '=' '{print $2}'|tr -d '[[:space:]]')"
+    dunst_x11_class="$(< ${XDG_CONFIG_HOME}/dunst/dunstrc awk -F '=' '/class/{print $2}'|tr -d '[[:space:]]')"
     # force dunst to cleanup notification query
     while [[ $(xdotool search --onlyvisible --class "${dunst_x11_class}") != "" ]]; do
         xdotool search --onlyvisible --class "${dunst_x11_class}" \
