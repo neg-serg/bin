@@ -5,12 +5,6 @@ summary_="$2" body_="$3" urgency_="$5"
 dunst_pics_="/tmp/dunst-images"
 cover_lock="${dunst_pics_}/notify.lock"
 
-# There is no need to convert size of something anymore ...
-function conv_image_(){ 
-    convert -resize ${size_} "$1" "$2" 2>/dev/null 
-    cp "$2" "/tmp/dunst-images/audio-x-generic.png"
-}
-
 function wf_(){
     builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_} "
 }
@@ -97,7 +91,7 @@ function send_notify_(){
     summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
     output="\n${output}$(get_lastfm_)\n\n${summary_}"
 
-    notify-send -a "prepare_image" -u "${urgency_}" -i "${new_image}" "${summary_}" "${output}"
+    notify-send -a "prepare_image" -u "${urgency_}" -i "${image_}" "${summary_}" "${output}"
     echo "${body_}" > "${cover_lock}"
 }
 
@@ -119,11 +113,8 @@ function main(){
     while [[ $(xdotool search --onlyvisible --class "${dunst_x11_class}") != "" ]]; do
         xdotool search --onlyvisible --class "${dunst_x11_class}" \
             | xargs -I{} sh -c 'xdotool key "Super+space"'
-        {
-            rm -f "${new_image}"
-            find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
-        }
     done
+    find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
 
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
     local previous_="${dunst_pics_}/prev.png"
@@ -131,24 +122,20 @@ function main(){
     image_="/tmp/.mpd-notification-artwork.png"
     if [[ -f ${image_} ]]; then
         [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
-        conv_image_ "${image_}" "${dunst_pics_}/cover_inter.png"
-        new_image="${dunst_pics_}/cover_inter.png"
 
         # send notification with compatible image
         if [[ ! -f "${previous_}" ]]; then
-            cp "${new_image}" "${previous_}"
+            cp "${image_}" "${previous_}"
             send_notify
         else
             local dunst_pics_list_=$(setopt nullglob dotglob; builtin print "${dunst_pics_}"/*)
-            if [[ $(compare_images_ ${new_image} "${previous_}") == "False" ]] \
+            if [[ $(compare_images_ ${image_} "${previous_}") == "False" ]] \
             && [[ ${#dunst_pics_list_[@]} -gt 1 ]]; then
-                cp "${new_image}" "${previous_}"
+                cp "${image_}" "${previous_}"
                 send_notify
             fi
         fi
     fi
 }
-
-readonly size_=200
 
 main "$@"
