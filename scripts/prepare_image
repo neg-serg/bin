@@ -82,11 +82,7 @@ function send_notify_(){
         bodyarr_[6]="\n"
 
     local output
-    for i in ${bodyarr_[@]}; do
-        if [[ ${i} != "\n" ]]; then
-            output="${output}${i}"
-        fi
-    done
+    for i in ${bodyarr_[@]}; [[ ${i} != "\n" ]] && output="${output}${i}"
 
     summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
     output="\n${output}$(get_lastfm_)\n\n${summary_}"
@@ -95,7 +91,10 @@ function send_notify_(){
     echo "${body_}" > "${cover_lock}"
 }
 
-function compare_images_(){ ~/bin/scripts/compare_images.py "$1" "$2" }
+function compare_images_(){ 
+    ${HOME}/bin/scripts/compare_images.py "$1" "$2" \
+        || builtin print "False"
+}
 
 function send_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
@@ -105,6 +104,7 @@ function send_notify(){
             send_notify_
         fi
     fi
+    cp "${image_}" "${prev_}"
 }
 
 function main(){
@@ -114,24 +114,24 @@ function main(){
         xdotool search --onlyvisible --class "${dunst_x11_class}" \
             | xargs -I{} sh -c 'xdotool key "Super+space"'
     done
-    find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
 
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
-    local previous_="${dunst_pics_}/prev.png"
+    prev_="${dunst_pics_}/prev.png"
 
+    find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
     image_="/tmp/.mpd-notification-artwork.png"
+
     if [[ -f ${image_} ]]; then
         [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
 
         # send notification with compatible image
-        if [[ ! -f "${previous_}" ]]; then
-            cp "${image_}" "${previous_}"
+        if [[ ! -f "${prev_}" ]]; then
             send_notify
         else
             local dunst_pics_list_=$(setopt nullglob dotglob; builtin print "${dunst_pics_}"/*)
-            if [[ $(compare_images_ ${image_} "${previous_}") == "False" ]] \
+            local cmp_result="$(compare_images_ ${image_} "${prev_}")"
+            if [[ ${cmp_result} == "False" ]] \
             && [[ ${#dunst_pics_list_[@]} -gt 1 ]]; then
-                cp "${image_}" "${previous_}"
                 send_notify
             fi
         fi
