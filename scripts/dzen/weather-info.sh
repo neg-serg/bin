@@ -1,5 +1,7 @@
 #/bin/zsh
 
+curl -X GET --silent "https://api.forecast.io/forecast/26611d19995c5fec79ad67e88cba6b6b/55.7522603,48.7445774" > ~/tmp/forecast.json
+
 FG='#dcdcdc'
 BG='#000000'
 fg_title="#abd4e2"
