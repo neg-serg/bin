@@ -13,6 +13,8 @@ from gi.repository import GdkPixbuf
 import lxml.html
 from lxml import etree
 
+import subprocess
+
 # Getting the path of all the boxes
 with open(expanduser("~/.mutt/mailboxes"), 'r') as fd:
     boxes=[expanduser(f[1:-1]) for f in re.findall('"[^"]+"', fd.readline()[10:])]
@@ -45,7 +47,6 @@ def newfile(event):
         elif part.get_content_type() == 'text/plain':
             text = decode_str(' '.join(part.get_payload().split('\n')) + "\n")
             ret = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
-            # text = str(msg.get_payload(decode=True),msg.get_content_charset(),'ignore')
             return ret.strip()
 
     def decode_str(string):
@@ -56,20 +57,35 @@ def newfile(event):
 
     fd = open(event.pathname, 'r')
     mail = MaildirMessage(message=fd)
-    From = "[From]: " + decode_field('From')
-    Subject = "[Subject]: " + decode_field('Subject')
-    Date = "[Date]: " + decode_field('Date')
+
+    def highlight_(s, color_num=4):
+        out = subprocess.Popen(
+            ['xrq', 'color'+str(color_num)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        ).communicate()[0]
+        color_=out.decode()[:-1]
+        return "<span weight='bold' color='" + color_  +"'>" + s + "</span>"
+
+    def wrap_(s, lhs=" ", rhs="  "):
+        return highlight_(lhs) + s + highlight_(rhs) + "≫ "
+
+    From = wrap_("From") + decode_field('From').replace('<', '[').replace('>', ']')
+    Subject = wrap_("Subject") + decode_field('Subject')
+    Date = wrap_("Date") + decode_field('Date')
+
     Payload = ""
     if want_payload:
         Payload = "[Text]: " + get_text(mail)[0:2]
-    n = notify2.Notification("New mail in " +
-                             '/'.join(event.path.split('/')[-3:-1]), From + "\n" +
-                             Subject + Payload + "\n" + Date)
-    fd.close()
+    mail_path = "New mail in " + '/'.join(event.path.split('/')[-3:-1])
+    if "INBOX" in mail_path:
+        n = notify2.Notification(mail_path, From + "\n" +
+                                Subject + Payload + "\n" + Date)
+        n.set_icon_from_pixbuf(icon)
+        n.set_timeout(12000)
+        n.show()
 
-    n.set_icon_from_pixbuf(icon)
-    n.set_timeout(12000)
-    n.show()
+    fd.close()
 
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm, newfile)
