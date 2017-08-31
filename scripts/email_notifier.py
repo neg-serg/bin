@@ -68,16 +68,18 @@ def newfile(event):
         return "<span weight='bold' color='" + color_  +"'>" + s + "</span>"
 
     def wrap_(s, lhs=" ", rhs="  "):
-        return highlight_(lhs) + s + highlight_(rhs) + "≫ "
+        return highlight_(lhs) + s + highlight_(rhs) + highlight_("≫ ", color_num=2)
 
-    From = wrap_("From") + decode_field('From').replace('<', '[').replace('>', ']')
+    From = wrap_("From") + decode_field('From') \
+        .replace('<', '[') \
+        .replace('>', ']')
     Subject = wrap_("Subject") + decode_field('Subject')
     Date = wrap_("Date") + decode_field('Date')
 
     Payload = ""
     if want_payload:
         Payload = "[Text]: " + get_text(mail)[0:2]
-    mail_path = "New mail in " + '/'.join(event.path.split('/')[-3:-1])
+    mail_path = highlight_("new mail") + highlight_(" in ",color_num=2) + '/'.join(event.path.split('/')[-3:-1])
     if "INBOX" in mail_path:
         n = notify2.Notification(mail_path, From + "\n" +
                                 Subject + Payload + "\n" + Date)
