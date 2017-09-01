@@ -25,30 +25,6 @@ notify2.init('email_notifier.py')
 icon = GdkPixbuf.Pixbuf.new_from_file("/usr/share/icons/Lüv/actions/24/mail-mark-unread-new.svg")
 
 def newfile(event):
-    want_payload=0
-    def get_text(msg):
-        text = ""
-        if msg.is_multipart():
-            html = None
-            for part in msg.get_payload():
-                if part.get_content_charset() is None:
-                    charset = chardet.detect(str(part))['encoding']
-                else:
-                    charset = part.get_content_charset()
-                if part.get_content_type() == 'text/plain':
-                    text = decode_str(' '.join(part.get_payload().split('\n')) + "\n")
-                if part.get_content_type() == 'text/html':
-                    html = str(part.get_payload(decode=True),str(charset),"ignore")
-            if html is None:
-                return text.strip()
-            else:
-                msg_data = lxml.html.document_fromstring(html.strip())
-                return str("\n".join(etree.XPath("//text()")(msg_data)))
-        elif part.get_content_type() == 'text/plain':
-            text = decode_str(' '.join(part.get_payload().split('\n')) + "\n")
-            ret = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
-            return ret.strip()
-
     def decode_str(string):
         return str(make_header(decode_header(string)))
 
@@ -58,7 +34,7 @@ def newfile(event):
     fd = open(event.pathname, 'r')
     mail = MaildirMessage(message=fd)
 
-    def highlight_(s, color_num=4):
+    def hi_(s, color_num=4):
         out = subprocess.Popen(
             ['xrq', 'color'+str(color_num)],
             stdout=subprocess.PIPE,
@@ -68,25 +44,26 @@ def newfile(event):
         return "<span weight='bold' color='" + color_  +"'>" + s + "</span>"
 
     def wrap_(s, lhs=" ", rhs="  "):
-        return highlight_(lhs) + s + highlight_(rhs) + highlight_("≫ ", color_num=2)
+        return hi_(lhs) + s + hi_(rhs) + hi_("≫ ", color_num=2)
 
-    From = wrap_("From") + decode_field('From') \
-        .replace('<', highlight_('[')) \
-        .replace('>', highlight_(']'))
+    from_data = decode_field('From') \
+        .replace('<', '[') \
+        .replace('>', ']') \
+        .replace('[', hi_('[')) \
+        .replace(']', hi_(']'))
+        .replace('@', hi_(']',color_num=2))
+    From = wrap_("From") + from_data
     Subject = wrap_("Subject") + decode_field('Subject')
     Date = wrap_("Date") + decode_field('Date')
 
-    Payload = ""
-    if want_payload:
-        Payload = "[Text]: " + get_text(mail)[0:2]
-    mail_path = highlight_("New mail", color_num=6) + \
-        highlight_(" in ",color_num=2) + \
-        highlight_('/', color_num=2).join(event.path.split('/')[-3:-1])
+    mail_path = hi_("New mail", color_num=6) + \
+        hi_(" in ",color_num=2) + \
+        hi_('/',color_num=2).join(event.path.split('/')[-3:-1])
     if "INBOX" in mail_path:
         n = notify2.Notification(mail_path, From + "\n" +
-                                Subject + Payload + "\n" + Date)
+                                Subject + Date)
         n.set_icon_from_pixbuf(icon)
-        n.set_timeout(12000)
+        n.set_timeout(12 * 1000)
         n.show()
 
     fd.close()
