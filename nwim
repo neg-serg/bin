@@ -132,7 +132,6 @@ class file_info_printer(object):
 class wim_runner(object):
     def __init__(self):
         self.settings={
-            "use_neovim":True,
             "debug":False,
         }
 
@@ -165,10 +164,7 @@ class wim_runner(object):
         self.r=redis.StrictRedis(host='localhost', port=6379, db=0)
         self.cmd=""
 
-        if self.settings["use_neovim"]:
-            self.wim_name="nwim"
-        else:
-            self.wim_name="wim"
+        self.wim_name="nwim"
 
         self.printer=file_info_printer()
 
@@ -189,11 +185,8 @@ class wim_runner(object):
         return bool(list(filter(lambda i: i.laddr == self.tmux_sock_path, self.unix_connections)) != [])
 
     def no_wim_x11_win_(self):
-        ret_=True
-        count_=(int(self.r.hmget('count_dict', 'wim')[0]))
-        if count_ > 0:
-            ret_=False
-        return ret_
+        count=(int(self.r.hmget('count_dict', 'wim')[0]))
+        return count <= 0
 
     # --[ print x11 windows hierarchy ]--
     def print_windows(self, window, indent):
@@ -245,7 +238,9 @@ class wim_runner(object):
     def V(self):
         self.dprint_with_args("Run V")
         del self.args[0]
+
         self.wait_for_run()
+
         self.dprint("wim is started")
         self.wim_run()
         self.wim_goto()
@@ -387,7 +382,7 @@ class wim_runner(object):
 if __name__ == '__main__':
     run_=wim_runner()
 
-    if "NWIM_STANDALONE" in os.environ and os.environ["NWIM_STANDALONE"]:
+    if os.environ.get("NWIM_STANDALONE"):
         run_.main("embedded")
     else:
         run_.main()
