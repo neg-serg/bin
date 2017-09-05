@@ -50,7 +50,7 @@ def newfile(event):
         .replace('<', '[') \
         .replace('>', ']') \
         .replace('[', hi_('[')) \
-        .replace(']', hi_(']'))
+        .replace(']', hi_(']')) \
         .replace('@', hi_(']',color_num=2))
     From = wrap_("From") + from_data
     Subject = wrap_("Subject") + decode_field('Subject')
@@ -59,9 +59,9 @@ def newfile(event):
     mail_path = hi_("New mail", color_num=6) + \
         hi_(" in ",color_num=2) + \
         hi_('/',color_num=2).join(event.path.split('/')[-3:-1])
+
+    n = notify2.Notification(mail_path, From + "\n" + Subject + Date)
     if "INBOX" in mail_path:
-        n = notify2.Notification(mail_path, From + "\n" +
-                                Subject + Date)
         n.set_icon_from_pixbuf(icon)
         n.set_timeout(12 * 1000)
         n.show()
