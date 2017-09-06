@@ -64,6 +64,9 @@ foreach my $file_name (@ARGV) {
     $new_name =~ s/-\./-/g;
     $new_name =~ s/-+/-/g;
     $new_name =~ s/\.-/-/g;
+    $new_name =~ s/\.:/:/g;
+    $new_name =~ s/:\./:/g;
+    $new_name =~ s/\.\././g;
     if ($opt_B){
         $new_name =~ s/[\(\)<>\\]//g;
     } else {
