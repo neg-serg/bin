@@ -61,6 +61,11 @@ function main(){
         -device vfio-pci,host=01:00.1
     )
 
+    local -a qemu_pass_network=(
+        -net none
+        -device vfio-pci,host=00:19.0
+    )
+
     local -a qemu_pass_input=(
         -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
         -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
@@ -110,7 +115,7 @@ function main(){
         "${qemu_emulated_sound[@]}" \
         "${qemu_pass_video[@]}" \
         "${qemu_pass_input[@]}" \
-        "${qemu_network[@]}" \
+        "${qemu_pass_network[@]}" \
         "${qemu_hugepages_stuff[@]}"
 
     # Restore settings
