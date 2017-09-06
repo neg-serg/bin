@@ -36,6 +36,9 @@ function main(){
     local cores_amount_="$(awk -F: '/per socket/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
     local threads_amount_="$(awk -F: '/Thread/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
 
+    local qemu_bypass_network=true
+    local -a qemu_network=()
+
     local -a qemu_params=(
         -enable-kvm
         -m "${vm_memory}"
@@ -98,7 +101,7 @@ function main(){
         "${qmp_sh_script}" "${qmp_socket_path}"
     )
 
-    local -a qemu_network=(
+    local -a qemu_default_network=(
         -net nic -net tap,ifname=tap0,script=/home/neg/bin/qemu/qemu-ifup,downscript=/home/neg/bin/qemu/qemu-ifdown
     )
 
@@ -109,6 +112,13 @@ function main(){
 
     if [[ ! $(pidof synergyc) ]]; then
         sudo -u neg "synergy" > /dev/null &! print "Autostart synergy"
+    fi
+
+    if [[ ${qemu_bypass_network} == true ]]; then
+        vfio_binder 0000:00:19.0
+        qemu_network=${qemu_pass_network[@]}
+    else
+        qemu_network=${qemu_default_network[@]}
     fi
 
     # Setup hugepages
@@ -124,7 +134,7 @@ function main(){
         "${qemu_emulated_sound[@]}" \
         "${qemu_pass_video[@]}" \
         "${qemu_pass_input[@]}" \
-        "${qemu_pass_network[@]}" \
+        "${qemu_network[@]}" \
         "${qemu_hugepages_stuff[@]}"
 
     # Restore settings
