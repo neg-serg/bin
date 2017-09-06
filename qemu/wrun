@@ -37,6 +37,7 @@ function main(){
     local threads_amount_="$(awk -F: '/Thread/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
 
     local qemu_bypass_network=true
+    local dynamic_usb_bypass=true
     local -a qemu_network=()
 
     local -a qemu_params=(
@@ -48,9 +49,10 @@ function main(){
         -drive if=pflash,format=raw,readonly,file=/one/vm/ovmf_code_x64.bin
         -drive if=pflash,format=raw,file=/one/vm/ovmf_vars_x64.bin
         -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
+
+        -qmp tcp:localhost:4444,server,nowait
         -serial none
-        -parallel none
-        -balloon none # Windows wont support it
+        -balloon none # Windows wont support it and kvm too, anyway
     )
 
     local -a qemu_source_params=(
@@ -60,8 +62,11 @@ function main(){
     )
 
     local -a qemu_vga_none=(
-        -nographic
         -vga none
+    )
+
+    local -a qemu_nographic=(
+        -nographic
     )
 
     local -a qemu_vga_spice=(
@@ -78,15 +83,20 @@ function main(){
         -device vfio-pci,host=00:19.0
     )
 
-    local -a qemu_pass_input=(
-        -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
-        -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
-    )
-    # -usb
-    # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
-    # -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
-    # -usbdevice host:1e7d:2e22 # Roccat kone rtd [ Mouse ]
-    # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+    local -a qemu_pass_input=()
+    if [[ ${dynamic_usb_bypass} == true ]]; then
+        sudo $(pwd)/usb-passthrough.sh || echo 'Usb bypass failed'
+    else
+        qemu_pass_input=(
+            -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
+            -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
+        )
+        # -usb
+        # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+        # -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
+        # -usbdevice host:1e7d:2e22 # Roccat kone rtd [ Mouse ]
+        # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
+    fi
 
     local -a qemu_emulated_sound=(
         -soundhw ac97
@@ -96,7 +106,7 @@ function main(){
         -net nic -net user,smb="${smb_path}"
     )
 
-    local -a qemu_separated_console=(
+    local -a qemu_qmp_socket_console=(
         -qmp unix:"${qmp_socket_path}",server --monitor stdio \
         "${qmp_sh_script}" "${qmp_socket_path}"
     )
@@ -111,14 +121,14 @@ function main(){
     )
 
     if [[ ! $(pidof synergyc) ]]; then
-        sudo -u neg "synergy" > /dev/null &! print "Autostart synergy"
+        sudo -u neg "synergy" 2>&1 > /dev/null &! print "[Autostart synergy]"
     fi
 
     if [[ ${qemu_bypass_network} == true ]]; then
-        vfio_binder 0000:00:19.0
-        qemu_network=${qemu_pass_network[@]}
+        sudo $(pwd)/vfio_binder "0000:00:19.0"
+        for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
     else
-        qemu_network=${qemu_default_network[@]}
+        for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
     fi
 
     # Setup hugepages
@@ -136,20 +146,6 @@ function main(){
         "${qemu_pass_input[@]}" \
         "${qemu_network[@]}" \
         "${qemu_hugepages_stuff[@]}"
-
-    # Restore settings
-    killall synergy # Kill synergy client
-    killall synergyc # Kill synergy server
-    sudo sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
-    setxkbmap \
-        -option keypad:pointerkeys \
-        -layout 'us,ru' \
-        -option 'grp:alt_shift_toggle' \
-        -variant altgr-intl \
-        -option ctrl:nocaps
-
-    xset m 0 0 # Revert mouse settings
-    xset -b r rate 250 50 # Revert keyboard rate
 }
 
 main "$@"
