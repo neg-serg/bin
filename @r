@@ -33,9 +33,7 @@ generate_convert_table(){
 }
 
 debug_print_convert_table(){
-    {for key in "${(@k)conv_table}"; do
-        builtin print "${key} -> ${conv_table[${key}]}" 
-    done}|sort -h
+    for key in "${(@k)conv_table}"; echo "${key} -> ${conv_table[${key}]}"|sort -h
 }
 
 apply_rename_files(){
@@ -48,9 +46,13 @@ apply_rename_dir(){
     apply_rename_ "$@"
 }
 
+extract_field(){
+    echo "${Data}"|grep "$1"| cut -d ':' -f 2-|xargs
+}
+
 apply_rename_(){
-    artist=$(builtin print "${Data}"|grep "Artist"| cut -d ':' -f 2-|xargs)
-    year=$(builtin print "${Data}"|grep "Year"| cut -d ':' -f 2-|xargs)
+    artist=$(extract_field "Artist")
+    year=$(extract_field "Year")
 
     generate_convert_table
 
@@ -58,7 +60,7 @@ apply_rename_(){
     year=$(awk '{print $1}' <<< "${year}")
     year=${year//$year/$conv_table[$year]}
 
-    album=$(builtin print "${Data}"|grep "Album"| cut -d ':' -f 2-|xargs)
+    album=$(extract_field "Album")
 
     if [[ -d "$1" ]]; then
         src="$1"
@@ -67,9 +69,8 @@ apply_rename_(){
     fi
     
     if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
-        result="$(dirname "${src}")/$(builtin print "${artist}-[${year}]-${album}")"
-        result="$(sed 's;/;.;g' <<< "$(basename "${result}")")"
-        mv -i "${src}" "${result}"
+        result="$(readlink -f $(dirname "${src}"))/$(sed 's;/;.;g' <<< $(echo "${artist}-[${year}]-${album}"))"
+        mv -vi "${src}" "${result}"
         fix_names.pl -i "${result}"
         rmdir "${src}" 2> /dev/null
     fi
