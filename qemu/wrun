@@ -163,6 +163,9 @@ function main(){
         -mem-path /dev/hugepages
     )
 
+    # Disable torrents
+    stig stop all
+
     if [[ ! $(pidof synergyc) ]]; then
         sudo -u neg "synergy" 2>&1 > /dev/null &! print "[Autostart synergy]"
     fi
