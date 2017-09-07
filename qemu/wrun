@@ -68,7 +68,9 @@ function main(){
         -drive if=pflash,format=raw,readonly,file=/one/vm/ovmf_code_x64.bin
         -drive if=pflash,format=raw,file=/one/vm/ovmf_vars_x64.bin
         -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
+    )
 
+    local -a qemu_consoles=(
         -qmp tcp:localhost:4444,server,nowait
         -serial none
         -balloon none # Windows wont support it and kvm too, anyway
@@ -104,7 +106,29 @@ function main(){
 
     local -a qemu_pass_input=()
     if [[ ${dynamic_usb_bypass} == true ]]; then
-        sudo $(pwd)/usb-passthrough.sh || echo 'Usb bypass failed'
+        modprobe ohci-hcd
+        modprobe ohci-pci
+
+        qemu_pass_input=(
+            -usb
+            -device nec-usb-xhci,id=xhci_defaults0
+            -device nec-usb-xhci,id=xhci_defaults1
+            -device nec-usb-xhci,id=xhci
+            -device ich9-usb-uhci1,id=uhci
+            -device usb-ehci,id=ehci
+        )
+
+        # -device usb-host,bus=xhci_defaults0.0,vendorid=6092,productid=4608,id=maschine
+        # -device usb-host,bus=xhci_defaults0.0,vendorid=2536,productid=123,id=akai_apc20
+        # -device usb-host,bus=xhci_defaults0.0,vendorid=1999,productid=26627,id=casio_midi_keyboard
+        # -device usb-host,bus=xhci_defaults0.0,vendorid=6048,productid=773,id=samson_usb_mic
+        # -device usb-host,bus=xhci_defaults0.0,vendorid=1133,productid=50475,id=logitech_unifying
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=2578,productid=1,id=bluetooth_dongle
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=1133,productid=49812,id=logitech_steering_wheel1
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=1133,productid=49818,id=logitech_steering_wheel2
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=6708,productid=63237,id=gc_adapter
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=4341,productid=529,id=usb_audio_dongle
+        # -device usb-host,bus=xhci_defaults1.0,vendorid=1118,productid=654,id=xbox360_controller
     else
         qemu_pass_input=(
             -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
@@ -153,6 +177,15 @@ function main(){
     # Setup hugepages
     sudo sysctl -w vm.nr_hugepages="${hugepages_amount}"
 
+    if [[ ${dynamic_usb_bypass} == true ]]; then
+        {
+            echo Do usbbypass
+            sleep 15s
+            sudo $(pwd)/usb-passthrough.sh add all || echo 'Usb bypass failed'
+            echo Do usbbypass ok
+        } &
+    fi
+
     QEMU_AUDIO_TIMER_PERIOD=150 \
     QEMU_PA_SAMPLES=1024 \
     QEMU_PA_SERVER=localhost \
@@ -164,7 +197,8 @@ function main(){
         "${qemu_pass_video[@]}" \
         "${qemu_pass_input[@]}" \
         "${qemu_network[@]}" \
-        "${qemu_hugepages_stuff[@]}"
+        "${qemu_hugepages_stuff[@]}" \
+        "${qemu_consoles[@]}"
 
     trap finish_ EXIT TERM KILL
 }
