@@ -57,6 +57,7 @@ function main(){
 
     local qemu_bypass_network=true
     local dynamic_usb_bypass=true
+    local usb_bypass_timeout=15
     local -a qemu_network=()
 
     local -a qemu_params=(
@@ -182,10 +183,8 @@ function main(){
 
     if [[ ${dynamic_usb_bypass} == true ]]; then
         {
-            echo Do usbbypass
-            sleep 15s
+            sleep ${usb_bypass_timeout}
             sudo $(pwd)/usb-passthrough.sh add all || echo 'Usb bypass failed'
-            echo Do usbbypass ok
         } &
     fi
 
