@@ -47,11 +47,9 @@ def newfile(event):
         return hi_(lhs) + s + hi_(rhs) + hi_("≫ ", color_num=2)
 
     from_data = decode_field('From') \
-        .replace('<', '[') \
-        .replace('>', ']') \
-        .replace('[', hi_('[')) \
-        .replace(']', hi_(']')) \
-        .replace('@', hi_(']',color_num=2))
+        .replace('<', '[').replace('>', ']') \
+        .replace('[', hi_('[')).replace(']', hi_(']')) \
+        .replace('@', hi_('◇',color_num=2))
     From = wrap_("From") + from_data
     Subject = wrap_("Subject") + decode_field('Subject')
     Date = wrap_("Date") + decode_field('Date')
