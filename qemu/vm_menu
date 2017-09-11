@@ -21,6 +21,7 @@ case "${res}" in
         if pgrep qemu 2>/dev/null; then
             sudo st zsh -c -i "${HOME}/bin/qemu/usb-passthrough.sh del all"
         fi
+        source ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh
     ;;
     *"Windows 10"*)
         os_name=${res:s_Start __}
