@@ -14,12 +14,12 @@ case "${res}" in
     ;;
     *"Usb passthrough add"*)
         if pgrep qemu 2>/dev/null; then
-            sudo st "${HOME}/bin/qemu/usb-passthrough.sh add all"
+            sudo st zsh -c -i "${HOME}/bin/qemu/usb-passthrough.sh add all"
         fi
     ;;
     *"Usb passthrough del"*)
         if pgrep qemu 2>/dev/null; then
-            sudo st "${HOME}/bin/qemu/usb-passthrough.sh del all"
+            sudo st zsh -c -i "${HOME}/bin/qemu/usb-passthrough.sh del all"
         fi
     ;;
     *"Windows 10"*)
