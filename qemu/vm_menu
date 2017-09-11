@@ -2,13 +2,25 @@
 
 local -a opts_=(
     "[Exit]"
+    "[Usb passthrough add]"
+    "[Usb passthrough del]"
     "[Start <Windows 10>]"
 )
 res=$(rofi -i -xoffset 20 -yoffset 20 -location 1 -p "[vm] >> " -dmenu <<< $(for opt in ${opts_}; echo ${opt}))
 
 case "${res}" in
-    *Exit*) 
+    *"Exit"*) 
         notify-send "[ Do ${res} ]"
+    ;;
+    *"Usb passthrough add"*)
+        if pgrep qemu 2>/dev/null; then
+            sudo st "${HOME}/bin/qemu/usb-passthrough.sh add all"
+        fi
+    ;;
+    *"Usb passthrough del"*)
+        if pgrep qemu 2>/dev/null; then
+            sudo st "${HOME}/bin/qemu/usb-passthrough.sh del all"
+        fi
     ;;
     *"Windows 10"*)
         os_name=${res:s_Start __}
