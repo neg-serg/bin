@@ -58,7 +58,7 @@ for i in "${USB_DEVICES[@]}"; do
 			echo "
 			{ \"execute\": \"qmp_capabilities\" }
 			{ \"execute\": \"device_del\", \"arguments\": { \"id\": \"usb_$vendor.$product.$bus.$device\" }}
-			" | nc localhost 4444
+			" | nc -q 3 localhost 4444
 			sleep 0.5
 		else
 			echo "Unknown command $1! Use either add or del as first argument."
