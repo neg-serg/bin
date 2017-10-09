@@ -57,6 +57,7 @@ function main(){
 
     local qemu_bypass_network=true
     local dynamic_usb_bypass=true
+    local auto_usb_bypass=true
     local usb_bypass_timeout=15
     local -a qemu_network=()
 
@@ -181,8 +182,9 @@ function main(){
     # Setup hugepages
     sudo sysctl -w vm.nr_hugepages="${hugepages_amount}"
 
-    if [[ ${dynamic_usb_bypass} == true ]]; then
+    if [[ ${dynamic_usb_bypass} == true && ${auto_usb_bypass} == true ]]; then
         {
+            echo "Bypass usb devices automatically, after ${usb_bypass_timeout} seconds"
             sleep ${usb_bypass_timeout}
             sudo $(pwd)/usb-passthrough.sh add all || echo 'Usb bypass failed'
         } &
