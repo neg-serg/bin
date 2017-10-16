@@ -26,7 +26,7 @@ if [[ "$2" == "input" || "$2" == "all" ]]; then
     )
     # G403 Prodigy Gaming Mouse 
     # Logitech G910 [Keyboard]  
-    # Iphone 7
+    # Apple, Inc. iPhone5/5C/5S/6/7
 
     # 1038:1702 # SteelSeries ApS [ Mouse ]
     # 046d:c32b # Logitech G910 [Keyboard]
