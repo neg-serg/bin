@@ -190,6 +190,8 @@ function main(){
         } &
     fi
 
+    sudo systemctl start smbd
+
     QEMU_AUDIO_TIMER_PERIOD=150 \
     QEMU_PA_SAMPLES=1024 \
     QEMU_PA_SERVER=localhost \
