@@ -190,6 +190,7 @@ function main(){
         } &
     fi
 
+    sudo systemctl start sshd
     sudo systemctl start smbd
 
     QEMU_AUDIO_TIMER_PERIOD=150 \
