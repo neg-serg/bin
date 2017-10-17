@@ -91,7 +91,7 @@ function send_notify_(){
     output="\n${output}$(get_lastfm_)\n\n${summary_}"
 
     notify-send -a "prepare_image" -u "${urgency_}" -i "${image_}" "${summary_}" "${output}"
-    echo "${body_}" > "${cover_lock}"
+    echo "${body_}$(get_lastfm_)" > "${cover_lock}"
 }
 
 function compare_images_(){ 
@@ -103,7 +103,7 @@ function send_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
         send_notify_
     elif [[ -s "${cover_lock}" ]]; then
-        if [[ "$(cat "${cover_lock}")" != "${body_}" ]]; then
+        if [[ "$(cat "${cover_lock}")" != "${body_}$(get_lastfm_)" ]]; then
             send_notify_
         fi
     fi
