@@ -55,29 +55,37 @@ function i3_restart(){
 }
 
 function main() {
+    zmodload -aF zsh/system b:zsystem
     lockfile="${HOME}/tmp/$(basename $0).lock"
-    if (set -o noclobber && echo ":: Locked ::" > "${lockfile}") 2> /dev/null; then
-        zshexit() { sleep 2s && rm -f "${lockfile}"; exit $? }
-        echo "Locking succeeded" >&2
-        #----------------------------------------------
-        if [[ ${1} != "" ]]; then
-            if [[ ${1} == "soft" ]]; then
-                soft_restart
-            else
-                wm_="$1"
-                shift
-                eval "$(echo ${wm_}_restart) $@"
-            fi
-        else
-            wm_="${windowmanager}"
-            eval "$(echo ${wm_}_restart)"
-        fi
-        #----------------------------------------------
-    else
-        echo "Lock failed - exit" >&2
-        notify-send "Lock failed - exit" 
+
+    if [[ -f ${lockfile} ]]; then
         exit 1
     fi
+
+    touch "${lockfile}"
+    (
+        if zsystem flock -t 2 -r "${lockfile}"; then
+            echo "Locking to [${lockfile}] succeeded" >&2
+
+            #----------------------------------------------
+            if [[ ${1} != "" ]]; then
+                if [[ ${1} == "soft" ]]; then
+                    soft_restart
+                else
+                    wm_="$1"
+                    shift
+                    eval "$(echo ${wm_}_restart) $@"
+                fi
+            else
+                wm_="${windowmanager}"
+                eval "$(echo ${wm_}_restart)"
+            fi
+            #----------------------------------------------
+        fi
+        sleep 2s
+        rm -v "${lockfile}"
+    ) &
+    
 }
 
 main "$@"
