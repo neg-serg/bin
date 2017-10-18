@@ -56,7 +56,8 @@ function i3_restart(){
 
 function main() {
     zmodload -aF zsh/system b:zsystem
-    lockfile="${HOME}/tmp/$(basename $0).lock"
+    local lockfile="${HOME}/tmp/$(basename $0).lock"
+    local timeout=2
 
     if [[ -f ${lockfile} ]]; then
         exit 1
@@ -64,7 +65,7 @@ function main() {
 
     touch "${lockfile}"
     (
-        if zsystem flock -t 2 -r "${lockfile}"; then
+        if zsystem flock -t "${timeout}" -r "${lockfile}"; then
             echo "Locking to [${lockfile}] succeeded" >&2
 
             #----------------------------------------------
@@ -82,7 +83,7 @@ function main() {
             fi
             #----------------------------------------------
         fi
-        sleep 2s
+        sleep ${timeout}s
         rm -v "${lockfile}"
     ) &
     
