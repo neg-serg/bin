@@ -17,19 +17,23 @@ function send_notify_(){
     local st_=$(highlight_ 4)
     local st2_=$(highlight_ 8)
     local st3_=$(highlight_ 6)
+    local bold_="<span weight='bold'>"
 
     local cl_="</span>"
 
-    local header="[$input]"
+    local header="[${input}]"
     header="$(sed -e "s:${HOME}:~:" \
                   -e "s:\/:${st_}/${cl_}:g" \
                   -e "s:\(\[\|\]\):${st3_}\1${cl_}:g" -e "s:~:${st2_}~${cl_}:g" <<< ${header})"
 
     local info_=$(exiftool -ImageSize -MIMEType -Megapixels ${image_})
 
-    output=$(xargs -n4 <<< "${info_}")
+    output=$(xargs -n4 <<< "${info_}" \
+        | sed -e 's/^/\[/' -e 's/$/\]/' \
+        -e "s;\(.*\):;${bold_}\\1${st3_}:${cl_}${cl_};" \
+        -e "s:\(\[\|\]\):${st3_}\1${cl_}:g"
+    )
     
-    local bold_="<span weight='bold'>"
     local prefix_=$(wf_ "➣")
     
     wait
