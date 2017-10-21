@@ -10,7 +10,7 @@ highlight_(){
 }
 
 send_notify_(){ 
-    notify-send  "$(wf_ "Move")$(wf_ "${file}") -> $(wf_ ${HOME}/tmp)"
+    notify-send  "$(wf_ "mv")$(wf_ "${file}") -> $(wf_ ${HOME}/tmp)"
 }
 
 main(){
@@ -22,13 +22,14 @@ main(){
             prefix_=$(wf_ "➣")
 
             # Transmission-related stuff
-            inotifywait -m -q -e close_write --format "%f" ${XDG_DOWNLOAD_DIR}/ \
-                | while IFS= read -r file; do
-            if [[ "${file}" =~ ".torrent.added"$ ]]; then
-                send_notify_ "Move ["${file}"] -> ${HOME}/tmp"
-                mv "${file}" "${HOME}/tmp"
-            fi
-        done
+            inotifywait -m -q -e close --format "%f" ${XDG_DOWNLOAD_DIR}/ \
+            | while IFS= read -r file_; do
+                file=$(readlink -f ${XDG_DOWNLOAD_DIR}/${file_})
+                if [[ "${file}" =~ ".torrent.added"$ ]]; then
+                    mv "${file}" "$(readlink -f ${HOME}/tmp/)"
+                    send_notify_ 
+                fi
+            done
         ;;
         s*)
             shift
