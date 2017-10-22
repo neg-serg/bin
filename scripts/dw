@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 wf_(){
-    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_} "
+    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_}"
 }
 
 highlight_(){
