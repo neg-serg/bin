@@ -69,7 +69,7 @@ apply_rename_(){
     fi
     
     if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
-        result="$(readlink -f $(dirname "${src}"))/$(sed 's;/;.;g' <<< $(echo "${artist}-[${year}]-${album}"))"
+        result="$(dirname "${src}")/$(sed 's;/;.;g' <<< "${artist}-[${year}]-${album}")"
         mv -i "${src}" "${result}"
         fix_names.pl -i "${result}"
         rmdir "${src}" 2> /dev/null
