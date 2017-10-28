@@ -46,6 +46,16 @@ for i in "${USB_DEVICES[@]}"; do
 		guestbus="xhci.0"
 		vendorproduct="${vendor}:${product}"
 
+		if hash jq 2> /dev/null; then
+            bpasscmd(){
+                nc -q 3 localhost 4444 <<< "${1}" | jq -c 
+            }
+		else
+            bpasscmd(){
+                nc -q 3 localhost 4444 <<< "${1}"  
+            }
+        fi
+
 		if [[ ${1} == "add" ]]; then
 			echo "Passing through (USB):"
 			echo "${line}"
@@ -53,7 +63,7 @@ for i in "${USB_DEVICES[@]}"; do
 			{ \"execute\": \"qmp_capabilities\" }
 			{ \"execute\": \"device_add\", \"arguments\": { \"driver\": \"usb-host\", \"hostbus\": \"${bus}\", \"hostaddr\": \"${device}\", \"id\": \"usb_${vendor}.${product}.${bus}.${device}\", \"bus\": \"${guestbus}\" }}
 			"
-			nc -q 3 localhost 4444 <<< "${cmd}"
+			bpasscmd "${cmd}"
 		elif [[ ${1} == "del" ]]; then
 			echo "Undoing passthrough (USB):"
 			echo ${line}
@@ -61,7 +71,7 @@ for i in "${USB_DEVICES[@]}"; do
 			{ \"execute\": \"qmp_capabilities\" }
 			{ \"execute\": \"device_del\", \"arguments\": { \"id\": \"usb_$vendor.$product.$bus.$device\" }}
 			"
-			nc -q 3 localhost 4444 <<< "${cmd}"
+			bpasscmd "${cmd}"
 			sleep 0.5
 		else
 			echo "Unknown command $1! Use either add or del as first argument."
