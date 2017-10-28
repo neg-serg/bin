@@ -1,18 +1,5 @@
 #!/bin/zsh
 
-wf_(){
-    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_}"
-}
-
-highlight_(){
-    local msg="$(xrq color$1)"
-    builtin print "<span weight='bold' color='${msg}'>"
-}
-
-send_notify_(){ 
-    notify-send  "$(wf_ "mv")$(wf_ "${file}") -> $(wf_ ${HOME}/tmp)"
-}
-
 main(){
     case "$1" in
         c*) 
@@ -91,6 +78,19 @@ main(){
                 2> /dev/null&
         ;;
     esac
+}
+
+wf_(){
+    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_}"
+}
+
+highlight_(){
+    local msg="$(xrq color$1)"
+    builtin print "<span weight='bold' color='${msg}'>"
+}
+
+send_notify_(){ 
+    notify-send  "$(wf_ "mv")$(wf_ "${file}") -> $(wf_ ${HOME}/tmp)"
 }
 
 main "$@"
