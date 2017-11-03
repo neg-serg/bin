@@ -4,7 +4,7 @@ image_="$1"
 
 function conv_image_(){ 
     readonly size_=200
-    [[ ! $1 =~ .*gif ]] && convert -sample ${size_} "$1" "$2"
+    [[ ! $1 =~ .*gif ]] && ~/bin/scripts/python_img_resizer.py ${size_} "$1" "$2"
 }
 
 function wf_(){
