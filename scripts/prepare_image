@@ -4,6 +4,7 @@ summary_="$2" body_="$3" urgency_="$5"
 
 dunst_pics_="/tmp/dunst-images"
 cover_lock="${dunst_pics_}/notify.lock"
+image_="/tmp/.mpd-notification-artwork.png"
 
 function wf_(){
     builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_} "
@@ -17,11 +18,12 @@ function get_pid_(){
 }
 
 function get_lastfm_(){
-    if [[ $(get_pid_ neg) != ""  ]]; then
-        builtin printf "$(wf_ "L")Neg last.fm"
-    elif [[ $(get_pid_ hextrick) != "" ]]; then
-        builtin printf "$(wf_ "L")Hextrick last.fm"
-    fi
+    for pid_ in neg hextrick; do
+        if [[ $(get_pid_ "${pid_}") != "" ]]; then
+            builtin printf "%s\n" "$(wf_ "L")$(sed 's:^.:\U&:g' <<< ${pid_}) last.fm"
+            break
+        fi
+    done
 }
 
 function highlight_(){
@@ -37,10 +39,8 @@ function send_notify_(){
     local bold_="<span weight='bold'>"
     local prefix_=$(wf_ "➣")
     declare -a bodyarr_
-    local c=1
     while read line; do
-        bodyarr_[$c]=${line}
-        c=$[c+1]
+        bodyarr_+="${line}"
     done <<< ${body_}
 
     length_=()
@@ -53,7 +53,7 @@ function send_notify_(){
 
     fancy_table_=('' '' '⟫' '')
 
-    for i in {1..4}; do
+    for i in {1..$#fancy_table_}; do
         if [[ ${bodyarr_[i]} != "" ]]; then
             bodyarr_[i]=$(wf_ $fancy_table_[i])"${bodyarr_[i]}\n"
         else
@@ -110,6 +110,15 @@ function send_notify(){
     cp "${image_}" "${prev_}"
 }
 
+function zshexit(){
+    (   
+        hashsum1=$(sha384sum "${image_}"|awk '{print $1}')
+        sleep 4s;
+        hashsum2=$(sha384sum "${image_}"|awk '{print $1}')
+        [[ ${hashsum1} = ${hashsum2} ]] && rm ${image_}
+    ) &
+}
+
 function main(){
     dunst_x11_class="$(< ${XDG_CONFIG_HOME}/dunst/dunstrc awk -F '=' '/class/{print $2}'|tr -d '[[:space:]]')"
     # force dunst to cleanup notification query
@@ -122,7 +131,6 @@ function main(){
     prev_="${dunst_pics_}/prev.png"
 
     find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
-    image_="/tmp/.mpd-notification-artwork.png"
 
     if [[ -f ${image_} ]]; then
         [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
