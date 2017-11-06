@@ -21,9 +21,7 @@ main(){
             device=$(echo "${line}" | cut -d" " -f4 | sed 's/://' | sed 's/^0*//')
             vendor=$(echo "${line}" | cut -d" " -f6 | cut -d: -f1)
             product=$(echo "${line}" | cut -d" " -f6 | cut -d: -f2)
-
             guestbus="xhci.0"
-            vendorproduct="${vendor}:${product}"
 
             if hash jq 2> /dev/null; then
                 bpasscmd(){
