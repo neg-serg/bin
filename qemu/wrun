@@ -192,6 +192,9 @@ function main(){
             for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
         fi
 
+        # Compact memory for hugepages
+        echo 1 > /proc/sys/vm/compact_memory
+
         # Setup hugepages
         sudo sysctl -w vm.nr_hugepages="${hugepages_amount}"
 
