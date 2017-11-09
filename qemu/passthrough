@@ -72,4 +72,5 @@ fi
 
 main "$@"
 
+source "~neg/.zsh/00-common.zsh"
 source "${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh"
