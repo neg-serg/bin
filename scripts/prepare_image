@@ -47,7 +47,7 @@ function send_notify_(){
     for i in {1..6}; length_+=${#bodyarr_[$i]};
     length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
 
-    max_length_=50
+    max_length_=35
     length_=$[${(@)length_[1]}]
     [[ ${length_} > ${max_length_} ]] && length_=${max_length_}
 
