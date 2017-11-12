@@ -69,18 +69,20 @@ function send_notify_(){
         | awk -F ': ' '/Quality/{print $2}' \
         | sed -e 's; / ;·;g' -e 's; channels;;')"
     sox_metadata="$(sox --i "${mpd_music_dir}/${current_file}" 2> /dev/null)"
-    media_file_encoding="$(awk -F': ' '/Sample Encoding/{print $2}' <<< "${sox_metadata}")"
+    if [[ ! -z "${sox_metadata// }" ]]; then
+        media_file_encoding="$(awk -F': ' '/Sample Encoding/{print $2}' <<< "${sox_metadata}")"
 
-    case "${media_file_encoding}" in
-        *FLAC*) file_enc="flac" ;;
-        *MPEG*) file_enc="mp3" ;;
-    esac
-    file_enc="${file_enc}:$(awk -F': ' '/Precision/{print $2}' <<< ${sox_metadata})"
+        case "${media_file_encoding}" in
+            *FLAC*) file_enc="flac" ;;
+            *MPEG*) file_enc="mp3" ;;
+        esac
+        file_enc="${file_enc}:$(awk -F': ' '/Precision/{print $2}' <<< ${sox_metadata})"
+    fi
 
-    [[ ${file_enc} != "" ]] && \
+    [[ ${file_enc// } != "" ]] && \
         bodyarr_[5]=$(wf_ '')"${file_enc}\n" || \
         bodyarr_[5]="\n"
-    [[ ${albumdetails_metadata} != "" ]] && \
+    [[ ${albumdetails_metadata// } != "" ]] && \
         bodyarr_[6]=$(wf_ '')"${albumdetails_metadata}\n" || \
         bodyarr_[6]="\n"
 
