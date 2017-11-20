@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+source ~/.zsh/03-xdg_vars.zsh
+cd ${XDG_CONFIG_HOME}/startpage/server
+caddy
