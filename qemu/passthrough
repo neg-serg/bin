@@ -1,7 +1,7 @@
 #!/bin/bash
 
 handle_all_devices(){
-    USB_DEVICES+=("046d:c083" "046d:c32b" "05ac:12a8")
+    USB_DEVICES+=("046d:c083" "046d:c32b")
     # G403 Prodigy Gaming Mouse 
     # Logitech G910 [Keyboard]  
     # Apple, Inc. iPhone5/5C/5S/6/7
