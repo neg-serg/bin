@@ -8,32 +8,29 @@ function gpaste_run() {
         echo $(which gpaste) -client --oneline
     else
         echo There is no gpaste in \$PATH>/dev/stderr
+        exit 1
     fi
 }
 
 function clip_main(){
     local rofi_pid=" -pid /run/user/$(id -u)/rofi_clip.pid"
-    local rofi_font="PragmataPro for Powerline bold 12"
     declare -a rofi_opts_
     local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
-    rofi_opts_=(-font ${rofi_font}  -yoffset -22 -location 6 -width $[x11_width-70] -lines 10 "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p "[>>]")
-    local menu=$($(gpaste_run)|rofi ${rofi_opts_[@]})
+    local width_=$[x11_width-70]
+    local lines_=10
+    local yoffset_=-22
+    readonly rofi_cmd=(
+        rofi -dmenu 
+        -opacity "${opacity_}"
+        -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
+        -theme-str "'#listview { lines:${lines_}; }'"
+        "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
+    )
+    local menu=$($(gpaste_run)|eval ${rofi_cmd})
     local selection=$(echo "${menu}" | cut -d ':' -f1)
     $(gpaste_run) select ${selection}
 }
 
-function clipster_main(){
-    local rofi_pid=" -pid /run/user/$(id -u)/rofi_clip.pid"
-    local rofi_font="PragmataPro for Powerline bold 12"
-    declare -a rofi_opts_
-    local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
-    rofi_opts_=(-font ${rofi_font}  -yoffset -22 -location 6 -width $[x11_width-70] -lines 10 "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p "[>>]" -sep '\x00')
-    local menu=$(clipster -o -n 250 -0|rofi ${rofi_opts_[@]})
-    local selection=$(echo "${menu}" | cut -d ':' -f1)
-    [[ ${selection} != "" ]] && clipster <<< ${selection}
-}
-
 case "$1" in
-    clipster) clipster_main ;;
     *) clip_main
 esac
