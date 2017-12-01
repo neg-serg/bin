@@ -45,6 +45,111 @@ function init_ansi() {
     reset="${esc}[0m"
 }
 
+function init_ansi2(){
+  esc=""
+
+  blackf="${esc}[30m";   redf="${esc}[31m";    greenf="${esc}[32m"
+  yellowf="${esc}[33m"   bluef="${esc}[34m";   purplef="${esc}[35m"
+  cyanf="${esc}[36m";    whitef="${esc}[37m"
+  
+  blackb="${esc}[40m";   redb="${esc}[41m";    greenb="${esc}[42m"
+  yellowb="${esc}[43m"   blueb="${esc}[44m";   purpleb="${esc}[45m"
+  cyanb="${esc}[46m";    whiteb="${esc}[47m"
+
+  boldon="${esc}[1m";    boldoff="${esc}[22m"
+  italicson="${esc}[3m"; italicsoff="${esc}[23m"
+  ulon="${esc}[4m";      uloff="${esc}[24m"
+  invon="${esc}[7m";     invoff="${esc}[27m"
+
+  reset="${esc}[0m"
+}
+
+
+function crunchbang_mini(){
+init_ansi2
+
+cat << EOF
+
+ ${reset}${redf}▄█▄█▄ ${reset}${boldon}${redf}█ ${reset}${greenf}▄█▄█▄ ${reset}${boldon}${greenf}█ ${reset}${yellowf}▄█▄█▄ ${reset}${boldon}${yellowf}█ ${reset}${bluef}▄█▄█▄ ${reset}${boldon}${bluef}█ ${reset}${purplef}▄█▄█▄ ${reset}${boldon}${purplef}█ ${reset}${cyanf}▄█▄█▄ ${reset}${boldon}${cyanf}█${reset} 
+ ${reset}${redf}▄█▄█▄ ${reset}${boldon}${redf}▀ ${reset}${greenf}▄█▄█▄ ${reset}${boldon}${greenf}▀ ${reset}${yellowf}▄█▄█▄ ${reset}${boldon}${yellowf}▀ ${reset}${bluef}▄█▄█▄ ${reset}${boldon}${bluef}▀ ${reset}${purplef}▄█▄█▄ ${reset}${boldon}${purplef}▀ ${reset}${cyanf}▄█▄█▄ ${reset}${boldon}${cyanf}▀${reset}
+ ${reset}${redf} ▀ ▀  ${reset}${boldon}${redf}▀ ${reset}${greenf} ▀ ▀  ${reset}${boldon}${greenf}▀ ${reset}${yellowf} ▀ ▀  ${reset}${boldon}${yellowf}▀ ${reset}${bluef} ▀ ▀  ${reset}${boldon}${bluef}▀ ${reset}${purplef} ▀ ▀  ${reset}${boldon}${purplef}▀ ${reset}${cyanf} ▀ ▀  ${reset}${boldon}${cyanf}▀${reset}
+EOF
+}
+
+function pukeskull(){
+    #
+    #  ┳━┓┳━┓0┏┓┓┳━┓┏━┓┓ ┳
+    #  ┃┳┛┃━┫┃┃┃┃┃━┃┃ ┃┃┃┃
+    #  ┃┗┛┛ ┃┃┃┗┛┻━┛┛━┛┗┻┛
+    #     ┳━┓┳ ┓┳┏ ┳━┓
+    #     ┃━┛┃ ┃┣┻┓┣━ 
+    #     ┇  ┗━┛┃ ┛┻━┛
+    #    ┓━┓┳┏ ┳ ┓┳  ┳
+    #    ┗━┓┣┻┓┃ ┃┃  ┃
+    #    ━━┛┇ ┛┗━┛┗━┛┗━┛
+    #
+    # the worst color script
+    # by xero <http://0w.nz>
+
+    cat << 'EOF'
+    [1;37m                  .................
+    [1;37m             .syhhso++++++++/++osyyhys+.
+    [1;37m          -oddyo+o+++++++++++++++o+oo+osdms:
+    [1;37m        :dmyo++oosssssssssssssssooooooo+/+ymm+`
+    [1;37m       hmyo++ossyyhhddddddddddddhyyyssss+//+ymd-
+    [1;37m     -mho+oosyhhhddmmmmmmmmmmmmmmddhhyyyso+//+hN+
+    [1;37m     my+++syhhhhdmmNNNNNNNNNNNNmmmmmdhhyyyyo//+sd:
+    [1;37m    hs//+oyhhhhdmNNNNNNNNNNNNNNNNNNmmdhyhhhyo//++y
+    [1;37m    s+++shddhhdmmNNNNNNNNNNNNNNNNNNNNmdhhhdhyo/++/
+    [1;37m    'hs+shmmmddmNNNNNNNNNNNNNNNNNNNNNmddddddhs+oh/
+    [1;37m     shsshdmmmmmNNMMMMMMMMMMMNNNNNNNNmmmmmmdhssdh-
+    [1;37m      +ssohdmmmmNNNNNMMMMMMMMNNNNNNmmmmmNNmdhhhs:`
+    [1;37m  -+oo++////++sydmNNNNNNNNNNNNNNNNNNNdyyys/--://+//:
+    [1;37m  d/+hmNNNmmdddhhhdmNNNNNNNNNNNNNNNmdhyyyhhhddmmNmdyd-
+    [1;37m  ++--+ymNMMNNNNNNmmmmNNNNNNNNNNNmdhddmNNMMMMMMNmhyss
+    [1;37m   /d+` -+ydmNMMMMMMNNmNMMMMMMMmmmmNNMMMMMNNmh- :sdo
+    [1;37m    sNo   ` /ohdmNNMMMMNNMMMMMNNNMMMMMNmdyo/ `  hNh
+    [1;37m     M+'     ``-/oyhmNNMNhNMNhNMMMMNmho/ `     'MN/
+    [1;37m     d+'         `-+osydh0w.nzmNNmho:          'mN:
+    [1;37m    +o/             ` :oo+:s :+o/-`            -dds
+    [1;37m   :hdo       [0;31mx[1;37m    `-/ooss:':+ooo: `    [0;31m0[1;37m      :sdm+
+    [1;37m  +dNNNh+         :ydmNNm'   `sddmyo          +hmNmds
+    [1;37m dhNMMNNNNmddhsyhdmmNNNM:      NNmNmhyo+oyyyhmNMMNmysd
+    [1;37m ydNNNNNh+/++ohmMMMMNMNh       oNNNNNNNmho++++yddhyssy
+    [1;37m              `:sNMMMMN'       `mNMNNNd/`
+        [1;31mXXXX[0;31mXXXX[1;33mX[1;37m y/hMMNm/  .dXb.  -hdmdy: ` [0;34mXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;37m `o+hNNds. -ymNNy-  .yhys+/`` [0;34mXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;37m +-+//o/+odMNMMMNdmh++////-/s [0;34mXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXX[1;37m mhNd -+d/+myo++ysy/hs -mNsdh/ [0;34mXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;37m mhMN+ dMm-/-smy-::dMN/sMMmdo [0;34mXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXX[1;37m NMy+NMMh oMMMs yMMMyNMMs+ [0;34mXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXX[1;37m dy-hMMm+dMMMdoNMMh ydo [1;34mX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mX [1;37m smm 'NMMy dms  sm  [1;34mXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXX                   [1;34mXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXXXX
+        [1;31mXXXX[0;31mXXXX[1;33mXXXX[0;33mXXXX[1;35mXXXX[0;35mXXXX[1;32mXXXX[0;32mXXXX[1;34mXXXX[0;34mXXXX[1;37mXER0
+EOF
+}
 
 function reference() {
     echo -en "\n   +  "
@@ -90,7 +195,7 @@ EOF
 
 function colorvalues() {
     local xdef="${XDG_CONFIG_HOME}/xres/colors/current_colors"
-    local colors=( $( sed -re '/^!/d; /^$/d; /^#/d; s/(\*color)([0-9]):/\10\2:/g;' $xdef | grep 'color[01][0-9]:' | sort | sed  's/^.*: *//g' ) )
+    local colors=( $( sed -re '/^!/d; /^$/d; /^#/d; s/(\*color)([0-9]):/\10\2:/g;' ${xdef} | grep 'color[01][0-9]:' | sort | sed  's/^.*: *//g' ) )
     echo -e "\e[1;37m
     Black    Red      Green    Yellow   Blue     Magenta   Cyan    White
     ──────────────────────────────────────────────────────────────────────\e[0m"
@@ -165,18 +270,42 @@ function colorformatting(){
 }
 
 function list() {
-    T='gYw'   # The test text
+    local arg
+    local mode
 
-    echo -e "\n                 40m     41m     42m     43m\
-        44m     45m     46m     47m";
+    if [[ -z ${1} ]]; then
+        arg="gYw"
+    else
+        arg="$1"
+    fi
 
+    cmd_slim=$'echo -en "$EINS \033[$FG\033[$BG $T \033[0m"'
+    cmd_default=$'echo -en "$EINS \033[$FG\033[$BG  $T  \033[0m"'
+
+    local delimiter_default=" \t"
+    local delimiter_slim=" "
+
+    T="${arg}"
+
+    if [[ ! -z "$2" ]]; then
+        mode="slim"
+        dl_=${delimiter_slim}
+        pre_dl_="\t     "
+    else
+        mode="default"
+        dl_=${delimiter_default}
+        pre_dl_="\t\t "
+    fi
+
+    echo -e "\n${pre_dl_}40m${dl_}41m${dl_}42m${dl_}43m${dl_}44m${dl_}45m${dl_}46m${dl_}47m";
     for FGs in '    m' '   1m' '  30m' '1;30m' '  31m' '1;31m' '  32m' \
         '1;32m' '  33m' '1;33m' '  34m' '1;34m' '  35m' '1;35m' \
         '  36m' '1;36m' '  37m' '1;37m';
     do FG=${FGs// /}
         echo -en " $FGs \033[$FG  $T  "
-        for BG in 40m 41m 42m 43m 44m 45m 46m 47m;
-        do echo -en "$EINS \033[$FG\033[$BG  $T  \033[0m"; done
+        for BG in 40m 41m 42m 43m 44m 45m 46m 47m; do 
+            eval "$(eval echo -ne \$cmd_${mode})"
+        done
         echo;
     done
     echo
@@ -304,6 +433,28 @@ function spectrum(){
     for color in {0..255}; do print -P "${FG[$color][3,-3]} $color $[ [##16] $color ]" ; done
 }
 
+function tiny_spectrum(){
+# Author: crshd
+# Source: http://crunchbang.org/forums/viewtopic.php?pid=128584#p128584
+
+echo
+
+for f in {0..6}; do
+	echo -en "\033[$((f+41))m\033[$((f+30))m██▓▒░"
+done
+echo -en "\033[37m██\n"
+
+echo
+
+for f in {0..6}; do
+	echo -en "\033[$((f+41))m\033[1;$((f+30))m██▓▒░"
+done
+echo -en "\033[1;37m██"
+
+echo -e "\033[0m"
+echo
+}
+
 function ls_colors(){
     typeset -A names
     names[no]="global default"
@@ -399,6 +550,46 @@ initializeANSI()
   reset="${esc}[0m"
 }
 
+function illuminate(){
+    cat << EOF
+    [1;33m._________________________________. [0;0;37m
+    [1;33m|[34;7;1m  [0;0;0m[0;0;46m        [36;7;1m       [0;0;45m       [35;7;1m       [0;0;0m[0;0;45m [0;0;0m[0;0;41m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[36;7;1m [0;0;0m[0;0;44m [0;0;0m               [0;34m_             [31;7;1m [0;0;0m[35;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[34;7;1m [0;0;0m               [0;34m//\             [0;0;41m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[34;7;1m [0;0;0m         [0;32m/[1;32m/-- [0;34m/[1;34m/  [0;36m\  [0;32m========, [0;0;41m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;44m [0;0;0m        [0;32m/[1;32m/   [0;34m/[1;34m/    [0;36m\        [0;32m/  [31;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;44m [0;0;0m       [0;32m/[1;32m/   [0;34m/[1;34m/      [0;36m\      [0;32m/   [31;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;44m [0;0;0m [1;31m__________  ___[0;0;41m [0;37;7;1m [0;0;0m[0;31m__  _________[31;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;42m [0;0;0m      [0;32m/     [0;34m\   [0;0;47m [31;7;1m [0;0;0m   [1;34m/[0;34m/  [1;32m/[0;32m/    [0;0;43m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;42m [0;0;0m     [0;32m/       [0;34m\      [1;34m/[0;34m/  [1;32m/[0;32m/     [0;0;43m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;42m [0;0;0m    [0;32m/__________________[1;32m/[0;32m/      [0;0;43m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[32;7;1m [0;0;0m               [0;34m\  [1;34m/[0;34m/           [33;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[32;7;1m [0;0;0m                [0;34m\[1;34m/[0;34m/            [33;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[0;0;40m [0;0;0m[0;0;42m [0;0;0m                [1;34m"            [0;0;43m [0;0;0m[37;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m|[32;7;1m [0;0;0m[30;7;1m [0;0;0m[0;0;40m        [0;0;0m[30;7;1m       [0;0;0m[0;0;47m       [0;0;0m[37;7;1m       [0;0;0m[0;0;47m [0;0;0m[33;7;1m [0;0;0m[1;33m| [0;0;37m
+    [1;33m'---------------------------------' [0;0;37m
+EOF
+}
+
+function blocks2(){
+    init_ansi2
+    cat << EOF
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+EOF
+}
+
+
 function poke(){
 init_ansi
 
@@ -427,24 +618,31 @@ EOF
 
 }
 
-case $1 in
-    ""|ref*) reference ;;
-    256*) 256colors; exit 0 ;;
-    24*) 24bit; exit 0 ;;
-    clrv*) colorvalues; exit 0 ;;
-    inv*) invader; exit 0 ;;
-    ansi*) ansi; exit 0 ;;
-    blk*) blocks; exit 0 ;;
-    fmt*) colorformatting; exit 0 ;;
-    pac*) pacman; exit 0 ;;
-    list*) list; exit 0 ;;
-    all*) all; exit 0 ;;
-    bar*) bars; exit 0 ;;
-    fn*) fancy; exit 0 ;;
-    tmux*) tmux_pallete; exit 0 ;;
-    spectr*) spectrum; exit 0 ;; 
-    ls*) ls_colors; exit 0 ;;
-    ira*) ira; exit 0 ;;
-    skull*) skulls; exit 0 ;;
-    poke*) poke; exit 0 ;;
+case "${1}" in
+    ""|ref*) reference                ;;
+    256*) 256colors          ; exit 0 ;;
+    24*) 24bit               ; exit 0 ;;
+    clrv*) colorvalues       ; exit 0 ;;
+    inv*) invader            ; exit 0 ;;
+    ansi*) ansi              ; exit 0 ;;
+    b1) blocks               ; exit 0 ;;
+    b2) blocks2              ; exit 0 ;;
+    fmt*) colorformatting    ; exit 0 ;;
+    pac*) pacman             ; exit 0 ;;
+    l1) list                 ; exit 0 ;;
+    l2) list '•••'           ; exit 0 ;;
+    lslim) list '•' "s"      ; exit 0 ;;
+    all*) all                ; exit 0 ;;
+    bar*) bars               ; exit 0 ;;
+    fn*) fancy               ; exit 0 ;;
+    tmux*) tmux_pallete      ; exit 0 ;;
+    spectr*) spectrum        ; exit 0 ;;
+    ls*) ls_colors           ; exit 0 ;;
+    ira*) ira                ; exit 0 ;;
+    skull*) skulls           ; exit 0 ;;
+    poke*) poke              ; exit 0 ;;
+    ill*) illuminate         ; exit 0 ;;
+    puke*) pukeskull         ; exit 0 ;;
+    cr*) crunchbang_mini     ; exit 0 ;;
+    tspctrm*) tiny_spectrum  ; exit 0 ;;
 esac
