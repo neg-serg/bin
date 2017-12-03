@@ -12,6 +12,76 @@ function gpaste_run() {
     fi
 }
 
+function read_command {
+    readonly rofi_cmd=(
+        rofi -dmenu 
+        -opacity "${opacity_}"
+        -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
+        -theme-str "'#listview { lines:${lines_}; }'"
+        "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
+    )
+    cmd_=$(echo -n "${cmds}"| tr -s ' ' '\n' | eval ${rofi_cmd[@]})
+    echo ${cmd_}
+}
+
+function send_key(){
+    local key="$1"
+    xdotool key --window "${window}" "${key}"
+}
+
+function clipboard_pipe(){
+    local cmd=""
+    local selection=""
+    local out=""
+    local paste=false
+
+    local cmds=("sort" "tac")
+    local window=$(xdotool getwindowfocus|tr -d '\n')
+
+    while true; do
+        case "$1" in 
+            -p | --paste)
+                paste=true; 
+                shift
+            ;;
+            -c | -e | --command) 
+                if [[ $2 != "" ]]; then
+                    cmd="$2"
+                else
+                    cmd="$(read_command)"
+                fi
+                shift
+            ;;
+            *) cmd="$(read_command)" ;;
+            --) shift; break ;;
+        esac
+        if [[ ${paste} == true ]]; then
+            echo -n | xclip -i # clear clipboard first
+            send_key 'Control_L+c'; send_key 'Control_L+v'
+        fi
+        if [[ ${cmd} != "" ]]; then
+            # read the selection
+            selection=$(xclip -o)
+            if [[ ${selection} == "" && ${paste} ]]; then
+                builtin printf "no input, aborting..."
+                exit 1
+            fi
+
+            # put it into the clipboard (and clear it first so Klipper doesn't interfere)
+            echo -n | xclip -i -sel clipboard
+
+            clipboard=$(xclip -o)
+            out=$(${cmd} <<< "${clipboard}")
+            xclip -i -sel clipboard <<< "${out}"
+
+            exit 0
+        else
+            notify-send "you need to specify a command"
+            exit 1
+        fi
+    done
+}
+
 function clip_main(){
     local rofi_pid=" -pid /run/user/$(id -u)/rofi_clip.pid"
     declare -a rofi_opts_
@@ -32,5 +102,6 @@ function clip_main(){
 }
 
 case "$1" in
-    *) clip_main
+    *) clip_main                     ;;
+    pipe) shift; clipboard_pipe "$@" ;;
 esac
