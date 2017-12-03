@@ -6,9 +6,16 @@ local -a opts_=(
     "[Usb passthrough del]"
     "[Start <Windows 10>]"
 )
-res=$(rofi -i -xoffset 20 -yoffset 20 -location 1 -p "[vm] >> " -dmenu <<< $(for opt in ${opts_}; echo ${opt}))
 
-case "${res}" in
+width_=800
+yoffset_=40
+rofi_cmd=(
+    rofi
+    -theme-str "'#window { width:${width_}; x-offset: 40; y-offset: ${yoffset_}; location: north west; anchor: north west; }'"
+    -i -p "'[vm] >> '" -dmenu
+)
+
+case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
     *"Exit"*) 
         notify-send "[ Do ${res} ]"
     ;;
