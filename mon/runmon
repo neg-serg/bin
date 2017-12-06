@@ -1,3 +1,0 @@
-#!/bin/zsh
-dstat_path="${HOME}/tmp/log"
-dstat -d --output >/dev/null ${dstat_path}/hdd.csv &
