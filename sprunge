@@ -14,7 +14,6 @@ function sprunge() {
         fi | curl -F 'sprunge=<-' http://sprunge.us
       else
         echo No arguments found, printing USAGE and exiting. >&2
-        usage
       fi
     else
       echo Using input from a pipe or STDIN redirection... >&2
