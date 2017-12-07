@@ -31,13 +31,19 @@ function finish_(){
 }
 
 function main(){
+    succeeded=false
     [[ $(id -u) != "0" ]] && echo "Should be runned from root" && exit 0
 
     zmodload -aF zsh/system b:zsystem
     lockfile="$(readlink -f ~neg/tmp/)$(basename $0).lock"
 
     if [[ -f ${lockfile} ]]; then
-        exit 1
+        if pgrep qemu 2>/dev/null; then
+            echo "There is lockfile in [${lockfile}]"
+            exit 1
+        else
+            sudo rm -v "${lockfile}"
+        fi
     fi
 
     touch "${lockfile}"
@@ -222,13 +228,12 @@ function main(){
             "${qemu_network[@]}" \
             "${qemu_hugepages_stuff[@]}" \
             "${qemu_consoles[@]}"
-
         fi
 
         succeeded=true
         trap finish_ EXIT TERM KILL
-        rm -v "${lockfile}"
     ) &
+    sudo rm -v "${lockfile}"
 }
 
 main "$@"
