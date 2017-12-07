@@ -7,7 +7,7 @@ main(){
     if [[ "${tmux_console_counter}" = "teardrop" ]]; then
         tmux -S "${sock_path}" a
     else
-        tmux -S "${sock_path}" new -s teardrop -n pulsemixer pulsemixer \; neww -n glances glances \; neww -n stig stig \; select-window -t 1
+        tmux -S "${sock_path}" new -s teardrop -n pulsemixer pulsemixer \; neww -n glances glances \; neww -n stig stig \; neww -n turses turses \; neww -n newsboat newsboat \; select-window -t 3
     fi
 }
 
