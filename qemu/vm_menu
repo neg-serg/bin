@@ -40,7 +40,7 @@ case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
     *"Win"*"10"*)
         os_name=${res:s_Start__}
         notify-send "Starting ... ${os_name}"
-        if st tmux -S ~/1st_level/vm.socket new -n vm 'sudo nohup ~neg/bin/qemu/wrun'; then
+        if st tmux -S ~/1st_level/vm.socket new -n vm 'sudo nohup ~neg/bin/qemu/wrun >/dev/null'; then
             notify-send "Start ${os_name} failed" && exit 1
         else
             notify-send "Done"
