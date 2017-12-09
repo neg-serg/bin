@@ -67,7 +67,7 @@ apply_rename_(){
     else
         src="$(builtin print "$(dirname ${1})")"
     fi
-    
+
     if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
         src_dirname=$(dirname "${src}")
         music_dirname="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
