@@ -32,26 +32,23 @@ function i3::common_restart(){
 function i3_restart(){
     polybar_cfg=${XDG_CONFIG_HOME}/polybar/main
     # kill any current poppers (thanks Dylan)
-    if [[  $(i3 --version|awk '{print $3}'|grep '^4.13' -ow) == "4.13" ]]; then
-        i3::common_restart
-        wait_a_bit
-        notify-send "[${wm_}] reload"
-        i3-msg reload
-        ps aux \
-            | grep python \
-            | grep i3 \
-            | awk '{print $2}' \
-            | xargs kill
-        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/disable-standby-fs.py"
-        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/nsd.py"
-        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/circled.py"
-        i3-msg "exec --no-startup-id python3 ${XDG_CONFIG_HOME}/i3/flastd.py"
-    else
-        i3::common_restart
-        wait_a_bit
+    i3::common_restart
+    wait_a_bit
+    notify-send "[${wm_}] reload"
+    i3-msg restart
+    ps aux \
+        | grep python \
+        | grep i3 \
+        | awk '{print $2}' \
+        | xargs -t kill
+    (
+        sleep 1s && \
+        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/disable-standby-fs.py"
+        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/nsd.py"
+        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/circled.py"
+        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/flastd.py"
         notify-send "[${wm_}] restart"
-        i3-msg restart
-    fi
+    ) &
 }
 
 function main() {
@@ -60,6 +57,7 @@ function main() {
     local timeout=2
 
     if [[ -f ${lockfile} ]]; then
+        notify-send "There is the lockfile in [${lockfile}]"
         exit 1
     fi
 
@@ -83,10 +81,8 @@ function main() {
             fi
             #----------------------------------------------
         fi
-        sleep ${timeout}s
-        rm -v "${lockfile}"
     ) &
-    
+    sleep ${timeout}s && rm -v "${lockfile}"
 }
 
 main "$@"
