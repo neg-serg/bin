@@ -1,49 +1,62 @@
 #!/bin/zsh
 
-local -a opts_=(
-    "[Exit]"
-    "[Usb :: passthrough add]"
-    "[Usb :: passthrough del]"
-    "[Start <Win10>]"
-)
+function no_qemu_msg(){
+    notify-send "There is no QEMU"
+}
 
-width_=800
-xoffset_=40
-yoffset_=40
+function do_if_qemu(){
+    if pgrep qemu 2>/dev/null; then
+        eval "$@"
+    else
+        no_qemu_msg
+    fi
+}
 
-rofi_cmd=(
-    rofi
-    -theme-str "'#window { width:${width_}; x-offset: ${xoffset_}; y-offset: ${yoffset_}; location: north west; anchor: north west; }'"
-    -i -p "'[vm] >> '" -dmenu
-)
+function check_qemu(){
+    st tmux -S ~/1st_level/vm.socket new -s vm -n vm 'sudo nohup ~neg/bin/qemu/wrun > /dev/null'
+}
 
-tmux -S ~/1st_level/vm.socket new -s vm
+function main(){
+    local -a opts_=(
+        "[Exit]"
+        "[Usb :: passthrough add]"
+        "[Usb :: passthrough del]"
+        "[Start <Win10>]"
+    )
 
-case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
-    *"Exit"*) 
-        notify-send "[ Do ${res} ]" ;;
-    *"Usb"*"pass"*"add"*) 
-        if pgrep qemu 2>/dev/null; then
-            st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
-        else
-            notify-send "There is no QEMU"
-        fi
-    ;;
-    *"Usb"*"pass"*"del"*) 
-        if pgrep qemu 2>/dev/null; then
-            st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough del"
-        else
-            notify-send "There is no QEMU"
-        fi
-        source ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh
-    ;;
-    *"Win"*"10"*)
-        os_name=${res:s_Start__}
-        notify-send "Starting ... ${os_name}"
-        if ! st tmux -S ~/1st_level/vm.socket new -n vm 'sudo nohup ~neg/bin/qemu/wrun'; then
-            notify-send "Start ${os_name} failed" && exit 1
-        else
-            notify-send "Done"
-        fi
-    ;;
-esac
+    local width_=800
+    local xoffset_=40
+    local yoffset_=40
+
+    local -a rofi_cmd=(
+        rofi
+        -theme-str "'#window { width:${width_}; x-offset: ${xoffset_}; y-offset: ${yoffset_}; location: north west; anchor: north west; }'"
+        -i -p "'[vm] >> '" -dmenu
+    )
+
+    tmux -S ~/1st_level/vm.socket new -s vm
+
+    case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
+        *"Exit"*) 
+            notify-send "[ Do ${res} ]" ;;
+        *"Usb"*"pass"*"add"*) 
+            do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
+        ;;
+        *"Usb"*"pass"*"del"*) 
+            do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough del"
+            source ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh
+        ;;
+        *"Win"*"10"*)
+            os_name=${res:s_Start__}
+            notify-send "Starting ... ${os_name}"
+            if ! check_qemu; then
+                notify-send "Start ${os_name} failed" \
+                    && exit 1
+            else
+                notify-send "Done"
+            fi
+        ;;
+    esac
+}
+
+main "$@"
