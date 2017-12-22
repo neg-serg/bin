@@ -11,8 +11,13 @@ function haltcmd(){
     eval "${haltcmd}"
 }
 
-zshexit(){
-    [[ ${succeeded} == true ]] && finish_
+function zshexit(){
+    [[ ${qemu_run_success} == true ]] && finish_
+}
+
+function qemu::msg(){
+    echo "QEMU :: [$@]"
+    notify-send "QEMU :: [$@]"
 }
 
 function finish_(){
@@ -31,15 +36,15 @@ function finish_(){
 }
 
 function main(){
-    succeeded=false
-    [[ $(id -u) != "0" ]] && echo "Should be runned from root" && exit 0
+    qemu_run_success=false
+    [[ $(id -u) != "0" ]] && qemu::msg "Should be runned from root" && exit 0
 
     zmodload -aF zsh/system b:zsystem
     lockfile="$(readlink -f ~neg/tmp/)$(basename $0).lock"
 
     if [[ -f ${lockfile} ]]; then
         if pgrep qemu 2>/dev/null; then
-            echo "There is lockfile in [${lockfile}]"
+            qemu::msg "There is lockfile in [${lockfile}]"
             exit 1
         else
             sudo rm -v "${lockfile}"
@@ -49,8 +54,7 @@ function main(){
     touch "${lockfile}"
     (
         if zsystem flock -r "${lockfile}"; then
-        echo "Locking to [${lockfile}] succeeded" >&2
-
+        qemu::msg "Locking to [${lockfile}] qemu_run_success" >&2
 
         local user_=neg
         local home_=/home/${user_}
@@ -70,9 +74,9 @@ function main(){
         local hugepages_amount=$(printf '%.0f00\n' "$[${vm_memory}*1024./${hugepagesize}*1.075/100]")
 
         local lscpu_info=("$(lscpu)")
-        local sockets_amount_="$(awk -F: '/Socket/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
-        local cores_amount_="$(awk -F: '/per socket/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
-        local threads_amount_="$(awk -F: '/Thread/{print $2}' <<< ${lscpu_info[@]}|tr -d '[:space:]')"
+        local sockets_amount_="$(awk -F: '/Socket/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
+        local cores_amount_="$(awk -F:   '/per socket/{print $2}' <<< ${lscpu_info[@]} | tr -d '[:space:]')"
+        local threads_amount_="$(awk -F: '/Thread/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
 
         local qemu_bypass_network=true
         local dynamic_usb_bypass=true
@@ -92,9 +96,8 @@ function main(){
         )
 
         local -a qemu_consoles=(
-            -qmp tcp:localhost:4444,server,nowait
-            -serial none
             -balloon none # Windows wont support it and kvm too, anyway
+            -qmp tcp:localhost:4444,server,nowait
         )
 
         local -a qemu_source_params=(
@@ -127,8 +130,8 @@ function main(){
 
         local -a qemu_pass_input=()
         if [[ ${dynamic_usb_bypass} == true ]]; then
-            modprobe ohci-hcd
-            modprobe ohci-pci
+            modprobe ohci-hcd 2> /dev/null
+            modprobe ohci-pci 2> /dev/null
 
             qemu_pass_input=(
                 -usb
@@ -187,8 +190,9 @@ function main(){
         # Disable torrents
         stig stop all
 
-        if [[ ! $(pidof synergyc) ]]; then
-            sudo -u neg "synergy" 2>&1 > /dev/null &! print "[Autostart synergy]"
+        if [[ ! $(pidof synergyc) && $(hash synergy > /dev/null) ]]; then
+            sudo -u neg "synergy" 2>&1 > /dev/null &! \
+                qemu::msg "Autostart synergy"
         fi
 
         if [[ ${qemu_bypass_network} == true ]]; then
@@ -206,14 +210,13 @@ function main(){
 
         if [[ ${dynamic_usb_bypass} == true && ${auto_usb_bypass} == true ]]; then
             {
-                echo "Bypass usb devices automatically, after ${usb_bypass_timeout} seconds"
+                qemu::msg "Bypass usb devices automatically, after ${usb_bypass_timeout} seconds"
                 sleep ${usb_bypass_timeout}
-                sudo $(pwd)/usb-passthrough.sh add all || echo 'Usb bypass failed'
+                sudo $(pwd)/usb-passthrough.sh add all || qemu::msg 'Usb bypass failed'
             } &
         fi
 
-        sudo systemctl start sshd
-        sudo systemctl start smbd
+        sudo systemctl start {ssh,smb}d
 
         QEMU_AUDIO_TIMER_PERIOD=150 \
         QEMU_PA_SAMPLES=1024 \
@@ -230,7 +233,7 @@ function main(){
             "${qemu_consoles[@]}"
         fi
 
-        succeeded=true
+        qemu_run_success=true
         trap finish_ EXIT TERM KILL
     ) &
     sudo rm -v "${lockfile}"
