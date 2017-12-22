@@ -1,7 +1,12 @@
-#!/bin/bash
+#!/bin/zsh
 
-handle_all_devices(){
-    USB_DEVICES+=("046d:c083" "046d:c32b")
+function handle_all_devices(){
+
+    USB_DEVICES+=(
+        "046d:c083" 
+        "046d:c32b"
+    )
+
     # G403 Prodigy Gaming Mouse 
     # Logitech G910 [Keyboard]  
     # Apple, Inc. iPhone5/5C/5S/6/7
@@ -12,7 +17,24 @@ handle_all_devices(){
     # 1038:1702 # SteelSeries ApS [ Mouse ]
 }
 
-main(){
+function prepare(){
+    trap "exit 1" TERM
+    export TOP_PID=$$
+
+    USB_DEVICES=()
+
+    netcat_port=4444
+    netcat_host=localhost
+    sec_wait=3
+
+    if [[ -z "${2}" ]]; then
+        handle_all_devices
+    else
+        USB_DEVICES+=("${2}")
+    fi
+}
+
+function main(){
     # loop over given search strings
     for i in "${USB_DEVICES[@]}"; do
         # loop over results of search string
@@ -24,30 +46,32 @@ main(){
             guestbus="xhci.0"
 
             if hash jq 2> /dev/null; then
-                bpasscmd(){
-                    nc -q 3 localhost 4444 <<< "${1}" | jq -c 
+                function bpasscmd(){
+                    for i in "$@";
+                        echo "${i}" | nc -q "${sec_wait}" "${netcat_host}" "${netcat_port}" | jq -c
                 }
             else
-                bpasscmd(){
-                    nc -q 3 localhost 4444 <<< "${1}"  
+                function bpasscmd(){
+                    for i in "$@";
+                        echo "${i}" | nc -q "${sec_wait}" "${netcat_host}" "${netcat_port}"
                 }
             fi
 
             if [[ ${1} == "add" ]]; then
                 echo "Passing through (USB):"
                 echo "${line}"
-                cmd="
-                { \"execute\": \"qmp_capabilities\" }
-                { \"execute\": \"device_add\", \"arguments\": { \"driver\": \"usb-host\", \"hostbus\": \"${bus}\", \"hostaddr\": \"${device}\", \"id\": \"usb_${vendor}.${product}.${bus}.${device}\", \"bus\": \"${guestbus}\" }}
-                "
+                cmd=(
+                    '{ "execute": "qmp_capabilities" }'
+                    '{ "execute": "device_add", "arguments": { "driver": "usb-host", "hostbus": "'${bus}'", "hostaddr": "'${device}'", "id": "'"usb_${vendor}.${product}.${bus}.${device}"'", "bus": "'${guestbus}'" }}'
+                )
                 bpasscmd "${cmd}"
             elif [[ ${1} == "del" ]]; then
                 echo "Undoing passthrough (USB):"
                 echo ${line}
-                cmd="
-                { \"execute\": \"qmp_capabilities\" }
-                { \"execute\": \"device_del\", \"arguments\": { \"id\": \"usb_$vendor.$product.$bus.$device\" }}
-                "
+                cmd=(
+                    "{ \"execute\": \"qmp_capabilities\" }"
+                    "{ \"execute\": \"device_del\", \"arguments\": { \"id\": \"usb_${vendor}.${product}.${bus}.${device}\" }}"
+                )
                 bpasscmd "${cmd}"
                 sleep 0.5
             else
@@ -58,19 +82,8 @@ main(){
     done
 }
 
-
-trap "exit 1" TERM
-export TOP_PID=$$
-
-USB_DEVICES=()
-
-if [[ -z "$2" ]]; then
-    handle_all_devices
-else
-    USB_DEVICES+=("$2")
-fi
-
+prepare "$@"
 main "$@"
 
-source "~neg/.zsh/00-common.zsh"
-source "${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh"
+source "$(readlink -f ~neg/.zsh/00-common.zsh)"
+source "$(readlink -f ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh)"
