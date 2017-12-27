@@ -13,7 +13,12 @@ function do_if_qemu(){
 }
 
 function check_qemu(){
-    st tmux -S ~/1st_level/vm.socket new -s vm -n vm 'sudo nohup ~neg/bin/qemu/wrun > /dev/null'
+    local cmd=(sudo ~neg/bin/qemu/wrun)
+    st dtach -c /tmp/qemu_wrun.session -Ez "${cmd[@]}"
+}
+
+function msg(){
+    notify-send "$@"
 }
 
 function main(){
@@ -38,7 +43,7 @@ function main(){
 
     case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
         *"Exit"*) 
-            notify-send "[ Do ${res} ]" ;;
+            msg "[ Do ${res} ]" ;;
         *"Usb"*"pass"*"add"*) 
             do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
         ;;
@@ -48,12 +53,12 @@ function main(){
         ;;
         *"Win"*"10"*)
             os_name=${res:s_Start__}
-            notify-send "Starting ... ${os_name}"
+            msg "Starting ... ${os_name}"
             if ! check_qemu; then
-                notify-send "Start ${os_name} failed" \
+                msg "Start ${os_name} failed" \
                     && exit 1
             else
-                notify-send "Done"
+                msg "Done"
             fi
         ;;
     esac
