@@ -50,19 +50,30 @@ opts_=(
 )
 
 menu_(){
-    res=$(rofi -xoffset 20 -yoffset 20 -location 1 -p "[screen] >> " -dmenu <<< $(for opt in ${opts_}; echo ${opt}))
-    case ${res} in
-        [Rr]*) select_ "$@"  ;;
-        [Ff]*) full_ "$@"    ;;
+    local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
+    local width_=$[x11_width-70]
+    local lines_=10
+    local yoffset_=-22
+
+    readonly rofi_cmd=(
+        rofi
+        -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
+        -theme-str "'#listview { lines:${lines_}; }'"
+        -p "'[screen] >> '"
+        -dmenu
+    )
+    case $(for opt in ${opts_}; do echo ${opt}; done | eval ${rofi_cmd[@]}) in
+        [Rr]*) select_  "$@" ;;
+        [Ff]*) full_    "$@" ;;
         [Cc]*) current_ "$@" ;;
-        [Dd]*) delay_ "$@"   ;;
+        [Dd]*) delay_   "$@" ;;
     esac
 }
-
+ 
 case $1 in
-    [Rr]*) select_ "$@"  ;;
+    [Rr]*) select_  "$@" ;;
     [Cc]*) current_ "$@" ;;
-    [Dd]*) delay_ "$@"   ;;
-    [Mm]*) menu_ "$@"    ;;
-    *) full_ "$@"     ;;
+    [Dd]*) delay_   "$@" ;;
+    [Mm]*) menu_    "$@" ;;
+    *)     full_    "$@" ;;
 esac
