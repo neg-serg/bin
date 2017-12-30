@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-grep 'define base' "${1:-$HOME/.Xresources}" | awk -F ' ' '{print $3}'
