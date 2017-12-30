@@ -1,9 +1,11 @@
 #/bin/zsh
 
-function main(){
+function load_forecast_info(){
     forecast_data_path=$(readlink -f "${HOME}/tmp/forecast.json")
     curl -X GET --silent "https://api.forecast.io/forecast/26611d19995c5fec79ad67e88cba6b6b/55.75,37.616667" > ${forecast_data_path}
+}
 
+function init_settings(){
     FG='#dcdcdc'
     BG='#000000'
     fg_title="#abd4e2"
@@ -21,7 +23,9 @@ function main(){
     icons2="Typicons:size=16"
     icons3="Ionicons:size=16"
     icons4="Typicons:size=13"
+}
 
+function init_weather_icon_list(){
     declare -A weather_icon_list
     weather_icon_list=(
         ["clear-day"]=""
@@ -42,7 +46,9 @@ function main(){
         ["NE"]="" ["NW"]=""
         ["SE"]="" ["SW"]=""
     )
+}
 
+function today_maxmin_info(){
     # ---- Today info ----
     today_sum=$(jshon -e daily < ${forecast_data_path} | \
                 jq '.data[0].summary' | \
@@ -68,6 +74,9 @@ function main(){
         jq '.data[0].temperatureMin')
     )
 
+}
+
+function today_sun_info(){
     sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunriseTime')
     sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunsetTime')
 
@@ -76,45 +85,15 @@ function main(){
 
     sunrise=$(date -d "${sunriseTime}" +'%H:%M')
     sunset=$(date -d "${sunsetTime}" +'%H:%M')
+}
 
-    # Moon phase
+# Moon phase
+function today_moon_info(){
     lunationNumber=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].moonPhase')
+}
 
-    # ---------- Currently
-    current_sum=$(jshon -e currently < ${forecast_data_path} | jq '.summary' | tr -d '"')
-    current_icon=$(grep $(jshon -e currently < ${forecast_data_path} | jq '.icon' | \
-        grep -o '[^\"]*') weather_icon_list | \
-        awk 'NR==1' | \
-        grep -o "\"[^\"]*\"" | \
-        grep -o "[^\"]*")
-    current_temp=$(printf "%0.0f\n" \
-        $(jshon -e currently < ${forecast_data_path} | \
-        jq '.temperature'))
-
-    cloudiness=$(jshon -e currently < ${forecast_data_path} | jq '.cloudCover')
-    if (( $(bc -l <<< "${cloudiness} != 0") )); then
-        if [[ "${cloudiness}" = "1" ]]; then
-            cloudiness=$(bc -l <<< "${cloudiness} * 100")
-        else
-            cloudiness=$(bc -l <<<  "${cloudiness} * 100"| tr -d '.00')
-        fi
-    else
-        cloudiness="${cloudiness}"
-    fi
-
-    # Humidity
-    humidity=$(jshon -e currently < ${forecast_data_path} | jq '.humidity')
-    if (( $(bc -l <<<  "${humidity} != 0") )); then
-        if [[ "${humidity}" = "1" ]]; then
-            humidity=$(bc -l <<<  "${humidity} * 100")
-        else
-            humidity=$(bc -l <<< "${humidity} * 100"| tr -d '.00')
-        fi
-    else
-        humidity="${humidity}"
-    fi
-
-    # Wind info
+# Wind info
+function today_wind_info(){
     windSpeed=$(jshon -e currently < ${forecast_data_path} | jq '.windSpeed')
 
     # Getting today's wind Speed and wind Bearing
@@ -123,8 +102,10 @@ function main(){
     else
         wind_bearing="n/a"
     fi
+}
 
-    # Getting today's wind direction name
+# Getting today's wind direction name
+function today_wind_direction(){
     if [[ "${wind_bearing}" = "n/a" ]]; then
         wind_dir="n/a"
     else
@@ -153,6 +134,62 @@ function main(){
         awk 'NR==1' | \
         grep -o "\"[^\"]*\"" | \
         grep -o "[^\"]*")
+
+}
+
+function today_temp_sum(){
+    current_sum=$(jshon -e currently < ${forecast_data_path} | jq '.summary' | tr -d '"')
+    current_icon=$(grep $(jshon -e currently < ${forecast_data_path} | jq '.icon' | \
+        grep -o '[^\"]*') weather_icon_list | \
+        awk 'NR==1' | \
+        grep -o "\"[^\"]*\"" | \
+        grep -o "[^\"]*")
+    current_temp=$(printf "%0.0f\n" \
+        $(jshon -e currently < ${forecast_data_path} | \
+        jq '.temperature'))
+}
+
+function today_cloudiness(){
+    cloudiness=$(jshon -e currently < ${forecast_data_path} | jq '.cloudCover')
+    if (( $(bc -l <<< "${cloudiness} != 0") )); then
+        if [[ "${cloudiness}" = "1" ]]; then
+            cloudiness=$(bc -l <<< "${cloudiness} * 100")
+        else
+            cloudiness=$(bc -l <<<  "${cloudiness} * 100"| tr -d '.00')
+        fi
+    else
+        cloudiness="${cloudiness}"
+    fi
+}
+
+# Humidity
+function today_humidity(){
+    humidity=$(jshon -e currently < ${forecast_data_path} | jq '.humidity')
+    if (( $(bc -l <<<  "${humidity} != 0") )); then
+        if [[ "${humidity}" = "1" ]]; then
+            humidity=$(bc -l <<<  "${humidity} * 100")
+        else
+            humidity=$(bc -l <<< "${humidity} * 100"| tr -d '.00')
+        fi
+    else
+        humidity="${humidity}"
+    fi
+}
+
+function main(){
+    load_forecast_info
+    init_settings
+    init_weather_icon_list
+
+    today_maxmin_info
+    today_sun_info
+    today_moon_info
+    today_temp_sum
+
+    today_humidity
+    today_wind_info
+    today_wind_direction
+    today_cloudiness
 
     # ---- Next 7 day forecast
     next7DAYsum=$(jshon -e daily < ${forecast_data_path} | jq '.summary')
