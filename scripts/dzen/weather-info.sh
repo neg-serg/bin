@@ -80,8 +80,8 @@ function today_sun_info(){
     local sunriseTime=$(date -ud @${sunriseTimeStamp})
     local sunsetTime=$(date -ud @${sunsetTimeStamp})
 
-    sunrise=$(date -d "${sunriseTime}" +'%H:%M')
-    sunset=$(date -d "${sunsetTime}" +'%H:%M')
+    today_sunrise=$(date -d "${sunriseTime}" +'%H:%M')
+    today_sunset=$(date -d "${sunsetTime}" +'%H:%M')
 }
 
 # Moon phase
@@ -135,8 +135,8 @@ function today_wind_direction(){
 }
 
 function today_temp_sum(){
-    current_sum=$(jshon -e currently < ${forecast_data_path} | jq '.summary' | tr -d '"')
-    current_icon=$(grep $(jshon -e currently < ${forecast_data_path} | jq '.icon' | \
+    today_sum=$(jshon -e currently < ${forecast_data_path} | jq '.summary' | tr -d '"')
+    today_icon=$(grep $(jshon -e currently < ${forecast_data_path} | jq '.icon' | \
         grep -o '[^\"]*') weather_icon_list | \
         awk 'NR==1' | \
         grep -o "\"[^\"]*\"" | \
@@ -367,10 +367,10 @@ function main(){
     )
 
     (
-        echo "   ^fn(${fn_14})${today_temp}°, ${current_sum}  ^fn(${fn1})"
-        echo "   ^p(+50;-9)^fn(${wic_45})${current_icon}^fn(${fn1})^p() ^p(+75)^fg(#87d7ff)${today_temp_min}°^fg()^fn(${icons2})^fn($fn1)^p(+2)^fg(#ff8b8b)${today_temp_max}°^fg()^p()  ${wind_dir} ^fn(${wic_16})${wind_icon}^fn(${fn1}) ${windSpeed} m/s"
-        echo "   ^p(+50;-36)^fn(${wic_45})${current_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%"
-        echo "   ^p(+50;-63)^fn(${wic_45})${current_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${sunset}"
+        echo "   ^fn(${fn_14})${today_temp}°, ${today_sum}  ^fn(${fn1})"
+        echo "   ^p(+50;-9)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fg(#87d7ff)${today_temp_min}°^fg()^fn(${icons2})^fn($fn1)^p(+2)^fg(#ff8b8b)${today_temp_max}°^fg()^p()  ${wind_dir} ^fn(${wic_16})${wind_icon}^fn(${fn1}) ${windSpeed} m/s"
+        echo "   ^p(+50;-36)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%"
+        echo "   ^p(+50;-63)^fn(${wic_45})${today_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunset}"
         echo "   ${today_sum}"
         echo "   ^fg(#666666)-----------------------------------------------------"
         echo "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%"
