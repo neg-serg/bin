@@ -1,12 +1,13 @@
 #/bin/zsh
 
-curl -X GET --silent "https://api.forecast.io/forecast/26611d19995c5fec79ad67e88cba6b6b/55.75,37.616667" > ~/tmp/forecast.json
+forecast_data_path=$(readlink -f "${HOME}/tmp/forecast.json")
+curl -X GET --silent "https://api.forecast.io/forecast/26611d19995c5fec79ad67e88cba6b6b/55.75,37.616667" > ${forecast_data_path}
 
 FG='#dcdcdc'
 BG='#000000'
 fg_title="#abd4e2"
 
-fn_="PragmataPro for Powerline"
+fn_="Iosevka Term Medium"
 wfn_="Weather Icons"
 fn1="${fn_}:size=11"      
 fnT="${fn_}:bold:size=11"  
@@ -19,8 +20,6 @@ icons1="Ionicons:size=13"
 icons2="Typicons:size=16"
 icons3="Ionicons:size=16"
 icons4="Typicons:size=13"
-
-forecast_data_=$(readlink -f ~/tmp/forecast.json)
 
 declare -A weather_icon_list
 weather_icon_list=(
@@ -37,22 +36,18 @@ weather_icon_list=(
     ["hail"]=""
     ["thunderstorm"]=""
     ["tornado"]=""
-    ["N"]=""
-    ["E"]=""
-    ["S"]=""
-    ["W"]=""
-    ["NE"]=""
-    ["NW"]=""
-    ["SE"]=""
-    ["SW"]=""
+    ["N"]="" ["E"]=""
+    ["S"]="" ["W"]=""
+    ["NE"]="" ["NW"]=""
+    ["SE"]="" ["SW"]=""
 )
 
 # ---- Today info ----
-today_sum=$(jshon -e daily < ${forecast_data_} | \
+today_sum=$(jshon -e daily < ${forecast_data_path} | \
             jq '.data[0].summary' | \
             tr -d '"'
 )
-today_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+today_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[0].icon' | \
                     grep -o '[^\"]*') \
              weather_icon_list | \
@@ -63,17 +58,17 @@ today_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
 
 # Temperature levels
 today_temp_max=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
       jq '.data[0].temperatureMax'
      )
 )
 today_temp_min=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[0].temperatureMin')
 )
 
-sunriseTimeStamp=$(jshon -e daily < ${forecast_data_} | jq '.data[0].sunriseTime')
-sunsetTimeStamp=$(jshon -e daily < ${forecast_data_} | jq '.data[0].sunsetTime')
+sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunriseTime')
+sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunsetTime')
 
 sunriseTime=$(date -ud @${sunriseTimeStamp})
 sunsetTime=$(date -ud @${sunsetTimeStamp})
@@ -82,20 +77,20 @@ sunrise=$(date -d "${sunriseTime}" +'%H:%M')
 sunset=$(date -d "${sunsetTime}" +'%H:%M')
 
 # Moon phase
-lunationNumber=$(jshon -e daily < ${forecast_data_} | jq '.data[0].moonPhase')
+lunationNumber=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].moonPhase')
 
 # ---------- Currently
-current_sum=$(jshon -e currently < ${forecast_data_} | jq '.summary' | tr -d '"')
-current_icon=$(grep $(jshon -e currently < ${forecast_data_} | jq '.icon' | \
+current_sum=$(jshon -e currently < ${forecast_data_path} | jq '.summary' | tr -d '"')
+current_icon=$(grep $(jshon -e currently < ${forecast_data_path} | jq '.icon' | \
     grep -o '[^\"]*') weather_icon_list | \
     awk 'NR==1' | \
     grep -o "\"[^\"]*\"" | \
     grep -o "[^\"]*")
 current_temp=$(printf "%0.0f\n" \
-    $(jshon -e currently < ${forecast_data_} | \
+    $(jshon -e currently < ${forecast_data_path} | \
     jq '.temperature'))
 
-cloudiness=$(jshon -e currently < ${forecast_data_} | jq '.cloudCover')
+cloudiness=$(jshon -e currently < ${forecast_data_path} | jq '.cloudCover')
 if (( $(bc -l <<< "${cloudiness} != 0") )); then
     if [[ "${cloudiness}" = "1" ]]; then
         cloudiness=$(bc -l <<< "${cloudiness} * 100")
@@ -107,7 +102,7 @@ else
 fi
 
 # Humidity
-humidity=$(jshon -e currently < ${forecast_data_} | jq '.humidity')
+humidity=$(jshon -e currently < ${forecast_data_path} | jq '.humidity')
 if (( $(bc -l <<<  "${humidity} != 0") )); then
     if [[ "${humidity}" = "1" ]]; then
         humidity=$(bc -l <<<  "${humidity} * 100")
@@ -119,11 +114,11 @@ else
 fi
 
 # Wind info
-windSpeed=$(jshon -e currently < ${forecast_data_} | jq '.windSpeed')
+windSpeed=$(jshon -e currently < ${forecast_data_path} | jq '.windSpeed')
 
 # Getting today's wind Speed and wind Bearing
 if (( $(bc -l <<<  "${windSpeed} != 0" ) )); then
-    wind_bearing=$(jshon -e currently < ${forecast_data_} | jq '.wind_bearing')
+    wind_bearing=$(jshon -e currently < ${forecast_data_path} | jq '.wind_bearing')
 else
     wind_bearing="n/a"
 fi
@@ -159,26 +154,26 @@ wind_icon=$(grep $(grep -o '[^\"]*' <<<  ${wind_dir}) weather_icon_list | \
     grep -o "[^\"]*")
 
 # ---- Next 7 day forecast
-next7DAYsum=$(jshon -e daily < ${forecast_data_} | jq '.summary')
+next7DAYsum=$(jshon -e daily < ${forecast_data_path} | jq '.summary')
 
 # Tomorrow
 next_name=$(date --date='+1 day' +'%a' | tr '[:lower:]' '[:upper:]')
-next_sum=$(jshon -e daily < ${forecast_data_} | \
+next_sum=$(jshon -e daily < ${forecast_data_path} | \
     jq '.data[1].summary' | \
     tr -d '"')
-next_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+next_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[1].icon' | \
     grep -o '[^\"]*') \
     weather_icon_list | \
     awk 'NR==1' | \
     grep -o "\"[^\"]*\"" | \
     grep -o "[^\"]*")
-next_temp_max=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_} | jq '.data[1].temperatureMax'))
-next_temp_min=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_} | jq '.data[1].temperatureMin'))
+next_temp_max=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMax'))
+next_temp_min=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMin'))
 
 # Sunrise, Sunset
-next_sunriseTimeStamp=$(jshon -e daily < ${forecast_data_} | jq '.data[1].sunriseTime')
-next_sunsetTimeStamp=$(jshon -e daily < ${forecast_data_} | jq '.data[1].sunsetTime')
+next_sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunriseTime')
+next_sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunsetTime')
 
 next_sunriseTime=$(date -ud @${next_sunriseTimeStamp})
 next_sunsetTime=$(date -ud @${next_sunsetTimeStamp})
@@ -186,7 +181,7 @@ next_sunsetTime=$(date -ud @${next_sunsetTimeStamp})
 next_sunrise=$(date -d "${next_sunriseTime}" +'%H:%M')
 next_sunset=$(date -d "${next_sunsetTime}" +'%H:%M')
 
-next_cloudiness=$(jshon -e daily < ${forecast_data_} | jq '.data[1].cloudCover')
+next_cloudiness=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].cloudCover')
 if (( $(bc -l <<< "${next_cloudiness} != 0") )); then
     if [[ "${next_cloudiness}" = "1" ]]; then
         next_cloudiness=$(bc -l <<<  "${next_cloudiness} * 100")
@@ -197,7 +192,7 @@ else
     next_cloudiness="${next_cloudiness}"
 fi
 
-next_humidity=$(jshon -e daily < ${forecast_data_} | jq '.data[1].humidity')
+next_humidity=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].humidity')
 
 if (( $(echo "${next_humidity} != 0" | bc -l) )); then
     if [[ "${next_humidity}" = "1" ]]; then
@@ -211,8 +206,8 @@ fi
 
 # 3rd day
 day3_name=$(date --date='+2 day' +'%a' | tr '[:lower:]' '[:upper:]')
-day3_sum=$(jshon -e daily < ${forecast_data_} | jq '.data[2].summary' | tr -d '"')
-day3_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+day3_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[2].summary' | tr -d '"')
+day3_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                    jq '.data[2].icon' | \
                    grep -o '[^\"]*') \
             weather_icon_list | \
@@ -222,11 +217,11 @@ day3_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
 )
 
 day3_temp_max=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
       jq '.data[2].temperatureMax') \
 )
 day3_temp_min=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[2].temperatureMin') \
 )
 
@@ -234,11 +229,11 @@ day3_temp_min=$(printf "%0.0f\n" \
 day4_name=$(date --date='+3 day' +'%a' | \
             tr '[:lower:]' '[:upper:]' \
            )
-day4_sum=$(jshon -e daily < ${forecast_data_} | \
+day4_sum=$(jshon -e daily < ${forecast_data_path} | \
            jq '.data[3].summary' | \
            tr -d '"' \
            )
-day4_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+day4_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                    jq '.data[3].icon' | \
                    grep -o '[^\"]*') \
             weather_icon_list | \
@@ -247,21 +242,21 @@ day4_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
             grep -o "[^\"]*" \
 )
 day4_temp_max=$(printf "%0.0f\n" \
-                $(jshon -e daily < ${forecast_data_} | \
+                $(jshon -e daily < ${forecast_data_path} | \
                 jq '.data[3].temperatureMax') \
                )
 day4_temp_min=$(printf "%0.0f\n" \
-                $(jshon -e daily < ${forecast_data_} | \
+                $(jshon -e daily < ${forecast_data_path} | \
                   jq '.data[3].temperatureMin') \
                )
 
 # 5th day
 day5_name=$(date --date='+4 day' +'%a' | tr '[:lower:]' '[:upper:]')
-day5_sum=$(jshon -e daily < ${forecast_data_} | \
+day5_sum=$(jshon -e daily < ${forecast_data_path} | \
            jq '.data[4].summary' | \
            tr -d '"' \
 )
-day5_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+day5_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                    jq '.data[4].icon' | \
                    grep -o '[^\"]*') \
             weather_icon_list | \
@@ -270,18 +265,18 @@ day5_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
             grep -o "[^\"]*" \
 )
 day5_temp_max=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[4].temperatureMax') \
 )
 day5_temp_min=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[4].temperatureMin') \
 )
 
 # 6th day
 day6_name=$(date --date='+5 day' +'%a' | tr '[:lower:]' '[:upper:]')
-day6_sum=$(jshon -e daily < ${forecast_data_} | jq '.data[5].summary' | tr -d '"')
-day6_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+day6_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[5].summary' | tr -d '"')
+day6_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                    jq '.data[5].icon' | \
                    grep -o '[^\"]*') \
             weather_icon_list | \
@@ -290,21 +285,21 @@ day6_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
             grep -o "[^\"]*" \
 )
 day6_temp_max=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[5].temperatureMax') \
 )
 day6_temp_min=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[5].temperatureMin') \
 )
 
 # 7th day
 day7_name=$(date --date='+6 day' +'%a' | tr '[:lower:]' '[:upper:]')
-day7_sum=$(jshon -e daily < ${forecast_data_} | \
+day7_sum=$(jshon -e daily < ${forecast_data_path} | \
            jq '.data[6].summary' | \
            tr -d '"' \
 )
-day7_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
+day7_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                    jq '.data[6].icon' | \
                    grep -o '[^\"]*') \
             weather_icon_list | \
@@ -313,11 +308,11 @@ day7_icon=$(grep $(jshon -e daily < ${forecast_data_} | \
             grep -o "[^\"]*" \
 )
 day7_temp_max=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[6].temperatureMax') \
 )
 day7_temp_min=$(printf "%0.0f\n" \
-    $(jshon -e daily < ${forecast_data_} | \
+    $(jshon -e daily < ${forecast_data_path} | \
     jq '.data[6].temperatureMin') \
 )
 
