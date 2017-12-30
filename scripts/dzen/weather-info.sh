@@ -6,20 +6,19 @@ function load_forecast_info(){
 }
 
 function init_settings(){
-    FG='#dcdcdc'
-    BG='#000000'
-    fg_title="#abd4e2"
+    local font="Iosevka Term Medium"
+    local weather_font="Weather Icons"
 
-    fn_="Iosevka Term Medium"
-    wfn_="Weather Icons"
-    fn1="${fn_}:size=11"      
-    fnT="${fn_}:bold:size=11"  
-    fn_14="${fn_}:bold:size=14"
-    wic_13="${wfn_}:size=13"  
-    wic_16="${wfn_}:size=16"   
-    wic_45="${wfn_}:size=45"
+    FG="$(xrq 'foreground')"
+    BG="$(xrq 'background')"
 
-    icons1="Ionicons:size=13"
+    fn1="${font}:size=11"      
+    fnT="${font}:bold:size=11"  
+    fn_14="${font}:bold:size=14"
+    wic_13="${weather_font}:size=13"  
+    wic_16="${weather_font}:size=16"   
+    wic_45="${weather_font}:size=45"
+
     icons2="Typicons:size=16"
     icons3="Ionicons:size=16"
     icons4="Typicons:size=13"
@@ -49,7 +48,6 @@ function init_weather_icon_list(){
 }
 
 function today_maxmin_info(){
-    # ---- Today info ----
     today_sum=$(jshon -e daily < ${forecast_data_path} | \
                 jq '.data[0].summary' | \
                 tr -d '"'
@@ -63,7 +61,7 @@ function today_maxmin_info(){
                 grep -o "[^\"]*"
     )
 
-    # Temperature levels
+    # Temperature max/min levels
     today_temp_max=$(printf "%0.0f\n" \
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[0].temperatureMax'
@@ -73,15 +71,14 @@ function today_maxmin_info(){
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[0].temperatureMin')
     )
-
 }
 
 function today_sun_info(){
-    sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunriseTime')
-    sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunsetTime')
+    local sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunriseTime')
+    local sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[0].sunsetTime')
 
-    sunriseTime=$(date -ud @${sunriseTimeStamp})
-    sunsetTime=$(date -ud @${sunsetTimeStamp})
+    local sunriseTime=$(date -ud @${sunriseTimeStamp})
+    local sunsetTime=$(date -ud @${sunsetTimeStamp})
 
     sunrise=$(date -d "${sunriseTime}" +'%H:%M')
     sunset=$(date -d "${sunsetTime}" +'%H:%M')
@@ -144,7 +141,7 @@ function today_temp_sum(){
         awk 'NR==1' | \
         grep -o "\"[^\"]*\"" | \
         grep -o "[^\"]*")
-    current_temp=$(printf "%0.0f\n" \
+    today_temp=$(printf "%0.0f\n" \
         $(jshon -e currently < ${forecast_data_path} | \
         jq '.temperature'))
 }
@@ -176,6 +173,69 @@ function today_humidity(){
     fi
 }
 
+function tomorrow_name(){
+    next_name=$(date --date='+1 day' +'%a' | tr '[:lower:]' '[:upper:]')
+}
+
+function tomorrow_sum(){
+    next_sum=$(jshon -e daily < ${forecast_data_path} | \
+        jq '.data[1].summary' | \
+        tr -d '"')
+}
+
+function tomorrow_icon(){
+    next_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
+        jq '.data[1].icon' | \
+        grep -o '[^\"]*') \
+        weather_icon_list | \
+        awk 'NR==1' | \
+        grep -o "\"[^\"]*\"" | \
+        grep -o "[^\"]*")
+}
+
+function tomorrow_minmax(){
+    next_temp_max=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMax'))
+    next_temp_min=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMin'))
+}
+
+function tomorrow_sun_info(){
+    next_sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunriseTime')
+    next_sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunsetTime')
+
+    next_sunriseTime=$(date -ud @${next_sunriseTimeStamp})
+    next_sunsetTime=$(date -ud @${next_sunsetTimeStamp})
+
+    next_sunrise=$(date -d "${next_sunriseTime}" +'%H:%M')
+    next_sunset=$(date -d "${next_sunsetTime}" +'%H:%M')
+}
+
+function tomorrow_cloudiness(){
+    tomorrow_cloudiness=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].cloudCover')
+    if (( $(bc -l <<< "${tomorrow_cloudiness} != 0") )); then
+        if [[ "${tomorrow_cloudiness}" = "1" ]]; then
+            tomorrow_cloudiness=$(bc -l <<<  "${tomorrow_cloudiness} * 100")
+        else
+            tomorrow_cloudiness=$(bc -l <<< "${tomorrow_cloudiness} * 100" | tr -d '.00')
+        fi
+    else
+        tomorrow_cloudiness="${tomorrow_cloudiness}"
+    fi
+}
+
+function tomorrow_humidity(){
+    tomorrow_humidity=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].humidity')
+
+    if (( $(echo "${tomorrow_humidity} != 0" | bc -l) )); then
+        if [[ "${tomorrow_humidity}" = "1" ]]; then
+            tomorrow_humidity=$(bc -l <<<  "${tomorrow_humidity} * 100")
+        else
+            tomorrow_humidity=$(bc -l <<<  "${tomorrow_humidity} * 100"| tr -d '.00')
+        fi
+    else
+        tomorrow_humidity="${tomorrow_humidity}"
+    fi
+}
+
 function main(){
     load_forecast_info
     init_settings
@@ -191,58 +251,14 @@ function main(){
     today_wind_direction
     today_cloudiness
 
-    # ---- Next 7 day forecast
-    next7DAYsum=$(jshon -e daily < ${forecast_data_path} | jq '.summary')
+    tomorrow_name
+    tomorrow_sum
+    tomorrow_icon
+    tomorrow_minmax
+    tomorrow_sun_info
+    tomorrow_cloudiness
+    tomorrow_humidity
 
-    # Tomorrow
-    next_name=$(date --date='+1 day' +'%a' | tr '[:lower:]' '[:upper:]')
-    next_sum=$(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[1].summary' | \
-        tr -d '"')
-    next_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[1].icon' | \
-        grep -o '[^\"]*') \
-        weather_icon_list | \
-        awk 'NR==1' | \
-        grep -o "\"[^\"]*\"" | \
-        grep -o "[^\"]*")
-    next_temp_max=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMax'))
-    next_temp_min=$(printf "%0.0f\n" $(jshon -e daily < ${forecast_data_path} | jq '.data[1].temperatureMin'))
-
-    # Sunrise, Sunset
-    next_sunriseTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunriseTime')
-    next_sunsetTimeStamp=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].sunsetTime')
-
-    next_sunriseTime=$(date -ud @${next_sunriseTimeStamp})
-    next_sunsetTime=$(date -ud @${next_sunsetTimeStamp})
-
-    next_sunrise=$(date -d "${next_sunriseTime}" +'%H:%M')
-    next_sunset=$(date -d "${next_sunsetTime}" +'%H:%M')
-
-    next_cloudiness=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].cloudCover')
-    if (( $(bc -l <<< "${next_cloudiness} != 0") )); then
-        if [[ "${next_cloudiness}" = "1" ]]; then
-            next_cloudiness=$(bc -l <<<  "${next_cloudiness} * 100")
-        else
-            next_cloudiness=$(bc -l <<< "${next_cloudiness} * 100" | tr -d '.00')
-        fi
-    else
-        next_cloudiness="${next_cloudiness}"
-    fi
-
-    next_humidity=$(jshon -e daily < ${forecast_data_path} | jq '.data[1].humidity')
-
-    if (( $(echo "${next_humidity} != 0" | bc -l) )); then
-        if [[ "${next_humidity}" = "1" ]]; then
-            next_humidity=$(bc -l <<<  "${next_humidity} * 100")
-        else
-            next_humidity=$(bc -l <<<  "${next_humidity} * 100"| tr -d '.00')
-        fi
-    else
-        next_humidity="${next_humidity}"
-    fi
-
-    # 3rd day
     day3_name=$(date --date='+2 day' +'%a' | tr '[:lower:]' '[:upper:]')
     day3_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[2].summary' | tr -d '"')
     day3_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
@@ -263,7 +279,6 @@ function main(){
         jq '.data[2].temperatureMin') \
     )
 
-    # 4th day
     day4_name=$(date --date='+3 day' +'%a' | \
                 tr '[:lower:]' '[:upper:]' \
             )
@@ -288,7 +303,6 @@ function main(){
                     jq '.data[3].temperatureMin') \
                 )
 
-    # 5th day
     day5_name=$(date --date='+4 day' +'%a' | tr '[:lower:]' '[:upper:]')
     day5_sum=$(jshon -e daily < ${forecast_data_path} | \
             jq '.data[4].summary' | \
@@ -311,7 +325,6 @@ function main(){
         jq '.data[4].temperatureMin') \
     )
 
-    # 6th day
     day6_name=$(date --date='+5 day' +'%a' | tr '[:lower:]' '[:upper:]')
     day6_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[5].summary' | tr -d '"')
     day6_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
@@ -331,7 +344,6 @@ function main(){
         jq '.data[5].temperatureMin') \
     )
 
-    # 7th day
     day7_name=$(date --date='+6 day' +'%a' | tr '[:lower:]' '[:upper:]')
     day7_sum=$(jshon -e daily < ${forecast_data_path} | \
             jq '.data[6].summary' | \
@@ -355,13 +367,13 @@ function main(){
     )
 
     (
-        echo "   ^fn(${fn_14})${current_temp}°, ${current_sum}  ^fn(${fn1})"
+        echo "   ^fn(${fn_14})${today_temp}°, ${current_sum}  ^fn(${fn1})"
         echo "   ^p(+50;-9)^fn(${wic_45})${current_icon}^fn(${fn1})^p() ^p(+75)^fg(#87d7ff)${today_temp_min}°^fg()^fn(${icons2})^fn($fn1)^p(+2)^fg(#ff8b8b)${today_temp_max}°^fg()^p()  ${wind_dir} ^fn(${wic_16})${wind_icon}^fn(${fn1}) ${windSpeed} m/s"
         echo "   ^p(+50;-36)^fn(${wic_45})${current_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%"
         echo "   ^p(+50;-63)^fn(${wic_45})${current_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${sunset}"
         echo "   ${today_sum}"
         echo "   ^fg(#666666)-----------------------------------------------------"
-        echo "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${next_humidity}%"
+        echo "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%"
         echo "   ${next_sum}"
         echo "   ^bg(#222222)^fn(${fn_14}) ${day3_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day3_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day3_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day3_temp_max}°^fg()"
         echo "   ${day3_sum}"
