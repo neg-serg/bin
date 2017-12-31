@@ -27,22 +27,22 @@
 set -e
 
 if test "$1" = -v; then
-sort=sort-by-votes
-shift
+    sort=sort-by-votes
+    shift
 fi
 
 base_url=http://www.commandlinefu.com/commands
 
 if test "$1"; then
-query=$1
-base64=`echo -n $query | base64`
-command_set=matching/$query/$base64
+    query=$1
+    base64=`echo -n $query | base64`
+    command_set=matching/$query/$base64
 else
-command_set=browse
+    command_set=browse
 fi
 
 if test "$sort"; then
-command_set=$command_set/$sort
+    command_set=$command_set/$sort
 fi
 
 format=plaintext
@@ -50,7 +50,7 @@ format=plaintext
 url=$base_url/$command_set/$format
 
 if test -t 1; then
-curl -s $url | source-highlight -s sh -f esc #| less -R
+    curl -s $url | source-highlight -s sh -f esc #| less -R
 else
-curl -s $url
+    curl -s $url
 fi
