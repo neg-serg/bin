@@ -367,21 +367,21 @@ function main(){
     )
 
     (
-        echo "   ^fn(${fn_14})${today_temp}°, ${today_sum}  ^fn(${fn1})"
-        echo "   ^p(+50;-9)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fg(#87d7ff)${today_temp_min}°^fg()^fn(${icons2})^fn($fn1)^p(+2)^fg(#ff8b8b)${today_temp_max}°^fg()^p()  ${wind_dir} ^fn(${wic_16})${wind_icon}^fn(${fn1}) ${windSpeed} m/s"
-        echo "   ^p(+50;-36)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%"
-        echo "   ^p(+50;-63)^fn(${wic_45})${today_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunset}"
-        echo "   ${today_sum}"
-        echo "   ^fg(#666666)-----------------------------------------------------"
-        echo "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%"
-        echo "   ${next_sum}"
-        echo "   ^bg(#222222)^fn(${fn_14}) ${day3_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day3_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day3_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day3_temp_max}°^fg()"
-        echo "   ${day3_sum}"
-        echo "   ^bg(#222222)^fn(${fn_14}) ${day4_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day4_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day4_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day4_temp_max}°^fg()"
-        echo "   ${day4_sum}"
-        echo "   ^bg(#222222)^fn(${fn_14}) ${day5_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day5_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day5_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day5_temp_max}°^fg()"
-        echo "   ${day5_sum}"
-        echo "^bg(#666666)^fg(#222222)   Powered by forecast.io   "
+        echo "    ^fn(${fn_14})${today_temp}°, ${today_sum}  ^fn(${fn1})"
+        echo -ne "    ^p(+50;-9)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fg(#87d7ff)${today_temp_min}°^fg()^fn(${icons2})^fn($fn1)^p(+2)^fg(#ff8b8b)${today_temp_max}°^fg()^p()  ${wind_dir} ^fn(${wic_16})${wind_icon}^fn(${fn1}) ${windSpeed} m/s\n" \
+        "   ^p(+50;-36)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%\n" \
+        "   ^p(+50;-63)^fn(${wic_45})${today_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunset}\n" \
+        "   ${today_sum}\n" \
+        "   ^fg(#666666)-----------------------------------------------------\n" \
+        "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%\n" \
+        "   ${next_sum}\n" \
+        "   ^bg(#222222)^fn(${fn_14}) ${day3_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day3_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day3_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day3_temp_max}°^fg()\n" \
+        "   ${day3_sum}\n" \
+        "   ^bg(#222222)^fn(${fn_14}) ${day4_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day4_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day4_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day4_temp_max}°^fg()\n" \
+        "   ${day4_sum}\n" \
+        "   ^bg(#222222)^fn(${fn_14}) ${day5_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day5_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day5_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day5_temp_max}°^fg()\n" \
+        "   ${day5_sum}\n" \
+        "^bg(#666666)^fg(#222222)   Powered by forecast.io   \n" \
     ) | dzen2 -p -x 582 -y 28 -w 420 \
         -bg ${BG} -fg ${FG} \
         -h 27 -l 14 -sa l -ta l \
