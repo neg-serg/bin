@@ -12,6 +12,9 @@ function init_settings(){
     FG="$(xrq 'foreground')"
     BG="$(xrq 'background')"
 
+    DGR="#222222"
+    LGR="#666666"
+
     fn1="${font}:size=11"      
     fnT="${font}:bold:size=11"  
     fn_14="${font}:bold:size=14"
@@ -259,9 +262,9 @@ function main(){
     tomorrow_cloudiness
     tomorrow_humidity
 
-    day3_name=$(date --date='+2 day' +'%a' | tr '[:lower:]' '[:upper:]')
-    day3_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[2].summary' | tr -d '"')
-    day3_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
+    d3name=$(date --date='+2 day' +'%a' | tr '[:lower:]' '[:upper:]')
+    d3sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[2].summary' | tr -d '"')
+    d3icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[2].icon' | \
                     grep -o '[^\"]*') \
                 weather_icon_list | \
@@ -270,23 +273,23 @@ function main(){
                 grep -o "[^\"]*" \
     )
 
-    day3_temp_max=$(printf "%0.0f\n" \
+    d3tempmax=$(printf "%0.0f\n" \
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[2].temperatureMax') \
     )
-    day3_temp_min=$(printf "%0.0f\n" \
+    d3tempmin=$(printf "%0.0f\n" \
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[2].temperatureMin') \
     )
 
-    day4_name=$(date --date='+3 day' +'%a' | \
+    d4name=$(date --date='+3 day' +'%a' | \
                 tr '[:lower:]' '[:upper:]' \
             )
-    day4_sum=$(jshon -e daily < ${forecast_data_path} | \
+    d4sum=$(jshon -e daily < ${forecast_data_path} | \
             jq '.data[3].summary' | \
             tr -d '"' \
             )
-    day4_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
+    d4icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[3].icon' | \
                     grep -o '[^\"]*') \
                 weather_icon_list | \
@@ -294,21 +297,21 @@ function main(){
                 grep -o "\"[^\"]*\"" | \
                 grep -o "[^\"]*" \
     )
-    day4_temp_max=$(printf "%0.0f\n" \
+    d4tempmax=$(printf "%0.0f\n" \
                     $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[3].temperatureMax') \
                 )
-    day4_temp_min=$(printf "%0.0f\n" \
+    d4tempmin=$(printf "%0.0f\n" \
                     $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[3].temperatureMin') \
                 )
 
-    day5_name=$(date --date='+4 day' +'%a' | tr '[:lower:]' '[:upper:]')
-    day5_sum=$(jshon -e daily < ${forecast_data_path} | \
+    d5name=$(date --date='+4 day' +'%a' | tr '[:lower:]' '[:upper:]')
+    d5sum=$(jshon -e daily < ${forecast_data_path} | \
             jq '.data[4].summary' | \
             tr -d '"' \
     )
-    day5_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
+    d5icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
                     jq '.data[4].icon' | \
                     grep -o '[^\"]*') \
                 weather_icon_list | \
@@ -316,54 +319,13 @@ function main(){
                 grep -o "\"[^\"]*\"" | \
                 grep -o "[^\"]*" \
     )
-    day5_temp_max=$(printf "%0.0f\n" \
+    d5tempmax=$(printf "%0.0f\n" \
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[4].temperatureMax') \
     )
-    day5_temp_min=$(printf "%0.0f\n" \
+    d5tempmin=$(printf "%0.0f\n" \
         $(jshon -e daily < ${forecast_data_path} | \
         jq '.data[4].temperatureMin') \
-    )
-
-    day6_name=$(date --date='+5 day' +'%a' | tr '[:lower:]' '[:upper:]')
-    day6_sum=$(jshon -e daily < ${forecast_data_path} | jq '.data[5].summary' | tr -d '"')
-    day6_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
-                    jq '.data[5].icon' | \
-                    grep -o '[^\"]*') \
-                weather_icon_list | \
-                awk 'NR==1' | \
-                grep -o "\"[^\"]*\"" | \
-                grep -o "[^\"]*" \
-    )
-    day6_temp_max=$(printf "%0.0f\n" \
-        $(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[5].temperatureMax') \
-    )
-    day6_temp_min=$(printf "%0.0f\n" \
-        $(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[5].temperatureMin') \
-    )
-
-    day7_name=$(date --date='+6 day' +'%a' | tr '[:lower:]' '[:upper:]')
-    day7_sum=$(jshon -e daily < ${forecast_data_path} | \
-            jq '.data[6].summary' | \
-            tr -d '"' \
-    )
-    day7_icon=$(grep $(jshon -e daily < ${forecast_data_path} | \
-                    jq '.data[6].icon' | \
-                    grep -o '[^\"]*') \
-                weather_icon_list | \
-                awk 'NR==1' | \
-                grep -o "\"[^\"]*\"" | \
-                grep -o "[^\"]*" \
-    )
-    day7_temp_max=$(printf "%0.0f\n" \
-        $(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[6].temperatureMax') \
-    )
-    day7_temp_min=$(printf "%0.0f\n" \
-        $(jshon -e daily < ${forecast_data_path} | \
-        jq '.data[6].temperatureMin') \
     )
 
     (
@@ -372,16 +334,16 @@ function main(){
         "   ^p(+50;-36)^fn(${wic_45})${today_icon}^fn(${fn1})^p() ^p(+75)^fn(${wic_16})^fn(${fn1}) ${humidity}%  ^fn(${icons3})^fn($fn1) ${cloudiness}%\n" \
         "   ^p(+50;-63)^fn(${wic_45})${today_icon}^fn(${fn1})^p()^p(+82)^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunrise}  ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${today_sunset}\n" \
         "   ${today_sum}\n" \
-        "   ^fg(#666666)-----------------------------------------------------\n" \
-        "   ^bg(#222222)^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%\n" \
+        "   ^fg(${FG})-----------------------------------------------------\n" \
+        "   ^bg(${DGR})^fn(${fn_14}) ${next_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${next_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${next_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${next_temp_max}°^fg()^p()   ^fg(#ffd7af)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunrise} ^fg(#ffafaf)^fn(${wic_13})^fn(${fn1})^fg() ${next_sunset}  ^fn(${wic_16})^fn(${fn1}) ${tomorrow_humidity}%\n" \
         "   ${next_sum}\n" \
-        "   ^bg(#222222)^fn(${fn_14}) ${day3_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day3_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day3_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day3_temp_max}°^fg()\n" \
-        "   ${day3_sum}\n" \
-        "   ^bg(#222222)^fn(${fn_14}) ${day4_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day4_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day4_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day4_temp_max}°^fg()\n" \
-        "   ${day4_sum}\n" \
-        "   ^bg(#222222)^fn(${fn_14}) ${day5_name} ^fn(${fn1})^bg()  ^fn(${wic_16})${day5_icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${day5_temp_min}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${day5_temp_max}°^fg()\n" \
-        "   ${day5_sum}\n" \
-        "^bg(#666666)^fg(#222222)   Powered by forecast.io   \n" \
+        "   ^bg(${DGR})^fn(${fn_14}) ${d3name} ^fn(${fn1})^bg()  ^fn(${wic_16})${d3icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${d3tempmin}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${d3tempmax}°^fg()\n" \
+        "   ${d3sum}\n" \
+        "   ^bg(${DGR})^fn(${fn_14}) ${d4name} ^fn(${fn1})^bg()  ^fn(${wic_16})${d4icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${d4tempmin}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${d4tempmax}°^fg()\n" \
+        "   ${d4sum}\n" \
+        "   ^bg(${DGR})^fn(${fn_14}) ${d5name} ^fn(${fn1})^bg()  ^fn(${wic_16})${d5icon}^fn(${fn1}) ^p(;+2)^fg(#87d7ff)${d5tempmin}°^fg()^fn(${icons4})^fn(${fn1})^p(+3)^fg(#ff8b8b)${d5tempmax}°^fg()\n" \
+        "   ${d5sum}\n" \
+        "^bg(${LGR})^fg(${DGR})   Powered by forecast.io   \n" \
     ) | dzen2 -p -x 582 -y 28 -w 420 \
         -bg ${BG} -fg ${FG} \
         -h 27 -l 14 -sa l -ta l \
