@@ -8,8 +8,8 @@ __   _____ | |_   _ _ __ ___   ___  __| |
   \_/ \___/|_|\__,_|_| |_| |_|\___|\__,_|
 
 Usage:
-  vold.py run
-  vold.py (--up | --down | --mute | --togmute | --unmute | --sync) [value]
+  volumed.py run
+  volumed.py (--up | --down | --mute | --togmute | --unmute | --sync) [value]
 
 Options:
   run           # Run volume daemon
