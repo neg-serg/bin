@@ -8,11 +8,12 @@ __   _____ | |_   _ _ __ ___   ___  __| |
   \_/ \___/|_|\__,_|_| |_| |_|\___|\__,_|
 
 Usage:
+  volumed.py
   volumed.py run
-  volumed.py (--up | --down | --mute | --togmute | --unmute | --sync) [value]
+  volumed.py ( + | - | --up | --down | --mute | --togmute | --unmute | --sync ) [value]
 
 Options:
-  run           # Run volume daemon
+  run           # Run volume daemon.
   -h --help     # Show this screen.
   --version     # Show version.
   --up          # Set volume up
@@ -22,6 +23,9 @@ Options:
   --unmute      # Unset Mute
   --sync        # Sync Volume
   -v            # Verbose mode
+
+Depends:
+    pulsectl
 
 Created by :: Neg
 email :: <serg.zorg@gmail.com>
@@ -45,12 +49,14 @@ import sys
 from docopt import docopt
 
 import mpd
+from contextlib import contextmanager
+import pulsectl
 
 class VolumeDaemon():
     def __init__(self):
         self.inc=1
         self.maxvol=100
-        self.curVol=0
+        self.current_volume=0
 
         self.mpv_socket="/tmp/mpv.socket"
         self.tmpfile='/tmp/pasink.tmp'
@@ -67,19 +73,7 @@ class VolumeDaemon():
         self.cwin=0
         self.term_class="st"
         self.mpd_client=None
-
-        try:
-            # use_unicode will enable the utf-8 mode for python2
-            # see http://pythonhosted.org/python-mpd2/topics/advanced.html#unicode-handling
-            client = mpd.MPDClient(use_unicode=True)
-            client.connect(self.ip_default_addr, self.mpd_port)
-        except OSError as err:
-            if err.errno == 101:
-                print("There is no mpd connection")
-                self.mpd_status=False
-            else:
-                self.mpd_client=client
-            pass
+        self.mpd_connection=None
 
     def get_active_sink(self):
         return subprocess.Popen(
@@ -102,6 +96,14 @@ class VolumeDaemon():
             return False
 
     def send_volume_inc_to_mpd(self):
+        # def queue(self, path):
+        #     with connection():
+        #         try:
+        #             client.add(path)
+        #         except mpd.CommandError:
+        #             return 'invalid path'
+        #     return 'queued'
+
         # echo -ne "volume "$1"\nclose\n" | netcat "${addr_}" "${port_}"
         return True
 
@@ -114,21 +116,17 @@ class VolumeDaemon():
 
     def mpv_change_vol_by_step(self, arg):
         ret = ""
-        if arg == "-":
+        table={ "+" : " 0", "-" : " 9" }
+        if arg in table.keys():
+            cmd_=table[arg]
             ret=subprocess.Popen(
-                shlex.split("xdotool key --window " + self.cwin + " \"9\""),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT
-            ).communicate()[0].decode("utf-8").strip('\n')
-        elif arg == "+":
-            ret=subprocess.Popen(
-                shlex.split("xdotool key --window " + self.cwin + " \"0\""),
+                shlex.split("xdotool key --window " + self.cwin + cmd_),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT
             ).communicate()[0].decode("utf-8").strip('\n')
         return ret
 
-    def alsa_enabled_or_not(self):
+    def alsa_enabled(self):
         return subprocess.Popen(
             shlex.split(""" amixer get Master | sed -n 's/^.*\[\(o[nf]\+\)]$/\1/p' | uniq """),
             stdout=subprocess.PIPE,
@@ -142,31 +140,55 @@ class VolumeDaemon():
             stderr=subprocess.STDOUT
         ).communicate()[0].decode("utf-8").strip('\n')
 
+    @contextmanager
+    def mpd_make_connection(self):
+        try:
+            # use_unicode will enable the utf-8 mode for python2
+            # see http://pythonhosted.org/python-mpd2/topics/advanced.html#unicode-handling
+            self.mpd_client = mpd.MPDClient(use_unicode=True)
+            self.mpd_client.connect(self.ip_default_addr, self.mpd_port)
+        except OSError as err:
+            if err.errno == 101:
+                print("There is no mpd connection")
+                self.mpd_status=False
+                yield
+        finally:
+            self.mpd_client.close()
+            self.mpd_client.disconnect()
+
+    def run_daemon(self, args):
+        volume_increment_step=1
+        mpd_status=self.mpd_status()
+        self.cwin=self.current_x11_window()
+
+        print("mpd_status={}".format(mpd_status))
+
+        # if mpd_status == "play":
+        #     send_volume_inc_to_mpd()
+        # elif self.cwin_is_mpv():
+        #     if args[1] == "+" or args[1] == "-":
+        #         self.mpv_change_vol_by_step(args[1])
+        # else:
+        #     self.mpv_change_vol_by_val(args[1])
+
     def run(self, args):
-        def main(args):
-            if len(args) == 1:
-                self.vol_manager()
-            else:
-                volume_increment_step=1
-                mpd_status=self.mpd_status()
-                self.cwin=self.current_x11_window()
-
-                if mpd_status == "play":
-                    send_volume_inc_to_mpd()
-                elif self.cwin_is_mpv():
-                    if args[1] == "+" or args[1] == "-":
-                        self.mpv_change_vol_by_step(args[1])
-                else:
-                    self.mpv_change_vol_by_val(args[1])
-
-        print(args)
-        # --up) volUp ;;
-        # --down) volDown ;;
-        # --togmute) volMuteStatus; [[ ${curStatus} == 'yes' ]] && { volMute unmute; exit 0; }; volMute mute ;;
-        # --mute) volMute mute ;;
-        # --unmute) volMute unmute ;;
-        # --sync) volSync ;;
-        main(args)
+        if args['--up']:
+            self.volume_up()
+        elif args['--down']:
+            self.volume_down()
+        elif args['--mute']:
+            self.volume_mute(True)
+        elif args['--unmute']:
+            self.volume_mute(False)
+        elif args['--togmute']:
+            self.toggle_mute()
+        elif args['--sync']:
+            self.volume_sync()
+        elif args['run']:
+            self.run_daemon(args)
+        else:
+            self.volume_manager()
+        # print(args)
 
     def check_pulseaudio(self):
         return True
@@ -176,18 +198,10 @@ class VolumeDaemon():
         return True
 
     def start_pulsemixer_with_terminal(self):
-        return subprocess.Popen(
-            shlex.split(""" st pulsemixer """),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT
-        ).communicate()[0].decode("utf-8").strip('\n')
+        return subprocess.call(["st", "-e", "pulsemixer"])
 
     def start_pulsemixer(self):
-        return subprocess.Popen(
-            shlex.split(""" pulsemixer """),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT
-        ).communicate()[0].decode("utf-8").strip('\n')
+        return subprocess.call("pulsemixer")
 
     def start_alsamixer_with_terminal(self):
         return subprocess.Popen(
@@ -196,17 +210,17 @@ class VolumeDaemon():
             stderr=subprocess.STDOUT
         ).communicate()[0].decode("utf-8").strip('\n')
 
-    def vol_manager(self):
-        self.pulseaudio_is_here=self.check_pulseaudio()
+    def volume_manager(self):
         if self.current_window_a_terminal():
+            print("current window is a terminal")
             self.start_pulsemixer()
         else:
-            if pulseaudio_is_here():
+            if self.check_pulseaudio():
                 self.start_pulsemixer_with_terminal()
             else:
                 self.start_alsamixer_with_terminal()
 
-    def volUp(self):
+    def volume_up(self):
         def set_active_sink_to_100():
             return subprocess.Popen(
                 shlex.split("pactl set-sink-volume " + self.active_sink +" -- 100% "),
@@ -226,23 +240,23 @@ class VolumeDaemon():
             # pactl set-sink-volume self.active_sink +$value%
             pass
 
-        self.getCurVol()
+        self.get_current_volume()
         if self.capvol == 'yes':
-            if self.curVol <= 100 and self.curVol >= self.limit:
+            if self.current_volume <= 100 and self.current_volume >= self.limit:
                 set_active_sink_to_100()
-            elif self.curVol < self.limit:
+            elif self.current_volume < self.limit:
                 set_pulseaudio_sink_volume(self.inc)
-            elif self.curVol <= self.maxvol and self.curVol >= self.maxlimit:
+            elif self.current_volume <= self.maxvol and self.current_volume >= self.maxlimit:
                 set_active_sink_to_max()
-            elif self.curVol < self.maxlimit:
+            elif self.current_volume < self.maxlimit:
                 set_pulseaudio_sink_volume2(self.inc)
-        self.getCurVol()
+        self.get_current_volume()
         if self.autosync == 'yes':
-            self.volSync()
+            self.volume_sync()
         return True
 
-    def volDown(self):
-        # pactl set-sink-volume ${active_sink} -self.inc + %; getCurVol; [[ ${autosync} = 'yes' ]] && volSync
+    def volume_down(self):
+        # pactl set-sink-volume ${active_sink} -self.inc + %; get_current_volume; [[ ${autosync} = 'yes' ]] && volume_sync
         return True
 
     def getSinkInputs(self):
@@ -250,14 +264,14 @@ class VolumeDaemon():
         # input_array=$(cat ${tmpfile})
         return True
 
-    def volSync(self):
+    def volume_sync(self):
         self.getSinkInputs()
-        self.getCurVol()
-        # for each in ${input_array}; pactl set-sink-input-volume ${each} ${curVol}%
+        self.get_current_volume()
+        # for each in ${input_array}; pactl set-sink-input-volume ${each} ${current_volume}%
         return True
 
-    def getCurVol(self):
-        # curVol=$(pacmd list-sinks \
+    def get_current_volume(self):
+        # current_volume=$(pacmd list-sinks \
         #     |grep -A 15 'index: '${active_sink}'' \
         #     |grep 'volume:' \
         #     |egrep -v 'base volume:' \
@@ -266,21 +280,21 @@ class VolumeDaemon():
         #     |sed s/.$// |tr -d ' ')
         return True
 
-    def volMute(self, mute):
+    def volume_mute(self, mute):
         ret=""
         if mute:
-            #pactl set-sink-mute ${active_sink} 1; curVol=0; status=1; ;;
+            #pactl set-sink-mute ${active_sink} 1; current_volume=0; status=1; ;;
             pass
         else:
-            #pactl set-sink-mute ${active_sink} 0; getCurVol; status=0; ;;
+            #pactl set-sink-mute ${active_sink} 0; get_current_volume; status=0; ;;
             pass
         return ret
 
     def toggle_mute(self):
-        # volMuteStatus; [[ ${curStatus} == 'yes' ]] && { volMute unmute; exit 0; }; volMute mute ;;
+        # volume_mute_status; [[ ${curStatus} == 'yes' ]] && { volume_mute unmute; exit 0; }; volume_mute mute ;;
         return True
 
-    def volMuteStatus(self):
+    def volume_mute_status(self):
         # curStatus=$(pacmd list-sinks | grep -A 15 'index: '${active_sink}'' | awk '/muted/{ print $2}')
         return True
 
