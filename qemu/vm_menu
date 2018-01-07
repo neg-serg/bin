@@ -23,7 +23,6 @@ function msg(){
 
 function main(){
     local -a opts_=(
-        "[Exit]"
         "[Usb :: passthrough add]"
         "[Usb :: passthrough del]"
         "[Start <Win10>]"
@@ -42,8 +41,6 @@ function main(){
     tmux -S ~/1st_level/vm.socket new -s vm
 
     case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
-        *"Exit"*) 
-            msg "[ Do ${res} ]" ;;
         *"Usb"*"pass"*"add"*) 
             do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
         ;;
