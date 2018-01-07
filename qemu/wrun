@@ -90,8 +90,8 @@ function main(){
             -smp sockets="${sockets_amount_}",cores="${cores_amount_}",threads="${threads_amount_}"
             -cpu host,kvm=off
             -device virtio-scsi-pci,id=scsi
-            -drive if=pflash,format=raw,readonly,file=/one/vm/ovmf_code_x64.bin
-            -drive if=pflash,format=raw,file=/one/vm/ovmf_vars_x64.bin
+            -drive if=pflash,format=raw,readonly,file=/home/neg/bin/qemu/ovmf_code_x64.bin
+            -drive if=pflash,format=raw,file=/home/neg/bin/qemu/ovmf_vars_x64.bin
             -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
         )
 
@@ -106,12 +106,8 @@ function main(){
             -boot menu=on
         )
 
-        local -a qemu_vga_none=(
-            -vga none
-        )
-
         local -a qemu_nographic=(
-            -nographic
+            -vga none
         )
 
         local -a qemu_vga_spice=(
@@ -122,6 +118,12 @@ function main(){
             -device vfio-pci,host=01:00.0,multifunction=on
             -device vfio-pci,host=01:00.1
         )
+
+        local -a qemu_pass_video_rom=(
+            -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/bios.bin
+            -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/bios.bin
+        )
+
 
         local -a qemu_pass_network=(
             -net none
@@ -224,7 +226,7 @@ function main(){
         PULSE_SERVER=localhost \
         QEMU_AUDIO_DRV=pa \
         qemu-system-x86_64 "${qemu_params[@]}" \
-            "${qemu_vga_none[@]}" \
+            "${qemu_nographic[@]}" \
             "${qemu_emulated_sound[@]}" \
             "${qemu_pass_video[@]}" \
             "${qemu_pass_input[@]}" \
