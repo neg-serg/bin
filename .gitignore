@@ -1,3 +1,7 @@
 qemu/qmp/qmp.pyc
 ./.fasd-init-cache
 utf7.pyc
+bios.bin
+ovmf_code_x64.bin
+ovmf_vars_x64.bin
+vbios.bin
