@@ -190,9 +190,9 @@ function main(){
         )
 
         # Disable torrents
-        stig stop all
+        stig stop all 2> /dev/null
 
-        if [[ ! $(pidof synergyc) && $(hash synergy > /dev/null) ]]; then
+        if [[ ! $(pidof synergyc) && $(hash synergy 2> /dev/null) ]]; then
             sudo -u neg "synergy" 2>&1 > /dev/null &! \
                 qemu::msg "Autostart synergy"
         fi
@@ -208,7 +208,7 @@ function main(){
         echo 1 > /proc/sys/vm/compact_memory
 
         # Setup hugepages
-        sudo sysctl -w vm.nr_hugepages="${hugepages_amount}"
+        sudo sysctl -w vm.nr_hugepages="${hugepages_amount}" 2> /dev/null
 
         if [[ ${dynamic_usb_bypass} == true && ${auto_usb_bypass} == true ]]; then
             {
