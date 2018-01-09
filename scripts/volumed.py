@@ -186,8 +186,7 @@ class VolumeDaemon():
         return True
 
     def current_window_a_terminal(self):
-        # xprop -id $(pfw) | grep -ow "${term_class}" | head -1) = "${term_class}"
-        return True
+        return self.make_pipe("xprop -id " + self.currX11win() + "| grep -ow \"" + self.term_class + "\"| head -1") == self.term_class
 
     def start_pulsemixer(self, with_terminal=False):
         if not with_terminal:
