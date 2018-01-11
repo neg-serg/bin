@@ -1,0 +1,2 @@
+#!/bin/dash
+firefox-unbranded-bin -app "/usr/share/conkeror/application.ini" "$@"
