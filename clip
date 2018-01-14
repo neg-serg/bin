@@ -1,17 +1,6 @@
 #!/bin/zsh
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 
-function gpaste_run() {
-    if [[ -x $(which gpaste-client) ]]; then
-        echo $(which gpaste-client) --oneline
-    elif [[ -x $(which gpaste) ]]; then
-        echo $(which gpaste) -client --oneline
-    else
-        echo There is no gpaste in \$PATH>/dev/stderr
-        exit 1
-    fi
-}
-
 function read_command {
     readonly rofi_cmd=(
         rofi -dmenu 
@@ -94,11 +83,14 @@ function clip_main(){
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
+        -async-pre-load
         "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
     )
-    local menu=$($(gpaste_run)|eval ${rofi_cmd})
-    local selection=$(echo "${menu}" | cut -d ':' -f1)
-    $(gpaste_run) select ${selection}
+    local gpaste_ret=$(gpaste-client --oneline|eval ${rofi_cmd})
+    local selection=$(echo "${gpaste_ret}" | cut -d ':' -f1)
+    if [[ ${selection} != "" ]]; then
+        gpaste-client select ${selection}
+    fi
 }
 
 case "$1" in
