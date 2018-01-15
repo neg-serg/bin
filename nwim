@@ -132,7 +132,7 @@ class file_info_printer(object):
 class wim_runner(object):
     def __init__(self):
         self.settings={
-            "debug":True,
+            "debug":False,
         }
 
         self.font="PragmataPro for Powerline"
@@ -159,7 +159,7 @@ class wim_runner(object):
 
         self.default_cmd=self.vim_commands["rsend"]
 
-        self.timeout=.05
+        self.timeout=.5
 
         self.r=redis.StrictRedis(host='localhost', port=6379, db=0)
         self.cmd=""
@@ -326,7 +326,8 @@ class wim_runner(object):
         else:
             wim=subprocess.Popen(
                 shlex.split("nvr " + self.default_cmd + self.cmd),
-                stdout=subprocess.PIPE
+                stdout=subprocess.PIPE,
+                env=self.nvr_env
             )
 
             for line in self.args:
