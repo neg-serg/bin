@@ -25,4 +25,4 @@ function main(){
     fi
 }
 
-main "$@"
+[[ -e ${LOG_ENABLED_} ]] && main "$@"
