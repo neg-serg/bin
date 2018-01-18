@@ -3,10 +3,10 @@
 require("os")
 
 function wrp(tmplte, left_side, right_side)
-    local bracket_color = "#287373"
+    local bracket_color = "#395573"
     local fg_color      = "#cccccc"
-    local left_side     = left_side or "[ "
-    local right_side    = right_side or " ]"
+    local left_side     = left_side or " || " -- "⟬ "
+    local right_side    = right_side or " ⟭"
     local function setcol(s)
         return '%{F' .. s .. '}'
     end
@@ -55,8 +55,7 @@ local function get_mpd_status()
     local data = saferead(mpd)
     if data == nil or string.sub(data,1,6) ~= "OK MPD" then
         mpd:close()
-        print(wrp("no mpd", "[","]"))
-        return wrp("no mpd", "[","]")
+        print(wrp("no mpd", "⟬","⟭"))
     end
 
     local info = {}
@@ -73,7 +72,7 @@ local function get_mpd_status()
     if data == nil or string.sub(data,1,2) ~= "OK" then
         mpd:close()
         print("error querying mpd status")
-        return wrp("error querying mpd status", "[","]")
+        return wrp("error querying mpd status", "⟬","⟭")
     end
 
     mpd:close()
