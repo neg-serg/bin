@@ -3,10 +3,8 @@
 wait_a_bit(){ sleep .2s; }
 
 function i3::common_restart(){
-    ps -ef | awk -v name="bar" '$0 ~ name {print $2}' | xargs kill 2>/dev/null
+    pkill polybar
     polybar -q -c ${polybar_cfg} main &
-    mpc play
-    mpc stop
     ppi3 ${XDG_CONFIG_HOME}/i3/_config > ${XDG_CONFIG_HOME}/i3/config
 }
 
@@ -25,9 +23,7 @@ function i3_restart(){
     (
         sleep 1s && \
         i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/disable-standby-fs.py"
-        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/nsd.py"
-        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/circled.py"
-        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/flastd.py"
+        i3-msg "exec --no-startup-id ${XDG_CONFIG_HOME}/i3/runner.py"
         notify-send "[${wm_}] restart"
     ) &
 }
