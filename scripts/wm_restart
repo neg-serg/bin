@@ -2,17 +2,16 @@
 
 wait_a_bit(){ sleep .2s; }
 
-function i3::common_restart(){
-    pkill polybar
-    polybar -q -c ${polybar_cfg} main &
-    sleep .5s && mpc update
+function soft_restart(){
+    polybar-msg cmd restart
+    sleep .3s && mpc update
     ppi3 ${XDG_CONFIG_HOME}/i3/_config > ${XDG_CONFIG_HOME}/i3/config
 }
 
 function i3_restart(){
     polybar_cfg=${XDG_CONFIG_HOME}/polybar/main
     # kill any current poppers (thanks Dylan)
-    i3::common_restart
+    soft_restart
     wait_a_bit
     notify-send "[${wm_}] reload"
     i3-msg restart
