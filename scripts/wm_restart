@@ -5,6 +5,7 @@ wait_a_bit(){ sleep .2s; }
 function i3::common_restart(){
     pkill polybar
     polybar -q -c ${polybar_cfg} main &
+    sleep .5s && mpc update
     ppi3 ${XDG_CONFIG_HOME}/i3/_config > ${XDG_CONFIG_HOME}/i3/config
 }
 
