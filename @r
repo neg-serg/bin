@@ -70,7 +70,7 @@ apply_rename_(){
 
     if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
         src_dirname=$(dirname "${src}")
-        music_dirname="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
+        music_dirname="$(awk '/music_directory/{print $2}' ${HOME}/.mpd.conf|tr -d '"')"
         if [[ ${src_dirname} =~ "^${music_dirname}/new.*" ]]; then
             result="${music_dirname}/new/$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")"
         else
@@ -78,7 +78,7 @@ apply_rename_(){
         fi
         mv -i "${src}" "${result}"
         fix_names.pl -i "${result}"
-        rmdir "${src}"
+        rmdir "${src}" 2> /dev/null
     fi
 }
 
