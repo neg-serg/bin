@@ -22,10 +22,9 @@ function windowchef_restart(){
 
 function i3::common_restart(){
     ps -ef | awk -v name="bar" '$0 ~ name {print $2}' | xargs kill 2>/dev/null
-    polybar -q -c ${polybar_cfg} tiny &
-    while ! pgrep -f "polybar -q -c ${XDG_CONFIG_HOME}/polybar/main tiny"; do
-        wait_a_bit
-    done && sleep 1s && polybar -q -c ${polybar_cfg} main
+    polybar -q -c ${polybar_cfg} main &
+    mpc play
+    mpc stop
     ppi3 ${XDG_CONFIG_HOME}/i3/_config > ${XDG_CONFIG_HOME}/i3/config
 }
 
