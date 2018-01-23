@@ -80,6 +80,7 @@ function clip_main(){
     local yoffset_=-22
     readonly rofi_cmd=(
         rofi -dmenu 
+        -no-plugins
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
