@@ -83,8 +83,8 @@ function clip_main(){
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
-        -async-pre-load
         "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
+        -async-pre-read 15
     )
     local gpaste_ret=$(gpaste-client --oneline|eval ${rofi_cmd})
     local selection=$(echo "${gpaste_ret}" | cut -d ':' -f1)
