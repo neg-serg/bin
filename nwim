@@ -135,7 +135,7 @@ class wim_runner(object):
             "debug":False,
         }
 
-        self.font="PragmataPro for Powerline"
+        self.font="Iosevka Term Medium"
         self.fsize=20
 
         self.unix_connections=net_connections(kind='unix')
@@ -267,7 +267,7 @@ class wim_runner(object):
             # --[ helper for remote_send ]---------------------------------[1]
             def remote_edit_file_():
                 self.dprint("[remote edit file]")
-                return subprocess.Popen(
+                ret=subprocess.Popen(
                     shlex.split(
                         "nvr " + prefix_cmd + self.default_cmd + \
                         "\"" + \
@@ -282,6 +282,7 @@ class wim_runner(object):
                     stderr=subprocess.DEVNULL,
                     env=self.nvr_env
                 )
+                return ret
 
             prefix_cmd=""
             if file.is_dir():
