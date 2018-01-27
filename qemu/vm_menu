@@ -1,10 +1,6 @@
 #!/bin/zsh
 
-function no_qemu_msg(){
-    notify-send "There is no QEMU"
-}
-
-function do_if_qemu(){
+do_if_qemu(){
     if pgrep qemu 2>/dev/null; then
         eval "$@"
     else
@@ -12,14 +8,13 @@ function do_if_qemu(){
     fi
 }
 
-function check_qemu(){
+check_qemu(){
     local cmd=(sudo ~neg/bin/qemu/wrun)
     st dtach -c /tmp/qemu_wrun.session -Ez "${cmd[@]}"
 }
 
-function msg(){
-    notify-send "$@"
-}
+msg(){ notify-send "$@" }
+no_qemu_msg(){ msg "There is no QEMU" }
 
 function main(){
     local -a opts_=(

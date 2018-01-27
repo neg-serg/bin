@@ -1,7 +1,6 @@
 #!/bin/zsh
 
 # Script to run windows 10 with geforce 980gtx gpu ;)
-
 function haltcmd(){
     haltcmd="echo '{ \"execute\": \"qmp_capabilities\" }{ \"execute\": \"system_powerdown\"}' | nc localhost 4444 && \
     sleep 9;\
@@ -12,7 +11,7 @@ function haltcmd(){
 }
 
 function zshexit(){
-    [[ ${qemu_run_success} == true ]] && finish_
+    [[ ${qemu_run_success} == true ]] && finish
 }
 
 function qemu::msg(){
@@ -20,10 +19,19 @@ function qemu::msg(){
     notify-send "QEMU :: [$@]"
 }
 
-function finish_(){
+function finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
     sudo sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
+    
+    # kill st - dtach window
+    ps aux | grep 'dtach -c /tmp/qemu_wrun.session' | awk '{print $2}' | xargs kill
+
+    while [[ $(xinput | grep 'Logitech Gaming Keyboard G910' | wc -l) == 0 ]]; do
+        echo 'wait for the keyboard'
+        sleep 1s
+    done
+
     setxkbmap \
         -option keypad:pointerkeys \
         -layout 'us,ru' \
@@ -31,7 +39,7 @@ function finish_(){
         -variant altgr-intl \
         -option ctrl:nocaps
 
-    xset m 0 0 # Revert mouse settings
+    xset m 0 0            # Revert mouse settings
     xset -b r rate 250 50 # Revert keyboard rate
 }
 
@@ -236,7 +244,7 @@ function main(){
         fi
 
         qemu_run_success=true
-        trap finish_ EXIT TERM KILL
+        trap finish EXIT TERM KILL
     ) &
     sudo rm -v "${lockfile}"
 
