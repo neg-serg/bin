@@ -41,6 +41,8 @@ function finish(){
 
     xset m 0 0            # Revert mouse settings
     xset -b r rate 250 50 # Revert keyboard rate
+
+    stig start all
 }
 
 function main(){
