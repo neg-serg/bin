@@ -1,25 +1,22 @@
-#!/bin/perl
+#!/usr/bin/env perl
 # Original taken from wicked cool perl scripts 2006
 
+use utf8;
+use v5.12; # or later to get "unicode_strings" feature
+
 use strict;
-use warnings;
+use warnings qw(FATAL utf8);    # fatalize encoding glitches
+use open qw(:std :utf8);        # undeclared streams in UTF-8
 
 use Getopt::Std;
 use Term::ANSIColor;
-use Encode;
+use Encode; 
 
-use utf8;
-binmode STDIN, ':encoding(UTF-8)'; 
-binmode STDOUT, ':encoding(UTF-8)';
+@ARGV = map { decode_utf8($_, 1) } @ARGV;
 
 getopts('islu');
-our(
-    $opt_i, 
-    $opt_s, 
-    $opt_l,
-    $opt_u,
-    $opt_B
-);
+
+our($opt_i, $opt_s, $opt_l, $opt_u, $opt_B); 
 
 sub wrp_{
     my ($str) = @_;
@@ -35,15 +32,9 @@ sub wrp_{
 sub fancy_string {
     my ($old_name, $new_name) = @_;
     return 
-        wrp_(">>") .
-        " " .
-        color('white') .
-        $old_name .
-        color('green') .
-        " -> " . 
-        color('white') .
-        " $new_name\n" .
-        color('reset');
+        wrp_(">>") . " " . color('white') .
+        $old_name . color('green') . " -> " .
+        color('white') . " $new_name\n" . color('reset');
 }
 
 foreach my $file_name (@ARGV) {
@@ -54,7 +45,6 @@ foreach my $file_name (@ARGV) {
     } elsif ($opt_u) {
         $new_name = encode_utf8(uc(decode_utf8($new_name)));
     }
-    utf8::encode($new_name);
 
     $new_name =~ tr/ /·/;
     $new_name =~ tr/\t/·/;
@@ -124,4 +114,3 @@ foreach my $file_name (@ARGV) {
         }
     }
 }
-
