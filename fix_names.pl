@@ -8,6 +8,10 @@ use Getopt::Std;
 use Term::ANSIColor;
 use Encode;
 
+use utf8;
+binmode STDIN, ':encoding(UTF-8)'; 
+binmode STDOUT, ':encoding(UTF-8)';
+
 getopts('islu');
 our(
     $opt_i, 
@@ -45,28 +49,50 @@ sub fancy_string {
 foreach my $file_name (@ARGV) {
     # Compute the new name
     my $new_name = $file_name;
-    my $delimiter = '.';
     if ($opt_l) {
         $new_name = encode_utf8(lc(decode_utf8($new_name)));
     } elsif ($opt_u) {
         $new_name = encode_utf8(uc(decode_utf8($new_name)));
     }
-    $new_name =~ tr/ /./;
-    $new_name =~ tr/\t/./;
+    utf8::encode($new_name);
+
+    $new_name =~ tr/ /·/;
+    $new_name =~ tr/\t/·/;
+    if(-d $new_name){
+        $new_name =~ tr/\./·/;
+    }  else {
+        substr($new_name, 0, rindex($new_name, ".")) =~ y/\./·/;
+    }
     $new_name =~ tr/;/:/;
     if ($opt_s){
-        $new_name =~ tr/_/./;
+        $new_name =~ tr/_/·/;
     } else {
         $new_name =~ tr/_/-/;
     }
     $new_name =~ s/\.-\./-/g;
+    $new_name =~ s/·-·/-/g;
+
     $new_name =~ s/\,[_-]/-/g;
+
     $new_name =~ s/-\./-/g;
+    $new_name =~ s/-·/-/g;
+
     $new_name =~ s/-+/-/g;
+
     $new_name =~ s/\.-/-/g;
+    $new_name =~ s/·-/-/g;
+
     $new_name =~ s/\.:/:/g;
-    $new_name =~ s/:\./:/g;
-    $new_name =~ s/\.\././g;
+    $new_name =~ s/·:/:/g;
+
+    $new_name =~ s/:\./:/g; 
+    $new_name =~ s/:·/:/g;
+
+    $new_name =~ s/\.\./·/g;
+    $new_name =~ s/··/·/g;
+
+    $new_name =~ s/·\././g;
+
     if ($opt_B){
         $new_name =~ s/[\(\)<>\\]//g;
     } else {
@@ -78,7 +104,7 @@ foreach my $file_name (@ARGV) {
     $new_name =~ s/^[--]+//g;
     $new_name =~ s/\&/.and./g;
     $new_name =~ s/\$/.dol./g;
-    $new_name =~ s/[,.]{2}/./g;
+    $new_name =~ s/[,.]{2}/·/g;
 
     # Make sure the names are different
     if ($file_name ne $new_name){
