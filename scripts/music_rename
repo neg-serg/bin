@@ -69,9 +69,8 @@ apply_rename_(){
     fi
 
     if [[ $(xargs<<<"${artist}") != "" && $(xargs<<<"${year}") != "" && $(xargs<<<"${album}") != "" ]]; then
-        src_dirname=$(dirname "${src}")
-        music_dirname="$(awk '/music_directory/{print $2}' ${HOME}/.mpd.conf|tr -d '"')"
-        if [[ ${src_dirname} =~ "^${music_dirname}/new.*" ]]; then
+        music_dirname="$(awk '/music_directory/{print $2}' ${HOME}/.mpd.conf|tr -d '"'|sed 's:^~:'${HOME}':')"
+        if [[ ${src} =~ "^${music_dirname}/new.*" ]]; then
             result="${music_dirname}/new/$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")"
         else
             result="${music_dirname}/$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")"
