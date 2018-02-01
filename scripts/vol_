@@ -23,7 +23,7 @@ main(){
         )
         if [[ ${mpd_status} == "play" ]]; then
             echo -ne "volume "$1"\nclose\n" | \
-            netcat "${addr_}" "${port_}"
+            netcat "${addr_}" "${port_}" > /dev/null
         elif [[ $(xprop -id ${current_x11_window}|rg WM_CLASS|awk -F ', ' '{print $2}'|tr -d '"') == "mpv" ]]; then
             case $1 in
                 *+*) xdotool key --window "${current_x11_window}" "0";;
