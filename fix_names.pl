@@ -10,28 +10,28 @@ use open qw(:std :utf8);        # undeclared streams in UTF-8
 
 use Getopt::Std;
 use Term::ANSIColor;
-use Encode; 
+use Encode;
 
 @ARGV = map { decode_utf8($_, 1) } @ARGV;
 
 getopts('islu');
 
-our($opt_i, $opt_s, $opt_l, $opt_u, $opt_B); 
+our($opt_i, $opt_s, $opt_l, $opt_u, $opt_B);
 
 sub wrp_{
     my ($str) = @_;
-    return color('blue') . 
+    return color('blue') .
            "[" .
            color('white') .
            $str  .
            color('blue') .
            "]" .
-           color('reset'); 
+           color('reset');
 }
 
 sub fancy_string {
     my ($old_name, $new_name) = @_;
-    return 
+    return
         wrp_(">>") . " " . color('white') .
         $old_name . color('green') . " -> " .
         color('white') . " $new_name\n" . color('reset');
@@ -75,7 +75,7 @@ foreach my $file_name (@ARGV) {
     $new_name =~ s/\.:/:/g;
     $new_name =~ s/·:/:/g;
 
-    $new_name =~ s/:\./:/g; 
+    $new_name =~ s/:\./:/g;
     $new_name =~ s/:·/:/g;
 
     $new_name =~ s/\.\./·/g;
@@ -95,6 +95,8 @@ foreach my $file_name (@ARGV) {
     $new_name =~ s/\&/.and./g;
     $new_name =~ s/\$/.dol./g;
     $new_name =~ s/[,.]{2}/·/g;
+    $new_name =~ s/^·//;
+    $new_name =~ s/·$//;
 
     # Make sure the names are different
     if ($file_name ne $new_name){
