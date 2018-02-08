@@ -41,9 +41,6 @@ import docopt
 # --[ colors ]--------------------
 from colored import fg, bg, attr
 
-# --[ interact with redis ]-------
-import redis
-
 class pretty_printer(object):
     def __init__(self):
         self.darkblue=fg(4)
@@ -160,12 +157,8 @@ class wim_runner(object):
         self.default_cmd=self.vim_commands["rsend"]
 
         self.timeout=.5
-
-        self.r=redis.StrictRedis(host='localhost', port=6379, db=0)
         self.cmd=""
-
         self.wim_name="nwim"
-
         self.printer=file_info_printer()
 
         self.nvr_env=os.environ.copy()
@@ -188,8 +181,15 @@ class wim_runner(object):
         return bool(list(filter(lambda i: i.laddr == self.tmux_sock_path, self.unix_connections)) != [])
 
     def no_wim_x11_win_(self):
-        count=(int(self.r.hmget('count_dict', 'wim')[0]))
-        return count <= 0
+        nwim_win=subprocess.Popen(
+            "wmctrl -xl|awk '{print $3}'|rg nwim",
+            stdin=None,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+        our, err = nwim_win.communicate()
+        return "nwim.nwim" != our.decode().strip('\n')
 
     # --[ print x11 windows hierarchy ]--
     def print_windows(self, window, indent):
