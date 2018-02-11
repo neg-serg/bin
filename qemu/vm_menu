@@ -10,7 +10,7 @@ do_if_qemu(){
 
 check_qemu(){
     local cmd=(sudo ~neg/bin/qemu/wrun)
-    st dtach -c /tmp/qemu_wrun.session -Ez "${cmd[@]}"
+    st -c qemu_run dtach -c /tmp/qemu_wrun.session -Ez "${cmd[@]}"
 }
 
 msg(){ notify-send "$@" }
@@ -37,10 +37,10 @@ function main(){
 
     case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
         *"Usb"*"pass"*"add"*) 
-            do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
+            do_if_qemu st -c qemu_usb_pass tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
         ;;
         *"Usb"*"pass"*"del"*) 
-            do_if_qemu st tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough del"
+            do_if_qemu st -c qemu_usb_pass tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough del"
             source ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh
         ;;
         *"Win"*"10"*)
