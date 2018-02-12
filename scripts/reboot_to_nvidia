@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+linux=linux-lts
+
 function cmdline(){
     # kexec -l /boot/efi/vmlinuz-linux --initrd=/boot/efi/initramfs-linux.img --command-line=initrd=\intel-ucode.img initrd=\initramfs-linux.img root=PARTUUID=c12f9faf-d0d7-41df-b7da-49a2fd4a8519 init=/usr/bin/init rw rootflags=rw vga=current rd.systemd.show_status=auto rd.udev.log-priority=3 libahci.ignore_sss=1
     local esp=/boot/efi
@@ -14,7 +16,7 @@ function run_kexec(){
     echo "Do you want yo use: [${kernel_cmdline}] ?"
     read ans
     if [[ ${ans} == "y" ]]; then
-        sudo kexec -l /boot/efi/vmlinuz-linux --initrd=/boot/initramfs-linux.img --command-line="initrd=\\intel-ucode.img initrd=\\initramfs-linux.img ${kernel_cmdline}"
+        sudo kexec -l /boot/efi/vmlinuz-${linux} --initrd=/boot/initramfs-${linux}.img --command-line="initrd=\\intel-ucode.img initrd=\\initramfs-${linux}.img ${kernel_cmdline}"
         sync
         sudo systemctl kexec
     fi
