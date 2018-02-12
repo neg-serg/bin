@@ -95,8 +95,8 @@ foreach my $file_name (@ARGV) {
     $new_name =~ s/\&/.and./g;
     $new_name =~ s/\$/.dol./g;
     $new_name =~ s/[,.]{2}/·/g;
-    $new_name =~ s/^·//;
-    $new_name =~ s/·$//;
+    $new_name =~ s/^·//g;
+    $new_name =~ s/·$//g;
 
     # Make sure the names are different
     if ($file_name ne $new_name){
