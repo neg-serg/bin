@@ -404,7 +404,20 @@ class wim_runner(object):
 if __name__ == '__main__':
     run = wim_runner()
 
-    if os.environ.get("NWIM_STANDALONE"):
+    oni_is_here = not subprocess.Popen(
+        ['pgrep', 'oni$'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL
+    ).communicate()[0] == []
+
+    if oni_is_here:
+        subprocess.Popen(
+            ["nvr", "--remote-silent"] + sys.argv[1:],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            env=run.nvr_env
+        ).communicate()[0].decode("utf-8").strip('\n')
+    elif os.environ.get("NWIM_STANDALONE"):
         run.main("embedded")
     else:
         run.main()
