@@ -272,7 +272,7 @@ class wim_runner(object):
 
     # --[ Open file in daemon and print nice file info ]----------------------
     # --[ Main function with several closures ]-------------------------------
-    def vim_file_open(self, line):
+    def vim_file_open(self, line, edit_file=True):
         def remote_edit_file(filename, file):
             # --[ helper for remote_send ]---------------------------------[1]
             def remote_edit_file_():
@@ -302,14 +302,15 @@ class wim_runner(object):
             if remote_edit_file_().returncode != 0:
                 remote_edit_file_()
 
-        def mainproc():
+        try:
             filename = os.path.normpath(os.path.realpath(line))
 
             # --[ normalize path ]-----------------------------------------
             file = Path(filename)
 
-            # Open target file / dir
-            remote_edit_file(filename, file)
+            if edit_file:
+                # Open target file / dir
+                remote_edit_file(filename, file)
 
             if not file.exists():
                 self.printer.nonexistsfile(filename)
@@ -320,11 +321,9 @@ class wim_runner(object):
                     self.printer.currentdir(filename)
                 else:
                     self.printer.dir(filename)
-
-        try:
-            mainproc()
         except:
             pass
+
 
     def process_list(self):
         self.wim_goto()
@@ -401,11 +400,14 @@ class wim_runner(object):
         p.communicate()[0].decode("utf-8").strip('\n')
         p.wait()
 
+        for line in sys.argv[1:]:
+            self.vim_file_open(line, edit_file=False)
+
     def switch_to_oni_window(self):
         subprocess.Popen(
             [
                os.environ["XDG_CONFIG_HOME"] + "/i3/send",
-                "circle", "next", "nwim"
+               "circle", "next", "nwim"
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
