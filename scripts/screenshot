@@ -69,7 +69,7 @@ menu_(){
         [Dd]*) delay_   "$@" ;;
     esac
 }
- 
+
 case $1 in
     [Rr]*) select_  "$@" ;;
     [Cc]*) current_ "$@" ;;
