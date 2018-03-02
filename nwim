@@ -392,9 +392,12 @@ class wim_runner(object):
 
     def nvr_for_oni(self):
         p = subprocess.Popen(
-            ["nvr", "--remote-silent"] + sys.argv[1:],
+            [
+                "nvr",
+                "--remote-silent",
+            ] + sys.argv[1:],
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             env=run.nvr_env
         )
         p.communicate()[0].decode("utf-8").strip('\n')
@@ -420,21 +423,51 @@ class wim_runner(object):
 
         self.V()
 
+    def spawn_oni(self):
+        p = subprocess.Popen(
+            ['oni'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=self.nvr_env
+        )
+        p.communicate()[0].decode("utf-8").strip('\n')
+        p.wait()
+
+    def nvr_and_switch_oni(self):
+        self.nvr_for_oni()
+        self.switch_to_oni_window()
+
 
 if __name__ == '__main__':
     run = wim_runner()
+    tmux_nvim = False
 
-    oni_is_here = not subprocess.Popen(
+    nvim_server_is_here = subprocess.Popen(
+        ['nvr', '--serverlist'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL
+    ).communicate()[0].decode('UTF-8').strip('\n')
+
+    oni_is_here = subprocess.Popen(
         ['pgrep', 'oni$'],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL
-    ).communicate()[0] == []
+    ).communicate()[0].decode('UTF-8').strip('\n')
 
-    if oni_is_here:
-        run.nvr_for_oni()
-        run.switch_to_oni_window()
-    elif os.environ.get("NWIM_STANDALONE"):
-        run.main("embedded")
+    if not len(nvim_server_is_here):
+        try:
+            os.remove(run.sock_path)
+        except OSError:
+            pass
+
+    if len(oni_is_here) and len(nvim_server_is_here):
+        run.nvr_and_switch_oni()
+    elif tmux_nvim:
+        if os.environ.get("NWIM_STANDALONE"):
+            run.main("embedded")
+        else:
+            run.main()
     else:
-        run.main()
+        run.spawn_oni()
+        run.nvr_and_switch_oni()
 
