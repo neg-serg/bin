@@ -1,2 +1,13 @@
 #!/bin/dash
-figlet -c Youtube Viewer|lolcat -S 23 -t; youtube-viewer --video-player=mpv -C "$@"
+if [ $1 = HD ]; then
+    figlet -c Youtube Viewer|lolcat -S 23 -t; youtube-viewer --video-player=mpv --colorful --hd &
+    shift
+else
+    figlet -c Youtube Viewer|lolcat -S 23 -t; youtube-viewer --video-player=mpv --colorful &
+fi
+for f in "$@"; do
+    xdotool type --clearmodifiers --delay 0 "$f "
+done
+xdotool type --clearmodifiers --delay 0 ''
+
+wait
