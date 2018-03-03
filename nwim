@@ -457,6 +457,7 @@ if __name__ == '__main__':
     if not len(nvim_server_is_here):
         try:
             os.remove(run.sock_path)
+            print(f'socket in {run.sock_path} removed')
         except OSError:
             pass
 
