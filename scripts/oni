@@ -1,0 +1,2 @@
+#!/usr/bin/dash
+if ! pgrep oni; then rm -f ~/1st_level/nvim.socket; fi; oni
