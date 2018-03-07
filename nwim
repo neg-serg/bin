@@ -427,6 +427,13 @@ class wim_runner(object):
         subprocess.call(["i3-msg", "exec", "oni"])
 
     def nvr_and_switch_oni(self):
+        t = subprocess.check_output(['pgrep', 'oni$']) \
+                      .decode('UTF-8').strip('\n')
+        while not len(t):
+            t = subprocess.check_output(['pgrep', 'oni$']) \
+                          .decode('UTF-8').strip('\n')
+            time.sleep(0.02)
+
         self.nvr_for_oni()
         self.switch_to_oni_window()
 
