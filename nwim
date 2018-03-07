@@ -424,14 +424,7 @@ class wim_runner(object):
         self.V()
 
     def spawn_oni(self):
-        p = subprocess.Popen(
-            ['oni'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=self.nvr_env
-        )
-        p.communicate()[0].decode("utf-8").strip('\n')
-        p.wait()
+        subprocess.call(["i3-msg", "exec", "oni"])
 
     def nvr_and_switch_oni(self):
         self.nvr_for_oni()
@@ -463,12 +456,15 @@ if __name__ == '__main__':
 
     if len(oni_is_here) and len(nvim_server_is_here):
         run.nvr_and_switch_oni()
+        sys.exit(0)
     elif tmux_nvim:
         if os.environ.get("NWIM_STANDALONE"):
             run.main("embedded")
         else:
             run.main()
     else:
+        print("spawn oni and switch")
         run.spawn_oni()
         run.nvr_and_switch_oni()
+        sys.exit(0)
 
