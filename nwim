@@ -401,7 +401,6 @@ class wim_runner(object):
             env=run.nvr_env
         )
         p.communicate()[0].decode("utf-8").strip('\n')
-        p.wait()
 
         for line in sys.argv[1:]:
             self.vim_file_open(line, edit_file=False)
