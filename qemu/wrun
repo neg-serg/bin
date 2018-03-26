@@ -47,7 +47,7 @@ function finish(){
 
 function main(){
     qemu_run_success=false
-    [[ $(id -u) != "0" ]] && qemu::msg "Should be runned from root" && exit 0
+    [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
 
     zmodload -aF zsh/system b:zsystem
     lockfile="$(readlink -f ~neg/tmp/)$(basename $0).lock"
@@ -153,18 +153,6 @@ function main(){
                 -device ich9-usb-uhci1,id=uhci
                 -device usb-ehci,id=ehci
             )
-
-            # -device usb-host,bus=xhci_defaults0.0,vendorid=6092,productid=4608,id=maschine
-            # -device usb-host,bus=xhci_defaults0.0,vendorid=2536,productid=123,id=akai_apc20
-            # -device usb-host,bus=xhci_defaults0.0,vendorid=1999,productid=26627,id=casio_midi_keyboard
-            # -device usb-host,bus=xhci_defaults0.0,vendorid=6048,productid=773,id=samson_usb_mic
-            # -device usb-host,bus=xhci_defaults0.0,vendorid=1133,productid=50475,id=logitech_unifying
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=2578,productid=1,id=bluetooth_dongle
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=1133,productid=49812,id=logitech_steering_wheel1
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=1133,productid=49818,id=logitech_steering_wheel2
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=6708,productid=63237,id=gc_adapter
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=4341,productid=529,id=usb_audio_dongle
-            # -device usb-host,bus=xhci_defaults1.0,vendorid=1118,productid=654,id=xbox360_controller
         else
             qemu_pass_input=(
                 -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
