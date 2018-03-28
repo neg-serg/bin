@@ -100,9 +100,9 @@ function main(){
             -smp sockets="${sockets_amount_}",cores="${cores_amount_}",threads="${threads_amount_}"
             -cpu host,kvm=off
             -device virtio-scsi-pci,id=scsi
-            -drive if=pflash,format=raw,readonly,file=/home/neg/bin/qemu/ovmf_code_x64.bin
-            -drive if=pflash,format=raw,file=/home/neg/bin/qemu/ovmf_vars_x64.bin
-            -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
+            -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
+            -drive if=pflash,format=raw,file=${home_}/bin/qemu/ovmf_vars_x64.bin
+            -drive format=raw,file=/dev/mapper/root-qemu,id=disk,if=none,aio=threads,cache=none -device scsi-hd,drive=disk
         )
 
         local -a qemu_consoles=(
