@@ -105,7 +105,7 @@ function main(){
             -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
             -drive if=pflash,format=raw,file=${home_}/bin/qemu/ovmf_vars_x64.bin
             -cdrom /home/neg/1st_level/iso/virtio-win-0.1.141.iso
-            -drive file="/one/vm/${disk_name}.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
+            -drive file="/mnt/qemu/w10.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
         )
 
         local -a qemu_consoles=(
