@@ -121,6 +121,7 @@ function main(){
 
         local -a qemu_nographic=(
             -vga none
+            -nographic
         )
 
         local -a qemu_vga_spice=(
