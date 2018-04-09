@@ -31,6 +31,19 @@ sub wrp_{
 
 sub fancy_string {
     my ($old_name, $new_name) = @_;
+    my $tilda = color('green') . '~' . color('white');
+    my $delimiter = color('blue') . '/' . color('white');
+    my $dot = color('blue') . '·' . color('white');
+
+    $old_name =~ s|^/home/neg|$tilda|e;
+    $new_name =~ s|^/home/neg|$tilda|e;
+
+    $old_name =~ s|·|$dot|ge;
+    $new_name =~ s|·|$dot|ge;
+
+    $old_name =~ s|/|$delimiter|ge;
+    $new_name =~ s|/|$delimiter|ge;
+
     return
         wrp_(">>") . " " . color('white') .
         $old_name . color('green') . " -> " .
