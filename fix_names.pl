@@ -8,6 +8,7 @@ use strict;
 use warnings qw(FATAL utf8);    # fatalize encoding glitches
 use open qw(:std :utf8);        # undeclared streams in UTF-8
 
+use File::HomeDir qw(home);
 use Getopt::Std;
 use Term::ANSIColor;
 use Encode;
@@ -29,20 +30,38 @@ sub wrp_{
            color('reset');
 }
 
+sub colorize {
+    my ($str, $color) = @_;
+    return color($color) . $str . color('reset') . color('white')
+}
+
+sub fancy_delimiters {
+    my (@args) = @_;
+
+    my $color = @args[0];
+    shift @args;
+
+    my $arg = @args[0];
+    shift @args;
+
+    foreach my $p (@args) {
+        $arg =~ s|$p|colorize($p, $color)|ge;       
+    }
+
+    return $arg
+}
+
 sub fancy_string {
     my ($old_name, $new_name) = @_;
-    my $tilda = color('green') . '~' . color('white');
-    my $delimiter = color('blue') . '/' . color('white');
-    my $dot = color('blue') . '·' . color('white');
+    my $home = home();
 
-    $old_name =~ s|^/home/neg|$tilda|e;
-    $new_name =~ s|^/home/neg|$tilda|e;
-
-    $old_name =~ s|·|$dot|ge;
-    $new_name =~ s|·|$dot|ge;
-
-    $old_name =~ s|/|$delimiter|ge;
-    $new_name =~ s|/|$delimiter|ge;
+    foreach my $c ($old_name, $new_name) {
+        $c =~ s|^$home|colorize('~', 'green')|e;
+        $c = fancy_delimiters('blue', $c, '·', '/');
+        $c = fancy_delimiters('cyan', $c, 'x');
+        $c =~ s|-\[|colorize('-[', 'blue')|e;
+        $c =~ s|\]-|colorize(']-', 'blue')|e;
+    }
 
     return
         wrp_(">>") . " " . color('white') .
@@ -59,8 +78,7 @@ foreach my $file_name (@ARGV) {
         $new_name = encode_utf8(uc(decode_utf8($new_name)));
     }
 
-    $new_name =~ tr/ /·/;
-    $new_name =~ tr/\t/·/;
+    $new_name =~ tr/ \t/··/;
     if(-d $new_name){
         $new_name =~ tr/\./·/;
     }  else {
