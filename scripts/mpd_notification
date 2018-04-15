@@ -92,7 +92,7 @@ function send_notify_(){
     summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
     output="\n${output}$(get_lastfm_)\n\n${summary_}"
 
-    notify-send -a "prepare_image" -u "${urgency_}" -i "${image_}" "${summary_}" "${output}"
+    notify-send -a "mpd_notification" -u "${urgency_}" -i "${image_}" "${summary_}" "${output}"
     echo "${body_}$(get_lastfm_)" > "${cover_lock}"
 }
 
@@ -126,7 +126,7 @@ function main(){
     # force dunst to cleanup notification query
     while [[ $(xdotool search --onlyvisible --class "${dunst_x11_class}") != "" ]]; do
         xdotool search --onlyvisible --class "${dunst_x11_class}" \
-            | xargs -I{} sh -c 'xdotool key "Super+space"'
+            | xargs -I{} dash -c 'xdotool key "Super+space"'
     done
 
     [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
