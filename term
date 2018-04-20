@@ -1,13 +1,8 @@
 #!/bin/zsh
 
 main(){
-    local fn_size="18"
-    local fn_name="PragmataPro for Powerline"
-
-    local main_detect=$(tmux list-sessions|awk -F ':' '/main/ {print $1}')
-
+    local main_detect=$(tmux -S ~/1st_level/main.socket list-sessions|awk -F ':' '/main/ {print $1}')
     local term_name="MainTerminal"
-    local term_class="MainTerminal"
     local session_name="main"
 
     local main_term_fn="${fn_name}:size=${fn_size}"
@@ -15,18 +10,16 @@ main(){
     if [[ ${main_detect} != "main" ]]; then
         wid=$(xdotool search --classname ${term_name})
         args_new=(
-            -t "${term_name}" -c "${term_class}" -f ${main_term_fn} 
-            -e dash -c "tmux new-session -s ${session_name} && tmux a -t ${session_name}"
+            -t "${term_name}" -e dash -c "~/bin/dynamic-colors switch dark3; tmux -S ~/1st_level/main.socket new-session -s ${session_name} && tmux -S ~/1st_level/main.socket a -t ${session_name}"
         )
         if [[ -z "${wid}" ]]; then
-            st ${args_new}
+            alacritty ${args_new} 
         fi
     else
         args_existing=(
-            -t "${term_name}" -c "${term_class}" -f ${main_term_fn}
-            -e dash -c "tmux a -t ${session_name}"
+            -t "${term_name}" -e dash -c "~/bin/dynamic-colors switch dark3; tmux -S ~/1st_level/main.socket a -t ${session_name}"
         )
-        st ${args_existing}
+        alacritty ${args_existing} 
     fi
 }
 
