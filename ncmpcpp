@@ -1,0 +1,23 @@
+#!/bin/zsh
+
+main(){
+    local main_detect=$(tmux -S ~/1st_level/mpdpad.socket list-sessions|awk -F ':' '/main/ {print $1}')
+    local term_name="mpd-pad2"
+    local session_name="mpdpad"
+    local main_term_fn="${fn_name}:size=${fn_size}"
+
+    args=(
+        -t "${term_name}" -e dash -c "dynamic-colors switch dark3; ncmpcpp"
+    )
+
+    if [[ ${main_detect} != "main" ]]; then
+        wid=$(xdotool search --classname ${term_name})
+        if [[ -z "${wid}" ]]; then
+            alacritty --config-file ~/.config/alacritty/ncmpcpp.yml ${args}
+        fi
+    else
+        alacritty --config-file ~/.config/alacritty/ncmpcpp.yml ${args}
+    fi
+}
+
+main "$@"
