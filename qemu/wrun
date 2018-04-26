@@ -220,7 +220,7 @@ function main(){
             } &
         fi
 
-        sudo systemctl start {ssh,smb}d
+        sudo systemctl start {sshd,smb}
 
         QEMU_AUDIO_TIMER_PERIOD=150 \
         QEMU_PA_SAMPLES=1024 \
