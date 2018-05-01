@@ -19,6 +19,18 @@ function qemu::msg(){
     notify-send "QEMU :: [$@]"
 }
 
+function vfio_binder(){
+    for dev in "$@"; do
+        vendor="$(cat /sys/bus/pci/devices/${dev}/vendor)"
+        device="$(cat /sys/bus/pci/devices/${dev}/device)"
+        if [[ -e /sys/bus/pci/devices/"${dev}"/driver ]]; then
+                echo "${dev}" > /sys/bus/pci/devices/"${dev}"/driver/unbind
+        fi
+        echo "${vendor}" "${device}" '> /sys/bus/pci/drivers/vfio-pci/new_id'
+        echo "${vendor}" "${device}" > /sys/bus/pci/drivers/vfio-pci/new_id
+    done
+}
+
 function finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
@@ -43,7 +55,8 @@ function finish(){
     xset m 0 0            # Revert mouse settings
     xset -b r rate 250 50 # Revert keyboard rate
 
-    stig start all
+    # Enable torrents
+    stig start all > /dev/null 2>&1
 }
 
 function main(){
@@ -192,7 +205,7 @@ function main(){
         )
 
         # Disable torrents
-        stig stop all 2> /dev/null
+        stig stop all > /dev/null 2>&1
 
         if [[ ! $(pidof synergyc) && $(hash synergy 2> /dev/null) ]]; then
             sudo -u neg "synergy" 2>&1 > /dev/null &! \
@@ -200,7 +213,7 @@ function main(){
         fi
 
         if [[ ${qemu_bypass_network} == true ]]; then
-            sudo ~neg/bin/qemu/vfio_binder "0000:00:19.0"
+            vfio_binder "0000:00:19.0"
             for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
         else
             for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
@@ -208,7 +221,7 @@ function main(){
 
         # Compact memory for hugepages
         sync && command sudo /bin/zsh -c 'echo 3 > /proc/sys/vm/drop_caches'
-        echo 1 > /proc/sys/vm/compact_memory
+        sync && sudo /bin/zsh -c 'echo 1 > /proc/sys/vm/compact_memory'
 
         # Setup hugepages
         sudo sysctl -w vm.nr_hugepages="${hugepages_amount}" 2> /dev/null
