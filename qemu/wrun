@@ -187,7 +187,7 @@ function main(){
         )
 
         local -a qemu_share=(
-            -net nic -net user,smb="${smb_path}"
+            -nic user,smb="${smb_path}"
         )
 
         local -a qemu_qmp_socket_console=(
