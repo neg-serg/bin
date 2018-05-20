@@ -1,5 +1,11 @@
 #!/bin/zsh
 
+select_window_=false
+current_window_=false
+apply_colorpace_=false
+delay_min_=false
+delay_=false
+
 scr_dir=~/tmp/shots
 window='root'
 name="screenshot"
@@ -14,20 +20,14 @@ shot_notify(){
 }
 
 make_shot(){
-    select_window_=false
-    current_window_=false
-    apply_colorpace_=false
-    delay_min_=false
-    delay_=false
-
     local -a arglist=()
     arglist+=( -p 0 )
 
-    [[ ${select_window_} == true ]] && arglist+=( -s )
-    [[ ${current_window_} == true ]] && arglist+=( -i $(xdotool getactivewindow) )
-    [[ ${apply_colorpace_} == true ]] && arglist+=( -c "${colorspace_}" )
-    [[ ${delay_min_} == true ]] && arglist+=( -d 0.5 )
-    [[ ${delay_} == true ]] && arglist+=( -d 5 )
+    [[ ${select_window_} = true ]] && arglist+=( -s )
+    [[ ${current_window_} = true ]] && arglist+=( -i "$(xdotool getactivewindow)" )
+    [[ ${apply_colorpace_} = true ]] && arglist+=( -c "${colorspace_}" )
+    [[ ${delay_min_} = true ]] && arglist+=( -d 0.5 )
+    [[ ${delay_} = true ]] && arglist+=( -d 5 )
 
     arglist+="${summary_}"
 
@@ -70,7 +70,7 @@ menu_(){
     esac
 }
 
-case $1 in
+case "$1" in
     [Rr]*) select_  "$@" ;;
     [Cc]*) current_ "$@" ;;
     [Dd]*) delay_   "$@" ;;
