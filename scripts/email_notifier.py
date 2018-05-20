@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import subprocess
 import pyinotify
 import notify2
 from os.path import expanduser
@@ -9,11 +9,6 @@ import re
 
 import gi; gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf
-
-import lxml.html
-from lxml import etree
-
-import subprocess
 
 # Getting the path of all the boxes
 with open(expanduser("~/.mutt/mailboxes"), 'r') as fd:
@@ -43,7 +38,7 @@ def newfile(event):
         color_=out.decode()[:-1]
         return "<span weight='bold' color='" + color_  +"'>" + s + "</span>"
 
-    def wrap_(s, lhs=" ", rhs="  "):
+    def wrap_(s, lhs="⟬ ", rhs=" ⟭ "):
         return hi_(lhs) + s + hi_(rhs) + hi_("≫ ", color_num=2)
 
     from_data = decode_field('From') \
