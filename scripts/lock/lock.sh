@@ -29,21 +29,20 @@ function i3lock_setup_params(){
         --ringvercolor=${D}
         --insidewrongcolor=${C}
         --ringwrongcolor=${W}
-        --textcolor=${T}
+        --verifcolor=${T}
         --timecolor=${T}
         --datecolor=${T}
         --keyhlcolor=${I}
         --bshlcolor=${W}
 
-        --timepos="x-90:h-ch-20" \
         --datepos="tx+24:ty+25" \
-        --clock --datestr "Введи пароль" \
+        --clock --datestr "Enter password" \
         --insidecolor=00000000 --ringcolor=ffffffff --line-uses-inside \
         --keyhlcolor=d23c3dff --bshlcolor=d23c3dff --separatorcolor=00000000 \
         --insidevercolor=00cf4dff --insidewrongcolor=d23c3dff \
         --ringvercolor=ffffffff --ringwrongcolor=ffffffff --indpos="x+290:h-120" \
         --radius=20 --ring-width=3 --veriftext="" --wrongtext="" \
-        --textcolor="ffffffff" --timecolor="ffffffff" --datecolor="ffffffff"
+        --verifcolor="ffffffff" --timecolor="ffffffff" --datecolor="ffffffff"
     )
 }
 
