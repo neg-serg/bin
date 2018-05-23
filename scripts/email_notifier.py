@@ -4,20 +4,27 @@ import pyinotify
 import notify2
 from os.path import expanduser
 from mailbox import MaildirMessage
-from email.header import Header, decode_header, make_header
+from email.header import decode_header, make_header
 import re
 
-import gi; gi.require_version('GdkPixbuf', '2.0')
+import gi
+gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import GdkPixbuf
 
 # Getting the path of all the boxes
 with open(expanduser("~/.mutt/mailboxes"), 'r') as fd:
-    boxes=[expanduser(f[1:-1]) for f in re.findall('"[^"]+"', fd.readline()[10:])]
+    boxes = [
+        expanduser(f[1:-1])
+        for f in re.findall('"[^"]+"', fd.readline()[10:])
+    ]
 
 notify2.init('email_notifier.py')
 
 # Handling a new mail
-icon = GdkPixbuf.Pixbuf.new_from_file("/usr/share/icons/Lüv/actions/24/mail-mark-unread-new.svg")
+icon = GdkPixbuf.Pixbuf.new_from_file(
+    "/usr/share/icons/Lüv/actions/24/mail-mark-unread-new.svg"
+)
+
 
 def newfile(event):
     def decode_str(string):
@@ -35,32 +42,33 @@ def newfile(event):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         ).communicate()[0]
-        color_=out.decode()[:-1]
-        return "<span weight='bold' color='" + color_  +"'>" + s + "</span>"
+        color_ = out.decode()[:-1]
+        return "<span weight='bold' color='" + \
+            color_ + "'>" + s + "</span>"
 
-    def wrap_(s, lhs="⟬ ", rhs=" ⟭ "):
+    def wrap_(s, lhs=">", rhs=" ⟭ "):
         return hi_(lhs) + s + hi_(rhs) + hi_("≫ ", color_num=2)
 
     from_data = decode_field('From') \
         .replace('<', '[').replace('>', ']') \
         .replace('[', hi_('[')).replace(']', hi_(']')) \
-        .replace('@', hi_('◇',color_num=2))
+        .replace('@', hi_('◇', color_num=2))
     From = wrap_("From") + from_data
     Subject = wrap_("Subject") + decode_field('Subject')
     Date = wrap_("Date") + decode_field('Date')
 
-    if From[-1] not in ['\n','\r']:
-        From+='\n'
+    if From[-1] not in ['\n', '\r']:
+        From += '\n'
 
-    if Subject[-1] not in ['\n','\r']:
-        Subject+='\n'
+    if Subject[-1] not in ['\n', '\r']:
+        Subject += '\n'
 
-    if Date[-1] not in ['\n','\r']:
-        Date+='\n'
+    if Date[-1] not in ['\n', '\r']:
+        Date += '\n'
 
     mail_path = hi_("New mail", color_num=6) + \
-        hi_(" in ",color_num=2) + \
-        hi_('/',color_num=2).join(event.path.split('/')[-3:-1])
+        hi_(" in ", color_num=2) + \
+        hi_('/', color_num=2).join(event.path.split('/')[-3:-1])
 
     n = notify2.Notification(mail_path, From + Subject + Date)
     if "INBOX" in mail_path:
@@ -69,6 +77,7 @@ def newfile(event):
         n.show()
 
     fd.close()
+
 
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm, newfile)
