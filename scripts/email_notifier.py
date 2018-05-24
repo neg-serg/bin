@@ -46,8 +46,9 @@ def newfile(event):
         return "<span weight='bold' color='" + \
             color_ + "'>" + s + "</span>"
 
-    def wrap_(s, lhs=">", rhs=" ⟭ "):
-        return hi_(lhs) + s + hi_(rhs) + hi_("≫ ", color_num=2)
+    def wrap_(s, lhs="", rhs=""):
+        return hi_(lhs) + hi_(s, color_num=8) + \
+               hi_(rhs) + hi_("≫ ", color_num=2)
 
     from_data = decode_field('From') \
         .replace('<', '[').replace('>', ']') \
@@ -86,3 +87,4 @@ for box in boxes:
     wm.add_watch(box+"/new", pyinotify.IN_CREATE | pyinotify.IN_MOVED_TO)
 
 notifier.loop()
+
