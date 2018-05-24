@@ -236,7 +236,54 @@ EOF
 }
 
 
-function ansi(){
+function full_ansi(){
+    fmt="%3d \e[%dmSGR \e[31mSGR \e[44mSGR\e[49m \e[39m\e[44mSGR\e[0m"
+    echo
+    echo "SGR ($fmt)"
+    echo
+    for i in {1..25} ; do
+        a=()
+        for j in {0..75..25}; do
+            a=("${a[@]}" "$((i+j))" "$((i+j))")
+        done
+        printf "$fmt $fmt $fmt $fmt\n" "${a[@]}"
+    done
+    echo
+    for i in {100..110..4} ; do
+        a=()
+        for j in {0..3}; do
+            a=("${a[@]}" "$((i+j))" "$((i+j))")
+        done
+        printf "$fmt $fmt $fmt $fmt\n" "${a[@]}"
+    done
+
+    fmt="\e[48;5;%dm   \e[0m"
+    echo
+    echo "256 Colors ($fmt)"
+    echo
+    for i in {0..7} ; do printf "%3d " "$i" ; done
+    for i in {232..243} ; do printf "%3d " "$i" ; done ; echo
+    for i in {0..7} ; do printf "$fmt " "$i" ; done
+    for i in {232..243} ; do printf "$fmt " "$i" ; done ; echo
+
+    for i in {8..15} ; do printf  "%3d " "$i" ; done ;
+    for i in {244..255} ; do printf "%3d " "$i" ; done ; echo
+    for i in {8..15} ; do printf "$fmt " "$i" ; done ;
+    for i in {244..255} ; do printf "$fmt " "$i" ; done ; echo
+    echo
+
+    fmt="%3d \e[38;5;0m\e[48;5;%dm___\e[0m"
+    for i in {16..51} ; do
+        a=()
+        for j in {0..196..36}; do
+            a=("${a[@]}" "$((i+j))" "$((i+j))")
+        done
+        printf "$fmt $fmt $fmt $fmt $fmt $fmt\n" "${a[@]}"
+    done
+
+}
+
+function blocks (){
     init_ansi
     cat << EOF
 
@@ -245,10 +292,6 @@ function ansi(){
     ${rf}▒▒ ${reset}${ON}${rf}▒▒▒▒${reset}   ${gf}▒▒ ${reset}${ON}${gf}▒▒▒▒${reset}   ${yf}▒▒ ${reset}${ON}${yf}▒▒▒▒${reset}   ${bf}▒▒ ${reset}${ON}${bf}▒▒▒▒${reset}   ${pf}▒▒ ${reset}${ON}${pf}▒▒▒▒${reset}   ${cf}▒▒ ${reset}${ON}${cf}▒▒▒▒${reset}  
 
 EOF
-}
-
-function blocks (){
-    init_ansi
     cat << EOF
     ${Bf}████${reset}${Bb}████${reset} ${rf}████${reset}${rb}████${reset} ${gf}████${reset}${gb}████${reset} ${yf}████${reset}${yb}████${reset} ${bf}████${reset}${bb}████${reset} ${pf}████${reset}${pb}████${reset} ${cf}████${reset}${cb}████${reset} ${wf}████${reset}${wb}████${reset}
     ${Bf}████${reset}${Bb}████${reset} ${rf}████${reset}${rb}████${reset} ${gf}████${reset}${gb}████${reset} ${yf}████${reset}${yb}████${reset} ${bf}████${reset}${bb}████${reset} ${pf}████${reset}${pb}████${reset} ${cf}████${reset}${cb}████${reset} ${wf}████${reset}${wb}████${reset}
@@ -388,25 +431,19 @@ function fancy(){
 }
 
 function 24bit(){
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};0;0m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;0;${i};0m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;0;0;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};128;128m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;128;${i};128m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;128;128;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};192;192m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;192;${i};192m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;192;192;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};224;224m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;224;${i};224m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;224;224;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};64;64m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;64;${i};64m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;64;64;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;${i};32;32m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;32;${i};32m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;32;32;${i}m█"; done; echo
-    for i in {0..255}; do echo -e -n "\033[38;2;255;255;${i}m█"; done; echo
+    awk 'BEGIN{ \
+        s="/\\/\\/\\/\\/\\"; s=s s s s s s s s; \
+        for (colnum = 0; colnum<77; colnum++) { \
+            r = 255-(colnum*255/76); \
+            g = (colnum*510/76); \
+            b = (colnum*255/76); \
+            if (g>255) g = 510-g; \
+            printf "\033[48;2;%d;%d;%dm", r,g,b; \
+            printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b; \
+            printf "%s\033[0m", substr(s,colnum+1,1); \
+        } \
+        printf "\n"; \
+    }'
 }
 
 function tmux_pallete(){
@@ -480,35 +517,6 @@ function ls_colors(){
         name=${names[(e)$key]-$key}
         printf '\e[%sm%s\e[m\n' $color $name
     done
-}
-
-function ira(){
-color8_init
-cat << EOF
-$f1  ▄▄        ▄▄   $f2  ▄▄        ▄▄   $f3  ▄▄        ▄▄   $f4  ▄▄        ▄▄   $f5  ▄▄        ▄▄   $f6  ▄▄        ▄▄   
-$f1▄█████▄  ▄█████▄ $f2▄█████▄  ▄█████▄ $f3▄█████▄  ▄█████▄ $f4▄█████▄  ▄█████▄ $f5▄█████▄  ▄█████▄ $f6▄█████▄  ▄█████▄ 
-$f1███████▄▄███████ $f2███████▄▄███████ $f3███████▄▄███████ $f4███████▄▄███████ $f5███████▄▄███████ $f6███████▄▄███████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1  ████████████   $f2  ████████████   $f3  ████████████   $f4  ████████████   $f5  ████████████   $f6  ████████████   
-$f1    ████████     $f2    ████████     $f3    ████████     $f4    ████████     $f5    ████████     $f6    ████████     
-$f1      ████       $f2      ████       $f3      ████       $f4      ████       $f5      ████       $f6      ████       $bld
-$f1  ▄▄        ▄▄   $f2  ▄▄        ▄▄   $f3  ▄▄        ▄▄   $f4  ▄▄        ▄▄   $f5  ▄▄        ▄▄   $f6  ▄▄        ▄▄   
-$f1▄█████▄  ▄█████▄ $f2▄█████▄  ▄█████▄ $f3▄█████▄  ▄█████▄ $f4▄█████▄  ▄█████▄ $f5▄█████▄  ▄█████▄ $f6▄█████▄  ▄█████▄ 
-$f1███████▄▄███████ $f2███████▄▄███████ $f3███████▄▄███████ $f4███████▄▄███████ $f5███████▄▄███████ $f6███████▄▄███████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1████████████████ $f2████████████████ $f3████████████████ $f4████████████████ $f5████████████████ $f6████████████████ 
-$f1  ████████████   $f2  ████████████   $f3  ████████████   $f4  ████████████   $f5  ████████████   $f6  ████████████   
-$f1    ████████     $f2    ████████     $f3    ████████     $f4    ████████     $f5    ████████     $f6    ████████     
-$f1      ████       $f2      ████       $f3      ████       $f4      ████       $f5      ████       $f6      ████       $rst
-
-Ира милая кошка ^_^
-Мурмурмур! :)
-Я тебя люблю)
-EOF
-
 }
 
 function skulls(){
@@ -620,11 +628,11 @@ EOF
 
 case "${1}" in
     ""|ref*) reference                ;;
-    256*) 256colors          ; exit 0 ;;
+    256) 256colors           ; exit 0 ;;
     24*) 24bit               ; exit 0 ;;
     clrv*) colorvalues       ; exit 0 ;;
     inv*) invader            ; exit 0 ;;
-    ansi*) ansi              ; exit 0 ;;
+    full*) full_ansi         ; exit 0 ;;
     b1) blocks               ; exit 0 ;;
     b2) blocks2              ; exit 0 ;;
     fmt*) colorformatting    ; exit 0 ;;
