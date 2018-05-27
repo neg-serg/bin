@@ -1,26 +1,51 @@
-#!/bin/zsh
+#!/usr/bin/python
 
-main(){
-    local main_detect=$(tmux -S ~/1st_level/main.socket list-sessions|awk -F ':' '/main/ {print $1}')
-    local term_name="MainTerminal"
-    local session_name="main"
+import subprocess
+import shlex
+from os.path import expanduser
 
-    local main_term_fn="${fn_name}:size=${fn_size}"
+def attach_to_session(term_name, session_name):
+    args_existing = [
+        "-t", term_name,
+        "-e", "dash", "-c",
+        f"{expanduser('~/bin/dynamic-colors')} switch dark3; tmux -S {expanduser('~/1st_level/main.socket')} a -t {session_name}"
+    ]
+    subprocess.run(
+        ["alacritty"] + args_existing
+    )
 
-    if [[ ${main_detect} != "main" ]]; then
-        wid=$(xdotool search --classname ${term_name})
-        args_new=(
-            -t "${term_name}" -e dash -c "~/bin/dynamic-colors switch dark3; tmux -S ~/1st_level/main.socket new-session -s ${session_name} && tmux -S ~/1st_level/main.socket a -t ${session_name}"
-        )
-        if [[ -z "${wid}" ]]; then
-            alacritty ${args_new} 
-        fi
-    else
-        args_existing=(
-            -t "${term_name}" -e dash -c "~/bin/dynamic-colors switch dark3; tmux -S ~/1st_level/main.socket a -t ${session_name}"
-        )
-        alacritty ${args_existing} 
-    fi
-}
+def main():
+    socket_path = expanduser('~/1st_level/main.socket')
+    session_list = subprocess.run(
+        shlex.split(f"tmux -S {socket_path} list-sessions"),
+        stdout=subprocess.PIPE
+    ).stdout
+    main_detect = subprocess.run(
+        shlex.split("awk -F ':' '/main/ {print $1}'"),
+        stdout=subprocess.PIPE,
+        input=(session_list)
+    ).stdout.decode()
+    term_name = "MainTerminal"
+    session_name = "main"
+    if session_name in main_detect:
+        wid = subprocess.run(
+            shlex.split(f"xdotool search --classname {term_name}"),
+            stdout=subprocess.PIPE
+        ).stdout
+        args_new = [
+            "-t", term_name,
+            "-e", "dash", "-c",
+            f"{expanduser('~/bin/dynamic-colors')} switch dark3; tmux -S {expanduser('~/1st_level/main.socket')} new-session -s {session_name} && tmux -S {expanduser('~/1st_level/main.socket')} a -t {session_name}"
+        ]
+        try:
+            if int(wid.decode()):
+                subprocess.run(
+                    ["alacritty"] + args_new
+                )
+        except ValueError:
+            print(f"wid={wid} is not corrent")
+            attach_to_session(term_name, session_name)
+    else:
+        attach_to_session(term_name, session_name)
 
-main "$@"
+main()
