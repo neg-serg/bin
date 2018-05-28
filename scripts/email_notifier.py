@@ -48,7 +48,7 @@ def newfile(event):
 
     def wrap_(s, lhs="", rhs=""):
         return hi_(lhs) + hi_(s, color_num=15) + \
-               hi_(rhs) + hi_("≫ ", color_num=2)
+               hi_(rhs) + hi_("> ", color_num=6)
 
     from_data = decode_field('From') \
         .replace('<', '[').replace('>', ']') \
