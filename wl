@@ -20,7 +20,7 @@ function main(){
     [[ $mode = "" ]] && mode="full"
     case ${1} in
         # toggle mode (fill/full)
-        t*)
+        -t)
             mode=$(xargs <<< $(< "${settings}")|head -1)
             if [[ "${mode}" == "full" ]]; then
                 builtin print "fill" > "${settings}"
@@ -30,7 +30,7 @@ function main(){
             print $(_zwrap "wl") $(_zwrap "Set mode -> ${mode}")
             ;;
         # open in image viewer
-        o*) if [[ $# == 1 ]]; then
+        -o) if [[ $# == 1 ]]; then
                 sxiv -Zftoa -sd $(tac "${prev_list}")
             elif [[ $# == 2 ]]; then
                 case ${2#[-+]} in
@@ -40,7 +40,7 @@ function main(){
             fi
             ;;
         # set wallpaper
-        s*)
+        -s)
             if [[ $# == 1 ]]; then
                 local -a filtered_wall_=()
                 for i in ${wall_[@]}; [[ -f $(readlink -f "${i}") ]] && { filtered_wall_+=(${i}) }
@@ -59,7 +59,7 @@ function main(){
             fi
             ;;
         # set random wallpaper from list
-        r*)
+        -r)
             local -a walls=(${wall_dir}/*.{jpg,png})
             local current="${walls[$[RANDOM % $#walls]+1]}"
             {
@@ -70,12 +70,12 @@ function main(){
             hsetroot -"${mode}" "${current}" && save_current_wall "${current}" &!
             ;;
         # delete wallpaper
-        d*)
+        -d)
             [[ ! -d ${trash_dir} ]] && mkdir "${trash_dir}"
             mv -iv "$(tail -1 ${prev_list})" "${trash_dir}"
             ;;
         # list wallpapers
-        l*)
+        -l)
             local counter_
             local print_format_="%0${last_count_digits}d"
             while IFS='' read -r line; do
@@ -84,10 +84,22 @@ function main(){
             done < "${prev_list}"
             ;;
         # print wallpaper name and copy it to clipboard
-        (c|p)*)
+        -c)
             print_wall "${current}"
             xclip <<< "${current}"
             ;;
+        # print help
+        --help|-h|*) 
+            echo "Wallpaper set script.\n" \
+                 "\n" \
+                 "  -t      toggle mode\n"  \
+                 "  -o      open in image viewer\n"  \
+                 "  -s      set wallpaper\n" \
+                 "  -r      set wallpaper from prepared list\n" \
+                 "  -d      delete wallpaper with given number\n" \
+                 "  -l      list wallpapers\n" \
+                 "  -c      print wallpaper name and copy it to clipboard"
+        ;;
     esac
 }
 
