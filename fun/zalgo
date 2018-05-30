@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-# For Python 3
+# Read from stdin and Zalgo-ify
+# By MetroWind <chris.corsair {AT} gmail>
 
-######################################################################
-################### Read from stdin and Zalgo-ify ####################
-############# By MetroWind <chris.corsair {AT} gmail> ################
-######################################################################
-
-import sys, os
+import sys
+import random
 
 # Characters taken from http://str.blogsite.org/Zalgo.htm.
 CHAR_UP = ['\u030D', '\u030E', '\u0304', '\u0305', '\u033F',
@@ -38,8 +35,8 @@ CHAR_DOWN = ['\u0316', '\u0317', '\u0318', '\u0319', '\u031C',
 ZALGO_POS = ("up", "mid", "down")
 ZALGO_CHARS = {"up": CHAR_UP, "mid": CHAR_MID, "down": CHAR_DOWN}
 
-import random
 random.seed()
+
 
 def randStr(charset, count, allow_repeat=True, return_list=True):
     """Randomly chooses a subset with `count' number of characters
@@ -60,6 +57,7 @@ def randStr(charset, count, allow_repeat=True, return_list=True):
         return Result
     else:
         return ''.join(Result)
+
 
 def zalgo(orig_str, intensities, excludes=(' '), rand_intensity=True,
           allow_repeat=True):
@@ -85,20 +83,23 @@ def zalgo(orig_str, intensities, excludes=(' '), rand_intensity=True,
                     ZalgoCounts[pos] = random.randint(0, intensities[pos])
                 else:
                     ZalgoCounts[pos] = intensities[pos]
-          
+
             Result.append(OrigChar)
-          
+
             for pos in ZALGO_POS:
-                Result += randStr(ZALGO_CHARS[pos], ZalgoCounts[pos], allow_repeat)
+                Result += randStr(
+                    ZALGO_CHARS[pos], ZalgoCounts[pos], allow_repeat
+                )
 
     return ''.join(Result)
+
 
 def main():
     Usage = "Usage: %prog [options]"
 
     import optparse
     OptParser = optparse.OptionParser(usage=Usage)
-    
+
     OptParser.add_option("-u", "--up-intensity", dest="IntenseUp", default=2,
                          type="int", metavar="NUM",
                          help="The number of Zalgo characters to put above"
@@ -118,9 +119,9 @@ def main():
                          default=' ', metavar="STR",
                          help="Don’t Zalgo-ify characters in STR. "
                          "Default: \"%default\"")
-    
+
     (Opts, Args) = OptParser.parse_args()
-    
+
     Intense = {"up": Opts.IntenseUp, "mid": Opts.IntenseMid,
                "down": Opts.IntenseDown}
 
@@ -128,5 +129,7 @@ def main():
         print(zalgo(Line, Intense, tuple(Opts.Excludes), Opts.Random))
     return 0
 
+
 if __name__ == "__main__":
     sys.exit(main())
+
