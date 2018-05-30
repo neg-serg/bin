@@ -1,2 +1,0 @@
-#!/bin/dash
-waterfox -app "/usr/share/conkeror/application.ini" "$@"
