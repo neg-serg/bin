@@ -134,7 +134,7 @@ class file_info_printer(object):
 
 class wim_runner(object):
     def __init__(self):
-        self.settings={
+        self.settings = {
             "debug": False,
         }
 
@@ -218,7 +218,11 @@ class wim_runner(object):
         if there_is("notion"):
             self.dprint("[notion] :: go to win with it")
             subprocess.Popen(
-                ["notionflux", "-e", "app.byclass('', '{}')".format(self.wim_name)],
+                [
+                    "notionflux",
+                    "-e",
+                    "app.byclass('', '{}')".format(self.wim_name)
+                ],
                 stdout=open(os.devnull, 'w')
             )
         elif there_is("i3"):
@@ -232,7 +236,9 @@ class wim_runner(object):
     # --[ check wim started or not by internal variable in nvim ]--------
     def wim_is_started(self):
         ret = subprocess.Popen(
-            shlex.split(""" nvr --remote-expr "printf(\\"%s\\", g:nvim_is_started)" """),
+            shlex.split(
+                """ nvr --remote-expr "printf(\\"%s\\", g:nvim_is_started)" """
+            ),
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             env=self.nvr_env
@@ -321,9 +327,8 @@ class wim_runner(object):
                     self.printer.currentdir(filename)
                 else:
                     self.printer.dir(filename)
-        except:
+        except Exception:
             pass
-
 
     def process_list(self):
         self.wim_goto()
@@ -391,16 +396,12 @@ class wim_runner(object):
             time.sleep(self.timeout)
 
     def nvr_for_oni(self):
-        p = subprocess.Popen(
-            [
-                "nvr",
-                "--remote-silent",
-            ] + sys.argv[1:],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+        subprocess.run(
+            ["nvr", "--remote-silent"] + sys.argv[1:],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             env=run.nvr_env
         )
-        p.communicate()[0].decode("utf-8").strip('\n')
 
         for line in sys.argv[1:]:
             self.vim_file_open(line, edit_file=False)
@@ -425,27 +426,38 @@ class wim_runner(object):
     def spawn_oni(self):
         subprocess.call(["i3-msg", "exec", "oni"])
 
-    def nvr_and_switch_oni(self):
+    def wait_for_oni(self):
         t = subprocess.check_output(['pgrep', 'oni$']) \
                       .decode('UTF-8').strip('\n')
         while not len(t):
             t = subprocess.check_output(['pgrep', 'oni$']) \
                           .decode('UTF-8').strip('\n')
-            time.sleep(0.02)
+            time.sleep(self.timeout)
 
-        self.nvr_for_oni()
-        self.switch_to_oni_window()
+    def wait_for_nvr(self):
+        counter = 0
+        nvim_server_is_here = subprocess.Popen(
+            ['nvr', '--serverlist'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        ).communicate()[0].decode('UTF-8').strip('\n')
+
+        while not len(nvim_server_is_here):
+            nvim_server_is_here = subprocess.Popen(
+                ['nvr', '--serverlist'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL
+            ).communicate()[0].decode('UTF-8').strip('\n')
+            time.sleep(self.timeout)
+            counter += 1
+            if counter > 9:
+                return False
+        return True
 
 
 if __name__ == '__main__':
     run = wim_runner()
     tmux_nvim = False
-
-    nvim_server_is_here = subprocess.Popen(
-        ['nvr', '--serverlist'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL
-    ).communicate()[0].decode('UTF-8').strip('\n')
 
     oni_is_here = subprocess.Popen(
         ['pgrep', 'oni$'],
@@ -453,17 +465,16 @@ if __name__ == '__main__':
         stderr=subprocess.DEVNULL
     ).communicate()[0].decode('UTF-8').strip('\n')
 
-    if not len(nvim_server_is_here):
-        try:
-            os.remove(run.sock_path)
-            print(f'socket in {run.sock_path} removed')
-        except OSError:
-            print
+    if not oni_is_here:
+        run.spawn_oni()
+        run.wait_for_oni()
 
-    if oni_is_here and nvim_server_is_here:
-        run.nvr_and_switch_oni()
+    if run.wait_for_nvr():
+        run.nvr_for_oni()
+        run.switch_to_oni_window()
         sys.exit(0)
-    elif tmux_nvim:
+
+    if tmux_nvim:
         if os.environ.get("NWIM_STANDALONE"):
             run.main("embedded")
         else:

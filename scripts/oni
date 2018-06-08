@@ -1,6 +1,0 @@
-#!/usr/bin/zsh
-if ! pgrep oni > /dev/null; then 
-    rm -f ${HOME}/1st_level/nvim.socket
-fi
-
-/usr/sbin/oni &
