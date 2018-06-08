@@ -38,15 +38,20 @@ get_index() {
         )
 }
 
+client=
+client_data=
+
 case $1 in
     -unmute) shift; get_index; pactl set-sink-mute ${index} 0 ;;
     -mute) shift; get_index; pactl set-sink-mute ${index} 1 ;;
-    *)  client=$(pacmd list-sink-inputs                              | \
+    *)  client_data=$(pacmd list-sink-inputs                         | \
                 grep -E 'client:|index:'                             | \
                 awk 'NR % 2 == 1 { o=$0 ; next } { print o " " $0 }' | \
                 awk '{print $2" "substr($0, index($0,$5))}'          | \
-                sed 's/[<>]/#/g'                                     | \
-                ${client_runner[@]})
+                sed 's/[<>]/#/g')
+        if [[ "${client_data}" != "" ]]; then 
+            client="$(echo "${client_data}" | ${client_runner[@]})"
+        fi
         case $1 in
             -vol)
                 shift
@@ -60,14 +65,16 @@ case $1 in
             ;;
             -sink)
                 shift
-                sink=$(pacmd list-sinks    | \
-                       grep name:          | \
-                       awk 'gsub(">$","")' | \
-                       cut -c 9-           | \
-                       sed 's/[<>]/ /g'    | \
-                       ${sink_runner[@]})
-                [[ ${SCRIPT_OUTPUT} ]] && echo "${sink}"
-                pacmd move-sink-input $(awk '{print $1}' <<< "${client}") $(echo ${sink})
+                if [[ "${client}" != "" ]]; then 
+                    sink=$(pacmd list-sinks | \
+                        grep name:          | \
+                        awk 'gsub(">$","")' | \
+                        cut -c 9-           | \
+                        sed 's/[<>]/ /g'    | \
+                        ${sink_runner[@]})
+                    [[ ${SCRIPT_OUTPUT} ]] && echo "${sink}"
+                    pacmd move-sink-input $(awk '{print $1}' <<< "${client}") $(echo ${sink})
+                fi
             ;;
             *)
         esac
