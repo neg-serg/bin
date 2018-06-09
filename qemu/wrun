@@ -258,6 +258,7 @@ function main(){
         qemu-system-x86_64 "${qemu_params[@]}" \
             "${qemu_nographic[@]}" \
             "${looking_glass[@]}" \
+            "${spice[@]}" \
             "${qemu_emulated_sound[@]}" \
             "${qemu_pass_video[@]}" \
             "${qemu_pass_input[@]}" \
