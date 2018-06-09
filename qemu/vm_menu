@@ -20,6 +20,7 @@ function main(){
     local -a opts_=(
         "[Usb :: passthrough add]"
         "[Usb :: passthrough del]"
+        "[Look at video output]"
         "[Start <Win10>]"
     )
 
@@ -36,6 +37,9 @@ function main(){
     tmux -S ~/1st_level/vm.socket new -s vm
 
     case $(for opt in ${opts_}; do echo ${opt}; done | eval "${rofi_cmd[@]}") in
+        *"Look"*)
+            do_if_qemu looking-glass-client -s
+        ;;
         *"Usb"*"pass"*"add"*) 
             do_if_qemu st -c qemu_usb_pass tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough add"
         ;;

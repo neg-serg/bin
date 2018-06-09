@@ -121,9 +121,23 @@ function main(){
             -drive file="/mnt/qemu/w10.qcow2",id=disk,format=qcow2,if=none,cache=writeback -device scsi-hd,drive=disk
         )
 
+        local -a spice=(
+            -spice port=5900,addr=127.0.0.1,disable-ticketing   
+        )
+
         local -a qemu_consoles=(
             -balloon none # Windows wont support it and kvm too, anyway
             -qmp tcp:localhost:4444,server,nowait
+        )
+
+        local -a looking_glass=(
+            -device ivshmem-plain,memdev=ivshmem
+            -object memory-backend-file,id=ivshmem,share=on,mem-path=/dev/shm/looking-glass,size=32M
+        )
+
+        local -a looking_glass_old=(
+            -device ivshmem-doorbell,chardev=ivshmem,vectors=1
+            -chardev socket,path=/tmp/ivshmem_socket,id=ivshmem
         )
 
         local -a qemu_source_params=(
@@ -243,6 +257,8 @@ function main(){
         QEMU_AUDIO_DRV=pa \
         qemu-system-x86_64 "${qemu_params[@]}" \
             "${qemu_nographic[@]}" \
+            "${looking_glass[@]}" \
+            "${spice[@]}" \
             "${qemu_emulated_sound[@]}" \
             "${qemu_pass_video[@]}" \
             "${qemu_pass_input[@]}" \
