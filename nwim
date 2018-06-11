@@ -42,7 +42,7 @@ class pretty_printer(object):
 
     # generic string wrapper
     def wrap(self, str):
-        return self.darkblue + "[" + self.darkwhite + str + self.darkblue + "]"
+        return self.darkblue + "⟬" + self.darkwhite + str + self.darkblue + "⟭"
 
     def size(self, sz):
         return self.wrap(
@@ -63,10 +63,10 @@ class pretty_printer(object):
         return self.wrap(filename)
 
     def prefix(self):
-        return self.wrap(">>")
+        return self.wrap(fg(25) + ">" + fg(26) + ">")
 
     def delim(self):
-        return (self.cyberblue + " :: " + self.default)
+        return (self.cyberblue + self.default)
 
     # pretty printing for filename
     def fancy_file(self, filename):
