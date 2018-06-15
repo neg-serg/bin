@@ -4,6 +4,18 @@ import codecs
 
 from subprocess import check_output
 
+def oauth2_client_id():
+    return check_output("pass oauth2_client_id", shell=True).strip("\n")
+
+def oauth2_client_secret():
+    return check_output("pass oauth2_client_secret", shell=True).strip("\n")
+
+def oauth2_request_url():
+    return "https://accounts.google.com/o/oauth2/token"
+
+def oauth2_refresh_token():
+    return check_output("pass oauth2_refresh_token", shell=True).strip("\n")
+
 def get_pass():
     return check_output("pass gmail", shell=True).strip("\n")
 
