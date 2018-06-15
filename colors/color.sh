@@ -17,7 +17,7 @@ function 256colors(){
 }
 
 function color8_init(){
-    for i in {0..8}; do 
+    for i in {0..8}; do
         printf -v f$i %b "\e[38;05;${i}m"
     done
     bld=$'\e[1m'
@@ -51,7 +51,7 @@ function init_ansi2(){
   blackf="${esc}[30m";   redf="${esc}[31m";    greenf="${esc}[32m"
   yellowf="${esc}[33m"   bluef="${esc}[34m";   purplef="${esc}[35m"
   cyanf="${esc}[36m";    whitef="${esc}[37m"
-  
+
   blackb="${esc}[40m";   redb="${esc}[41m";    greenb="${esc}[42m"
   yellowb="${esc}[43m"   blueb="${esc}[44m";   purpleb="${esc}[45m"
   cyanb="${esc}[46m";    whiteb="${esc}[47m"
@@ -70,7 +70,7 @@ init_ansi2
 
 cat << EOF
 
- ${reset}${redf}▄█▄█▄ ${reset}${boldon}${redf}█ ${reset}${greenf}▄█▄█▄ ${reset}${boldon}${greenf}█ ${reset}${yellowf}▄█▄█▄ ${reset}${boldon}${yellowf}█ ${reset}${bluef}▄█▄█▄ ${reset}${boldon}${bluef}█ ${reset}${purplef}▄█▄█▄ ${reset}${boldon}${purplef}█ ${reset}${cyanf}▄█▄█▄ ${reset}${boldon}${cyanf}█${reset} 
+ ${reset}${redf}▄█▄█▄ ${reset}${boldon}${redf}█ ${reset}${greenf}▄█▄█▄ ${reset}${boldon}${greenf}█ ${reset}${yellowf}▄█▄█▄ ${reset}${boldon}${yellowf}█ ${reset}${bluef}▄█▄█▄ ${reset}${boldon}${bluef}█ ${reset}${purplef}▄█▄█▄ ${reset}${boldon}${purplef}█ ${reset}${cyanf}▄█▄█▄ ${reset}${boldon}${cyanf}█${reset}
  ${reset}${redf}▄█▄█▄ ${reset}${boldon}${redf}▀ ${reset}${greenf}▄█▄█▄ ${reset}${boldon}${greenf}▀ ${reset}${yellowf}▄█▄█▄ ${reset}${boldon}${yellowf}▀ ${reset}${bluef}▄█▄█▄ ${reset}${boldon}${bluef}▀ ${reset}${purplef}▄█▄█▄ ${reset}${boldon}${purplef}▀ ${reset}${cyanf}▄█▄█▄ ${reset}${boldon}${cyanf}▀${reset}
  ${reset}${redf} ▀ ▀  ${reset}${boldon}${redf}▀ ${reset}${greenf} ▀ ▀  ${reset}${boldon}${greenf}▀ ${reset}${yellowf} ▀ ▀  ${reset}${boldon}${yellowf}▀ ${reset}${bluef} ▀ ▀  ${reset}${boldon}${bluef}▀ ${reset}${purplef} ▀ ▀  ${reset}${boldon}${purplef}▀ ${reset}${cyanf} ▀ ▀  ${reset}${boldon}${cyanf}▀${reset}
 EOF
@@ -82,7 +82,7 @@ function pukeskull(){
     #  ┃┳┛┃━┫┃┃┃┃┃━┃┃ ┃┃┃┃
     #  ┃┗┛┛ ┃┃┃┗┛┻━┛┛━┛┗┻┛
     #     ┳━┓┳ ┓┳┏ ┳━┓
-    #     ┃━┛┃ ┃┣┻┓┣━ 
+    #     ┃━┛┃ ┃┣┻┓┣━
     #     ┇  ┗━┛┃ ┛┻━┛
     #    ┓━┓┳┏ ┳ ┓┳  ┳
     #    ┗━┓┣┻┓┃ ┃┃  ┃
@@ -214,9 +214,9 @@ function invader() {
     cat << EOF
 
     $f0  ▄██▄     $f1  ▀▄   ▄▀     $f2 ▄▄▄████▄▄▄    $f3  ▄██▄     $f4  ▀▄   ▄▀     $f5 ▄▄▄████▄▄▄    $f6  ▄██▄   $rst
-    $f0▄█▀██▀█▄   $f1 ▄█▀███▀█▄    $f2███▀▀██▀▀███   $f3▄█▀██▀█▄   $f4 ▄█▀███▀█▄    $f5███▀▀██▀▀███   $f6▄█▀██▀█▄ $rst       
-    $f0▀▀█▀▀█▀▀   $f1█▀███████▀█   $f2▀▀▀██▀▀██▀▀▀   $f3▀▀█▀▀█▀▀   $f4█▀███████▀█   $f5▀▀▀██▀▀██▀▀▀   $f6▀▀█▀▀█▀▀ $rst        
-    $f0▄▀▄▀▀▄▀▄   $f1▀ ▀▄▄ ▄▄▀ ▀   $f2▄▄▀▀ ▀▀ ▀▀▄▄   $f3▄▀▄▀▀▄▀▄   $f4▀ ▀▄▄ ▄▄▀ ▀   $f5▄▄▀▀ ▀▀ ▀▀▄▄   $f6▄▀▄▀▀▄▀▄ $rst        
+    $f0▄█▀██▀█▄   $f1 ▄█▀███▀█▄    $f2███▀▀██▀▀███   $f3▄█▀██▀█▄   $f4 ▄█▀███▀█▄    $f5███▀▀██▀▀███   $f6▄█▀██▀█▄ $rst
+    $f0▀▀█▀▀█▀▀   $f1█▀███████▀█   $f2▀▀▀██▀▀██▀▀▀   $f3▀▀█▀▀█▀▀   $f4█▀███████▀█   $f5▀▀▀██▀▀██▀▀▀   $f6▀▀█▀▀█▀▀ $rst
+    $f0▄▀▄▀▀▄▀▄   $f1▀ ▀▄▄ ▄▄▀ ▀   $f2▄▄▀▀ ▀▀ ▀▀▄▄   $f3▄▀▄▀▀▄▀▄   $f4▀ ▀▄▄ ▄▄▀ ▀   $f5▄▄▀▀ ▀▀ ▀▀▄▄   $f6▄▀▄▀▀▄▀▄ $rst
 
     $bld $f0  ▄██▄     $f1  ▀▄   ▄▀     $f2 ▄▄▄████▄▄▄    $f3  ▄██▄     $f4  ▀▄   ▄▀     $f5 ▄▄▄████▄▄▄    $f6  ▄██▄  $rst
     $bld $f0▄█▀██▀█▄   $f1 ▄█▀███▀█▄    $f2███▀▀██▀▀███   $f3▄█▀██▀█▄   $f4 ▄█▀███▀█▄    $f5███▀▀██▀▀███   $f6▄█▀██▀█▄$rst
@@ -287,9 +287,9 @@ function blocks (){
     init_ansi
     cat << EOF
 
-    ${rf}▒▒▒▒${reset} ${ON}${rf}▒▒${reset}   ${gf}▒▒▒▒${reset} ${ON}${gf}▒▒${reset}   ${yf}▒▒▒▒${reset} ${ON}${yf}▒▒${reset}   ${bf}▒▒▒▒${reset} ${ON}${bf}▒▒${reset}   ${pf}▒▒▒▒${reset} ${ON}${pf}▒▒${reset}   ${cf}▒▒▒▒${reset} ${ON}${cf}▒▒${reset} 
-    ${rf}▒▒ ■${reset} ${ON}${rf}▒▒${reset}   ${gf}▒▒ ■${reset} ${ON}${gf}▒▒${reset}   ${yf}▒▒ ■${reset} ${ON}${yf}▒▒${reset}   ${bf}▒▒ ■${reset} ${ON}${bf}▒▒${reset}   ${pf}▒▒ ■${reset} ${ON}${pf}▒▒${reset}   ${cf}▒▒ ■${reset} ${ON}${cf}▒▒${reset}  
-    ${rf}▒▒ ${reset}${ON}${rf}▒▒▒▒${reset}   ${gf}▒▒ ${reset}${ON}${gf}▒▒▒▒${reset}   ${yf}▒▒ ${reset}${ON}${yf}▒▒▒▒${reset}   ${bf}▒▒ ${reset}${ON}${bf}▒▒▒▒${reset}   ${pf}▒▒ ${reset}${ON}${pf}▒▒▒▒${reset}   ${cf}▒▒ ${reset}${ON}${cf}▒▒▒▒${reset}  
+    ${rf}▒▒▒▒${reset} ${ON}${rf}▒▒${reset}   ${gf}▒▒▒▒${reset} ${ON}${gf}▒▒${reset}   ${yf}▒▒▒▒${reset} ${ON}${yf}▒▒${reset}   ${bf}▒▒▒▒${reset} ${ON}${bf}▒▒${reset}   ${pf}▒▒▒▒${reset} ${ON}${pf}▒▒${reset}   ${cf}▒▒▒▒${reset} ${ON}${cf}▒▒${reset}
+    ${rf}▒▒ ■${reset} ${ON}${rf}▒▒${reset}   ${gf}▒▒ ■${reset} ${ON}${gf}▒▒${reset}   ${yf}▒▒ ■${reset} ${ON}${yf}▒▒${reset}   ${bf}▒▒ ■${reset} ${ON}${bf}▒▒${reset}   ${pf}▒▒ ■${reset} ${ON}${pf}▒▒${reset}   ${cf}▒▒ ■${reset} ${ON}${cf}▒▒${reset}
+    ${rf}▒▒ ${reset}${ON}${rf}▒▒▒▒${reset}   ${gf}▒▒ ${reset}${ON}${gf}▒▒▒▒${reset}   ${yf}▒▒ ${reset}${ON}${yf}▒▒▒▒${reset}   ${bf}▒▒ ${reset}${ON}${bf}▒▒▒▒${reset}   ${pf}▒▒ ${reset}${ON}${pf}▒▒▒▒${reset}   ${cf}▒▒ ${reset}${ON}${cf}▒▒▒▒${reset}
 
 EOF
     cat << EOF
@@ -346,7 +346,7 @@ function list() {
         '  36m' '1;36m' '  37m' '1;37m';
     do FG=${FGs// /}
         echo -en " $FGs \033[$FG  $T  "
-        for BG in 40m 41m 42m 43m 44m 45m 46m 47m; do 
+        for BG in 40m 41m 42m 43m 44m 45m 46m 47m; do
             eval "$(eval echo -ne \$cmd_${mode})"
         done
         echo;
@@ -385,19 +385,19 @@ function minicolors() {
     init_ansi
     cat << EOF
 
-    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset} 
-    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset} 
-    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset} 
-    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
-    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset} 
- 
+    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset}
+    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset}
+    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${rf}■■■■${reset}${ON}${rf}■■${reset}   ${gf}■■■■${reset}${ON}${gf}■■${reset}   ${yf}■■■■${reset}${ON}${yf}■■${reset}   ${bf}■■■■${reset}${ON}${pf}■■${reset}   ${pf}■■■■${reset}${ON}${bf}■■${reset}   ${cf}■■■■${reset}${ON}${cf}■■${reset}
+    ${rf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${gf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${yf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${bf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${cf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+    ${gf}■■${reset}${ON}${gf}■■${reset}${ON}${rf}■■${reset}   ${yf}■■${reset}${ON}${yf}■■${reset}${ON}${gf}■■${reset}   ${bf}■■${reset}${ON}${bf}■■${reset}${ON}${yf}■■${reset}   ${ON}${cf}■■${reset}${pf}■■${reset}${ON}${pf}■■${reset}   ${ON}${pf}■■${reset}${ON}${cf}■■${reset}${ON}${bf}■■${reset}   ${bf}■■${reset}${ON}${pf}■■${reset}${ON}${cf}■■${reset}
+
 EOF
 }
 
@@ -422,7 +422,7 @@ function fancy(){
         done
         echo -en "\033[0m │"
             echo -e "\033[0m"
-            
+
     if [ "$b" -lt 8 ]; then
         echo "     ├──────────────────────────────────────────────────────────────────────────┤"
     fi
@@ -522,18 +522,18 @@ function ls_colors(){
 function skulls(){
 color8_init
 cat << EOF
-$f1  ▄▄▄▄▄▄▄   $f2  ▄▄▄▄▄▄▄   $f3  ▄▄▄▄▄▄▄   $f4  ▄▄▄▄▄▄▄   $f5  ▄▄▄▄▄▄▄   $f6  ▄▄▄▄▄▄▄   
-$f1▄█▀     ▀█▄ $f2▄█▀     ▀█▄ $f3▄█▀     ▀█▄ $f4▄█▀     ▀█▄ $f5▄█▀     ▀█▄ $f6▄█▀     ▀█▄ 
-$f1█         █ $f2█         █ $f3█         █ $f4█         █ $f5█         █ $f6█         █ 
-$f1███ ▄ ██  █ $f2███ ▄ ██  █ $f3███ ▄ ██  █ $f4███ ▄ ██  █ $f5███ ▄ ██  █ $f6███ ▄ ██  █ 
-$f1█▄     ▄▄██ $f2█▄     ▄▄██ $f3█▄     ▄▄██ $f4█▄     ▄▄██ $f5█▄     ▄▄██ $f6█▄     ▄▄██ 
+$f1  ▄▄▄▄▄▄▄   $f2  ▄▄▄▄▄▄▄   $f3  ▄▄▄▄▄▄▄   $f4  ▄▄▄▄▄▄▄   $f5  ▄▄▄▄▄▄▄   $f6  ▄▄▄▄▄▄▄
+$f1▄█▀     ▀█▄ $f2▄█▀     ▀█▄ $f3▄█▀     ▀█▄ $f4▄█▀     ▀█▄ $f5▄█▀     ▀█▄ $f6▄█▀     ▀█▄
+$f1█         █ $f2█         █ $f3█         █ $f4█         █ $f5█         █ $f6█         █
+$f1███ ▄ ██  █ $f2███ ▄ ██  █ $f3███ ▄ ██  █ $f4███ ▄ ██  █ $f5███ ▄ ██  █ $f6███ ▄ ██  █
+$f1█▄     ▄▄██ $f2█▄     ▄▄██ $f3█▄     ▄▄██ $f4█▄     ▄▄██ $f5█▄     ▄▄██ $f6█▄     ▄▄██
 $f1 █▄█▄█▄██▀  $f2 █▄█▄█▄██▀  $f3 █▄█▄█▄██▀  $f4 █▄█▄█▄██▀  $f5 █▄█▄█▄██▀  $f6 █▄█▄█▄██▀  $bld
-$f1  ▄▄▄▄▄▄▄   $f2  ▄▄▄▄▄▄▄   $f3  ▄▄▄▄▄▄▄   $f4  ▄▄▄▄▄▄▄   $f5  ▄▄▄▄▄▄▄   $f6  ▄▄▄▄▄▄▄   
-$f1▄█▀     ▀█▄ $f2▄█▀     ▀█▄ $f3▄█▀     ▀█▄ $f4▄█▀     ▀█▄ $f5▄█▀     ▀█▄ $f6▄█▀     ▀█▄ 
-$f1█         █ $f2█         █ $f3█         █ $f4█         █ $f5█         █ $f6█         █ 
-$f1███ ▄ ██  █ $f2███ ▄ ██  █ $f3███ ▄ ██  █ $f4███ ▄ ██  █ $f5███ ▄ ██  █ $f6███ ▄ ██  █ 
-$f1█▄     ▄▄██ $f2█▄     ▄▄██ $f3█▄     ▄▄██ $f4█▄     ▄▄██ $f5█▄     ▄▄██ $f6█▄     ▄▄██ 
-$f1 █▄█▄█▄██▀  $f2 █▄█▄█▄██▀  $f3 █▄█▄█▄██▀  $f4 █▄█▄█▄██▀  $f5 █▄█▄█▄██▀  $f6 █▄█▄█▄██▀  
+$f1  ▄▄▄▄▄▄▄   $f2  ▄▄▄▄▄▄▄   $f3  ▄▄▄▄▄▄▄   $f4  ▄▄▄▄▄▄▄   $f5  ▄▄▄▄▄▄▄   $f6  ▄▄▄▄▄▄▄
+$f1▄█▀     ▀█▄ $f2▄█▀     ▀█▄ $f3▄█▀     ▀█▄ $f4▄█▀     ▀█▄ $f5▄█▀     ▀█▄ $f6▄█▀     ▀█▄
+$f1█         █ $f2█         █ $f3█         █ $f4█         █ $f5█         █ $f6█         █
+$f1███ ▄ ██  █ $f2███ ▄ ██  █ $f3███ ▄ ██  █ $f4███ ▄ ██  █ $f5███ ▄ ██  █ $f6███ ▄ ██  █
+$f1█▄     ▄▄██ $f2█▄     ▄▄██ $f3█▄     ▄▄██ $f4█▄     ▄▄██ $f5█▄     ▄▄██ $f6█▄     ▄▄██
+$f1 █▄█▄█▄██▀  $f2 █▄█▄█▄██▀  $f3 █▄█▄█▄██▀  $f4 █▄█▄█▄██▀  $f5 █▄█▄█▄██▀  $f6 █▄█▄█▄██▀
 $rst
 EOF
 }
@@ -545,7 +545,7 @@ initializeANSI()
   Bf="${esc}[30m";   rf="${esc}[31m";   gf="${esc}[32m"
   yf="${esc}[33m";   bf="${esc}[34m";   pf="${esc}[35m"
   cf="${esc}[36m";   wf="${esc}[37m";
-  
+
   Bb="${esc}[40m";  rb="${esc}[41m";  gb="${esc}[42m"
   yb="${esc}[43m"   bb="${esc}[44m";   pb="${esc}[45m"
   cb="${esc}[46m";  wb="${esc}[47m"
@@ -582,18 +582,18 @@ EOF
 function blocks2(){
     init_ansi2
     cat << EOF
-    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
-    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
-    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset} 
-    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
-    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset} 
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset}
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset}
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${redf}■■■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■■■${reset}${boldon}${cyanf}■■${reset}
+    ${redf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${greenf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${yellowf}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${bluef}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${cyanf}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
+    ${greenf}■■${reset}${boldon}${greenf}■■${reset}${boldon}${redf}■■${reset}   ${yellowf}■■${reset}${boldon}${yellowf}■■${reset}${boldon}${greenf}■■${reset}   ${bluef}■■${reset}${boldon}${bluef}■■${reset}${boldon}${yellowf}■■${reset}   ${boldon}${cyanf}■■${reset}${purplef}■■${reset}${boldon}${purplef}■■${reset}   ${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}${boldon}${bluef}■■${reset}   ${bluef}■■${reset}${boldon}${purplef}■■${reset}${boldon}${cyanf}■■${reset}
 EOF
 }
 
@@ -619,7 +619,7 @@ ${Bf}██${cf}██${ON}████████${OFF}${Bf}██${rf}${ON}�
     ${Bf}████${cf}████████████${Bf}██${cf}██████${Bf}██                      ${Bf}██████${yf}████${rf}██████${Bf}████                              ${Bf}██████${bf}██${Bf}████
         ${Bf}██████████████${wf}${ON}██${OFF}${cf}██${wf}${ON}██${OFF}${Bf}██                            ${Bf}██████${rf}██${Bf}████                                  ${Bf}██${bf}██████${Bf}██
                       ${Bf}██████                                ${Bf}██${wf}${ON}██${OFF}${rf}██${wf}${ON}██${OFF}${Bf}██                                    ${Bf}██████
-                                                              ${Bf}██████                  
+                                                              ${Bf}██████
 ${reset}
 
 EOF
