@@ -1,3 +1,4 @@
+#!/bin/lua
 --Definitely not my best work, first script I've done in Lua 5.2 
 function draw()
 	nissue = {
