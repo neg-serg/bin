@@ -12,7 +12,7 @@ local last_count=40
 local last_count_digits=${#last_count}
 
 save_current_wall(){ print "$1" > ${HOME}/tmp/current_wallpaper }
-print_wall(){ print $(_zpref) $(_zfwrap "${1}") }
+print_wall(){ print $(zpref) $(zfwrap "${1}") }
 
 function main(){
     current=$(< ${HOME}/tmp/current_wallpaper|head -1)
@@ -27,7 +27,7 @@ function main(){
             else
                 builtin print "full" > "${settings}"
             fi
-            print $(_zwrap "wl") $(_zwrap "Set mode -> ${mode}")
+            print $(zwrap "wl") $(zwrap "Set mode -> ${mode}")
             ;;
         # open in image viewer
         -o) if [[ $# == 1 ]]; then
@@ -76,11 +76,10 @@ function main(){
             ;;
         # list wallpapers
         -l)
-            local counter_
             local print_format_="%0${last_count_digits}d"
             while IFS='' read -r line; do
-                let counter_=counter_+1
-                print $(_zwrap $(builtin printf "${print_format_}" "${counter_}")) $(_zfwrap "${line}")
+                let counter=counter+1
+                print $(zwrap $(builtin printf "${print_format_}" "${counter}"))$(zfwrap "${line}")
             done < "${prev_list}"
             ;;
         # print wallpaper name and copy it to clipboard
