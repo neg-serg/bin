@@ -1,6 +1,5 @@
 #!/bin/zsh
-while resource="$(inotifywait -r -e -m create "${XDG_PICTURES_DIR}"  --format %w%f . 2>/dev/null)"; do
+while true; do
+    resource="$(inotifywait --recursive --event create  --format %w%f "${XDG_PICTURES_DIR}/")"
     echo "${resource}" | _FASD_DATA="${XDG_DATA_HOME}/sxiv_do.data" xargs fasd -A
 done
-
-make_human_readable(){ gawk -i inplace -F '|' '{print $1}' ${XDG_DATA_HOME}/sxiv_do.data }
