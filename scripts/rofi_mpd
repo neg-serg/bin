@@ -1,8 +1,8 @@
 #!/bin/zsh
 
 mpd_menu=(
-    "title_copy" 
-    "artist_copy" 
+    "title_copy"
+    "artist_copy"
     "album_copy"
     "mpd_show"
 )
@@ -20,7 +20,7 @@ function generate(){
 }
 
 function handler(){
-    while IFS= read -r arg; do 
+    while IFS= read -r arg; do
         if [[ ${arg} =~ ".*title_copy.*" ]]; then
             mpc current | xsel -bi
         elif [[ ${arg} =~ ".*album_copy.*" ]]; then
@@ -46,10 +46,10 @@ local rofi_font="Pragmata Pro for Powerline bold 17"
 
 local rofi_colors=(
     -fg '${neg_rofi_fg}'
-    -bg '${neg_rofi_bg}' 
-    -hlfg '${neg_rofi_hlfg}' 
+    -bg '${neg_rofi_bg}'
+    -hlfg '${neg_rofi_hlfg}'
     -hlbg '${neg_rofi_hlbg}'
-    -bc '${neg_rofi_bc}' 
+    -bc '${neg_rofi_bc}'
 )
 
 local mon_width_=$(xrandr -q |awk '/Screen/{print $8}')
@@ -68,4 +68,4 @@ local rofi_options=(
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
 
-generate | eval "rofi ${rofi_colors} ${rofi_options} ${rofi_pid}" | handler 
+generate | eval "rofi ${rofi_colors} ${rofi_options} ${rofi_pid}" | handler
