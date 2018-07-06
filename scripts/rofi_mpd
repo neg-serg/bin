@@ -1,21 +1,16 @@
 #!/bin/zsh
 
-mpd_menu=(
-    "title_copy"
-    "artist_copy"
-    "album_copy"
-    "mpd_show"
-)
+mpd_menu=("title_copy" "artist_copy" "album_copy")
 
-blue_="<span weight='bold' color='$(xrq color4)'>"
-norm_="<span weight='bold' color='$(xrq foreground)'>"
-close_="</span>"
+blue="<span weight='bold' color='$(xrq color4)'>"
+norm="<span weight='bold' color='$(xrq foreground)'>"
+close="</span>"
 
 function generate(){
-    local j=0
-    for i in ${mpd_menu[@]}; do
-        (( j++ ))
-        echo "$j - ${blue_}[</span> $i ${blue_}]</span>"
+    local count=0
+    for item in ${mpd_menu[@]}; do
+        (( count++ ))
+        echo "${count}:${blue}⟬</span>${item}${blue}⟭</span>"
     done
 }
 
@@ -27,8 +22,6 @@ function handler(){
             mpc current -f "[%album%]"|xsel -bi
         elif [[ ${arg} =~ ".*artist_copy.*" ]]; then
             mpc current -f "[%artist%]"|xsel -bi
-        elif [[ ${arg} =~ ".*mpd_show.*" ]]; then
-            ~/bin/mpd_dzen_info
         fi
     done
 }
@@ -40,10 +33,8 @@ local neg_rofi_hlfg="#aaaaaa"
 local neg_rofi_hlbg="#194558"
 local neg_rofi_bc="#202020"
 
-local pref="${blue_}[${close_}mpd action${blue_}]${close_}"
-
-local rofi_font="Pragmata Pro for Powerline bold 17"
-
+local pref="${blue}⟬${close}MPD action${blue}⟭${close}"
+local rofi_font="Iosevka Term Medium 17"
 local rofi_colors=(
     -fg '${neg_rofi_fg}'
     -bg '${neg_rofi_bg}'
@@ -51,10 +42,8 @@ local rofi_colors=(
     -hlbg '${neg_rofi_hlbg}'
     -bc '${neg_rofi_bc}'
 )
-
-local mon_width_=$(xrandr -q |awk '/Screen/{print $8}')
-local gap_="70"
-
+local mon_width=$(xrandr -q |awk '/Screen/{print $8}')
+local gap="70"
 local rofi_options=(
     -markup-rows
     -mesg \"${pref}\"
@@ -63,7 +52,7 @@ local rofi_options=(
     -font '${rofi_font}'
     -b -disable-history -columns 8
     -lines 1
-    -width $((${mon_width_} - ${gap_}))
+    -width $((${mon_width} - ${gap}))
     -yoffset -22 -location 6 -p '\>'
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
