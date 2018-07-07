@@ -19,15 +19,11 @@ getopts('islu');
 
 our($opt_i, $opt_s, $opt_l, $opt_u, $opt_B);
 
-sub wrp_{
+sub wrap {
     my ($str) = @_;
     return color('blue') .
-           "[" .
-           color('white') .
-           $str  .
-           color('blue') .
-           "]" .
-           color('reset');
+           "⟬" . color('white') . $str  .
+           color('blue') . "⟭" . color('reset');
 }
 
 sub colorize {
@@ -64,7 +60,7 @@ sub fancy_string {
     }
 
     return
-        wrp_(">>") . " " . color('white') .
+        wrap(color('ansi25') . '>' . color('ansi26') . '>') . " " . color('white') .
         $old_name . color('green') . " -> " .
         color('white') . " $new_name\n" . color('reset');
 }
@@ -92,28 +88,19 @@ foreach my $file_name (@ARGV) {
     }
     $new_name =~ s/\.-\./-/g;
     $new_name =~ s/·-·/-/g;
-
     $new_name =~ s/\,[_-]/-/g;
-
     $new_name =~ s/-\./-/g;
     $new_name =~ s/-·/-/g;
-
     $new_name =~ s/-+/-/g;
-
     $new_name =~ s/\.-/-/g;
     $new_name =~ s/·-/-/g;
-
     $new_name =~ s/\.:/:/g;
     $new_name =~ s/·:/:/g;
-
     $new_name =~ s/:\./:/g;
     $new_name =~ s/:·/:/g;
-
     $new_name =~ s/\.\./·/g;
     $new_name =~ s/··/·/g;
-
     $new_name =~ s/·\././g;
-
     if ($opt_B){
         $new_name =~ s/[\(\)<>\\]//g;
     } else {
