@@ -9,7 +9,7 @@ function eat () {
     local pass="*"
     filename="$@"
     xclip -in -selection c < "${filename}"
-    _zwrap "${pass} ${txtund}"${filename##*/}"${txtrst} copied to clipboard"
+    zwrap "${pass} ${txtund}"${filename##*/}"${txtrst} copied to clipboard"
 }
 
 function main() {
@@ -34,9 +34,9 @@ function main() {
         |sed 's/#.*//' \
         |sed "s/^\.\W*/${ftype_pref}/" > "${tmp_file}"
 
-    _zwrap "-----------------------------"
-    _zwrap "You should handle it by hand:"
-    _zwrap "-----------------------------"
+    zwrap "-----------------------------"
+    zwrap "You should handle it by hand:"
+    zwrap "-----------------------------"
 
     local -a sed_args=(
         -e "s/${fg_eq}/fg=/"               
