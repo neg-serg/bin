@@ -37,7 +37,7 @@ function send_notify_(){
     local prefix_=$(wf_ "➣")
     
     wait
-    notify-send -h string:fgcolor:#617287 -a "pic_notify" -i "${new_image}" "${header}" "${output}"
+    notify-send -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" -i "${new_image}" "${header}" "${output}"
 }
 
 function highlight(){
