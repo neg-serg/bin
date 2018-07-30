@@ -4,10 +4,6 @@ main(){
     case "$1" in
         c*) 
             shift
-            st_=$(highlight_ 4)
-            bold_="<span weight='bold'>"
-            prefix_=$(wf_ "➣")
-
             # Transmission-related stuff
             inotifywait -m -q -e close --format "%f" ${XDG_DOWNLOAD_DIR}/ \
             | while IFS= read -r file_; do
@@ -80,8 +76,12 @@ main(){
     esac
 }
 
+st_=$(highlight_ 4)
+bold_="<span weight='bold'>"
+prefix_=$(wf_ "➣")
+
 wf_(){
-    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_}"
+    builtin print "${st_}⟬${cl_}${bold_}$1${cl_}${st_}⟭${cl_}"
 }
 
 highlight_(){
@@ -90,7 +90,7 @@ highlight_(){
 }
 
 send_notify_(){ 
-    notify-send  "$(wf_ "mv")$(wf_ "${file}") -> $(wf_ ${HOME}/tmp)"
+    notify-send "$(wf_ "mv")$(wf_ "${file}")->$(wf_ ${HOME}/tmp)"
 }
 
 main "$@"
