@@ -51,7 +51,7 @@ function send_notify_(){
     length_=$[${(@)length_[1]}]
     [[ ${length_} > ${max_length_} ]] && length_=${max_length_}
 
-    fancy_table_=('' '' '⟫' '')
+    fancy_table_=('' '♫' '⟫' '')
 
     for i in {1..$#fancy_table_}; do
         if [[ ${bodyarr_[i]} != "" ]]; then
