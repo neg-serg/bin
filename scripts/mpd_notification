@@ -1,69 +1,71 @@
 #!/bin/zsh
 
-summary_="$2" body_="$3" urgency_="$5"
+summary="$2"
+body="$3"
+urgency="$5"
 
-dunst_pics_="/tmp/dunst-images"
-cover_lock="${dunst_pics_}/notify.lock"
-image_="/tmp/.mpd-notification-artwork.png"
+dunst_pics="/tmp/dunst-images"
+cover_lock="${dunst_pics}/notify.lock"
+image="/tmp/.mpd-notification-artwork.png"
 
-function wf_(){
-    builtin print "${st_}[${cl_}${bold_}$1${cl_}${st_}]${cl_} "
+function wf(){
+    builtin print "${col1}⟬${end}${bold}$1${end}${col1}⟭${end} "
 }
 
-function get_pid_(){
-    local mpdsc_="$(which mpdscribble) --conf"
-    local mpdas_="${XDG_CONFIG_HOME}/mpdas"
-    pgrep -f "${mpdsc_} ${XDG_CONFIG_HOME}/mpdscribble/$1.conf --no-daemon" || \
-    pgrep -f "${mpdas_}/$1.rc"
+function get_pid(){
+    local mpdsc="$(which mpdscribble) --conf"
+    local mpdas="${XDG_CONFIG_HOME}/mpdas"
+    pgrep -f "${mpdsc} ${XDG_CONFIG_HOME}/mpdscribble/$1.conf --no-daemon" || \
+    pgrep -f "${mpdas}/$1.rc"
 }
 
-function get_lastfm_(){
+function get_lastfm(){
     for pid_ in neg hextrick; do
-        if [[ $(get_pid_ "${pid_}") != "" ]]; then
-            builtin printf "%s\n" "$(wf_ "L")$(sed 's:^.:\U&:g' <<< ${pid_}) last.fm"
+        if [[ $(get_pid "${pid_}") != "" ]]; then
+            builtin printf "%s\n" "$(wf "L")$(sed 's:^.:\U&:g' <<< ${pid_}) last.fm"
             break
         fi
     done
 }
 
-function highlight_(){
+function highlight(){
     local msg="$(xrq color$1)"
     builtin print "<span weight='bold' color='${msg}'>"
 }
 
-function send_notify_(){ 
-    local st_=$(highlight_ 4)
-    local st2_=$(highlight_ 8)
+function send_notify(){ 
+    local col1=$(highlight 4)
+    local col2=$(highlight 8)
 
-    local cl_="</span>"
-    local bold_="<span weight='bold'>"
-    local prefix_=$(wf_ "➣")
-    declare -a bodyarr_
+    local end="</span>"
+    local bold="<span weight='bold'>"
+    local prefix_=$(wf "➣")
+    declare -a bodyarr
     while read line; do
-        bodyarr_+="${line}"
-    done <<< ${body_}
+        bodyarr+="${line}"
+    done <<< ${body}
 
     length_=()
-    for i in {1..6}; length_+=${#bodyarr_[$i]};
+    for i in {1..6}; length_+=${#bodyarr[$i]};
     length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
 
     max_length_=35
     length_=$[${(@)length_[1]}]
     [[ ${length_} > ${max_length_} ]] && length_=${max_length_}
 
-    fancy_table_=('' '♫' '⟫' '')
+    fancy_table=('' '♫' '⟫' '')
 
-    for i in {1..$#fancy_table_}; do
-        if [[ ${bodyarr_[i]} != "" ]]; then
-            bodyarr_[i]=$(wf_ $fancy_table_[i])"${bodyarr_[i]}\n"
+    for i in {1..$#fancy_table}; do
+        if [[ ${bodyarr[i]} != "" ]]; then
+            bodyarr[i]=$(wf $fancy_table[i])"${bodyarr[i]}\n"
         else
-            bodyarr_[i]="\n"
+            bodyarr[i]="\n"
         fi
     done
 
-    current_file="$(mpc -f '%file%'|head -1)"
-    mpd_music_dir="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
-    current_dirname="${mpd_music_dir}/$(dirname "${current_file}")"
+    local current_file="$(mpc -f '%file%'|head -1)"
+    local mpd_music_dir="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')"
+    local current_dirname="${mpd_music_dir}/$(dirname "${current_file}")"
 
     albumdetails_metadata="$(find "${current_dirname}" -exec albumdetails '{}' + 2>&1 >/dev/null \
         | awk -F ': ' '/Quality/{print $2}' \
@@ -71,7 +73,6 @@ function send_notify_(){
     sox_metadata="$(sox --i "${mpd_music_dir}/${current_file}" 2> /dev/null)"
     if [[ ! -z "${sox_metadata// }" ]]; then
         media_file_encoding="$(awk -F': ' '/Sample Encoding/{print $2}' <<< "${sox_metadata}")"
-
         case "${media_file_encoding}" in
             *FLAC*) file_enc="flac" ;;
             *MPEG*) file_enc="mp3" ;;
@@ -80,44 +81,44 @@ function send_notify_(){
     fi
 
     [[ ${file_enc// } != "" ]] && \
-        bodyarr_[5]=$(wf_ '')"${file_enc}\n" || \
-        bodyarr_[5]="\n"
+        bodyarr[5]=$(wf '')"${file_enc}\n" || \
+        bodyarr[5]="\n"
     [[ ${albumdetails_metadata// } != "" ]] && \
-        bodyarr_[6]=$(wf_ '')"${albumdetails_metadata}\n" || \
-        bodyarr_[6]="\n"
+        bodyarr[6]=$(wf '')"${albumdetails_metadata}\n" || \
+        bodyarr[6]="\n"
 
     local output
-    for i in ${bodyarr_[@]}; [[ ${i} != "\n" ]] && output="${output}${i}"
+    for i in ${bodyarr[@]}; [[ ${i} != "\n" ]] && output="${output}${i}"
 
-    summary_=$'\n'"${st2_}$(repeat ${length_} builtin print -n "◇")${cl_}"
-    output="\n${output}$(get_lastfm_)\n\n${summary_}"
+    summary=$'\n'"${col2}$(repeat ${length_} builtin print -n "◇")${end}"
+    output="\n${output}$(get_lastfm)\n\n${summary}"
 
-    notify-send -a "mpd_notification" -u "${urgency_}" -i "${image_}" "${summary_}" "${output}"
-    echo "${body_}$(get_lastfm_)" > "${cover_lock}"
+    notify-send -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
+    echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
-function compare_images_(){ 
+function cmp_img(){ 
     ${HOME}/bin/scripts/compare_images.py "$1" "$2" \
         || builtin print "False"
 }
 
 function send_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
-        send_notify_
+        send_notify
     elif [[ -s "${cover_lock}" ]]; then
-        if [[ "$(cat "${cover_lock}")" != "${body_}$(get_lastfm_)" ]]; then
-            send_notify_
+        if [[ "$(cat "${cover_lock}")" != "${body}$(get_lastfm)" ]]; then
+            send_notify
         fi
     fi
-    cp "${image_}" "${prev_}"
+    cp "${image}" "${prev}"
 }
 
 function zshexit(){
     (   
-        hashsum1=$(sha384sum "${image_}"|awk '{print $1}')
+        hashsum1=$(sha384sum "${image}"|awk '{print $1}')
         sleep 4s;
-        hashsum2=$(sha384sum "${image_}"|awk '{print $1}')
-        [[ ${hashsum1} = ${hashsum2} ]] && rm ${image_}
+        hashsum2=$(sha384sum "${image}"|awk '{print $1}')
+        [[ ${hashsum1} = ${hashsum2} ]] && rm ${image}
     ) &
 }
 
@@ -129,22 +130,22 @@ function main(){
             | xargs -I{} dash -c 'xdotool key "Super+space"'
     done
 
-    [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}"
-    prev_="${dunst_pics_}/prev.png"
+    [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}"
+    prev="${dunst_pics}/prev.png"
 
-    find "${dunst_pics_}" -name prev.png -not -newermt '-900 seconds' -delete
+    find "${dunst_pics}" -name prev.png -not -newermt '-900 seconds' -delete
 
-    if [[ -f ${image_} ]]; then
-        [[ ! -d "${dunst_pics_}" ]] && mkdir -p "${dunst_pics_}" 
+    if [[ -f ${image} ]]; then
+        [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}" 
 
         # send notification with compatible image
-        if [[ ! -f "${prev_}" ]]; then
+        if [[ ! -f "${prev}" ]]; then
             send_notify
         else
-            local dunst_pics_list_=$(setopt nullglob dotglob; builtin print "${dunst_pics_}"/*)
-            local cmp_result="$(compare_images_ ${image_} "${prev_}")"
+            local dunst_picslist_=$(setopt nullglob dotglob; builtin print "${dunst_pics}"/*)
+            local cmp_result="$(cmp_img ${image} "${prev}")"
             if [[ ${cmp_result} == "False" ]] \
-            && [[ ${#dunst_pics_list_[@]} -gt 1 ]]; then
+            && [[ ${#dunst_picslist_[@]} -gt 1 ]]; then
                 send_notify
             fi
         fi
