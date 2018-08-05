@@ -9,49 +9,48 @@ cover_lock="${dunst_pics}/notify.lock"
 image="/tmp/.mpd-notification-artwork.png"
 
 function wf(){
-    builtin print "${col1}⟬${end}${bold}$1${end}${col1}⟭${end} "
+    print "${col1}⟬${end}${bold}$1${end}${col1}⟭${end} "
 }
 
 function get_pid(){
     local mpdsc="$(which mpdscribble) --conf"
     local mpdas="${XDG_CONFIG_HOME}/mpdas"
-    pgrep -f "${mpdsc} ${XDG_CONFIG_HOME}/mpdscribble/$1.conf --no-daemon" || \
-    pgrep -f "${mpdas}/$1.rc"
+    pgrep -f "${mpdsc} ${XDG_CONFIG_HOME}/mpdscribble/${1}.conf --no-daemon" || \
+    pgrep -f "${mpdas}/${1}.rc"
 }
 
 function get_lastfm(){
-    for pid_ in neg hextrick; do
-        if [[ $(get_pid "${pid_}") != "" ]]; then
-            builtin printf "%s\n" "$(wf "L")$(sed 's:^.:\U&:g' <<< ${pid_}) last.fm"
+    for pid in neg hextrick; do
+        if [[ $(get_pid "${pid}") != "" ]]; then
+            printf "%s\n" "$(wf "L")$(sed 's:^.:\U&:g' <<< ${pid}) last.fm"
             break
         fi
     done
 }
 
 function highlight(){
-    local msg="$(xrq color$1)"
-    builtin print "<span weight='bold' color='${msg}'>"
+    local msg="$(xrq color${1})"
+    print "<span weight='bold' color='${msg}'>"
 }
 
-function send_notify(){ 
-    local col1=$(highlight 4)
+function notify(){ 
+    local col1=$(highlight 12)
     local col2=$(highlight 8)
 
     local end="</span>"
     local bold="<span weight='bold'>"
-    local prefix_=$(wf "➣")
     declare -a bodyarr
     while read line; do
         bodyarr+="${line}"
     done <<< ${body}
 
-    length_=()
-    for i in {1..6}; length_+=${#bodyarr[$i]};
-    length_=($(printf "%s\n" "${length_[@]}"|sort -nr))
+    len=()
+    for i in {1..6}; len+=${#bodyarr[$i]};
+    len=($(printf "%s\n" "${len[@]}"|sort -nr))
 
-    max_length_=35
-    length_=$[${(@)length_[1]}]
-    [[ ${length_} > ${max_length_} ]] && length_=${max_length_}
+    max_len=35
+    len=$[${(@)len[1]}]
+    [[ ${len} > ${max_len} ]] && len=${max_len}
 
     fancy_table=('' '♫' '⟫' '')
 
@@ -90,7 +89,7 @@ function send_notify(){
     local output
     for i in ${bodyarr[@]}; [[ ${i} != "\n" ]] && output="${output}${i}"
 
-    summary=$'\n'"${col2}$(repeat ${length_} builtin print -n "◇")${end}"
+    summary=$'\n'"${col2}$(repeat ${len} print -n "◇")${end}"
     output="\n${output}$(get_lastfm)\n\n${summary}"
 
     notify-send -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
@@ -99,15 +98,15 @@ function send_notify(){
 
 function cmp_img(){ 
     ${HOME}/bin/scripts/compare_images.py "$1" "$2" \
-        || builtin print "False"
+        || print "False"
 }
 
-function send_notify(){
+function show_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
-        send_notify
+        notify
     elif [[ -s "${cover_lock}" ]]; then
         if [[ "$(cat "${cover_lock}")" != "${body}$(get_lastfm)" ]]; then
-            send_notify
+            notify
         fi
     fi
     cp "${image}" "${prev}"
@@ -134,19 +133,18 @@ function main(){
     prev="${dunst_pics}/prev.png"
 
     find "${dunst_pics}" -name prev.png -not -newermt '-900 seconds' -delete
-
     if [[ -f ${image} ]]; then
         [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}" 
 
         # send notification with compatible image
         if [[ ! -f "${prev}" ]]; then
-            send_notify
+            show_notify
         else
-            local dunst_picslist_=$(setopt nullglob dotglob; builtin print "${dunst_pics}"/*)
+            local dunst_picslist_=$(setopt nullglob dotglob; print "${dunst_pics}"/*)
             local cmp_result="$(cmp_img ${image} "${prev}")"
             if [[ ${cmp_result} == "False" ]] \
             && [[ ${#dunst_picslist_[@]} -gt 1 ]]; then
-                send_notify
+                show_notify
             fi
         fi
     fi
