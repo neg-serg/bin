@@ -252,8 +252,8 @@ function main(){
 
         QEMU_AUDIO_TIMER_PERIOD=150 \
         QEMU_PA_SAMPLES=1024 \
-        QEMU_PA_SERVER=localhost \
-        PULSE_SERVER=localhost \
+        QEMU_PA_SERVER="[::1]" \
+        PULSE_SERVER="[::1]" \
         QEMU_AUDIO_DRV=pa \
         qemu-system-x86_64 "${qemu_params[@]}" \
             "${qemu_nographic[@]}" \
