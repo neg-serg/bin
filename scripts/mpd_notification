@@ -92,7 +92,7 @@ function notify(){
     summary=$'\n'"${col2}$(repeat ${len} print -n "◇")${end}"
     output="\n${output}$(get_lastfm)\n\n${summary}"
 
-    notify-send -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
+    notify-send -h "string:fgcolor:#8DA6C4" -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
