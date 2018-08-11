@@ -39,24 +39,24 @@ function notify(){
 
     local end="</span>"
     local bold="<span weight='bold'>"
-    declare -a bodyarr
+    local -a bodyarr
     while read line; do
         bodyarr+="${line}"
     done <<< ${body}
 
-    len=()
+    local -a len=()
     for i in {1..6}; len+=${#bodyarr[$i]};
     len=($(printf "%s\n" "${len[@]}"|sort -nr))
 
-    max_len=35
+    local max_len=35
     len=$[${(@)len[1]}]
     [[ ${len} > ${max_len} ]] && len=${max_len}
 
-    fancy_table=('' '♫' '⟫' '')
+    local -a fancy_table=('' '♫' '⟫' '')
 
     for i in {1..$#fancy_table}; do
         if [[ ${bodyarr[i]} != "" ]]; then
-            bodyarr[i]=$(wf $fancy_table[i])"${bodyarr[i]}\n"
+            bodyarr[i]=$(wf ${fancy_table[i]})"${bodyarr[i]}\n"
         else
             bodyarr[i]="\n"
         fi
@@ -105,7 +105,7 @@ function show_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
         notify
     elif [[ -s "${cover_lock}" ]]; then
-        if [[ "$(cat "${cover_lock}")" != "${body}$(get_lastfm)" ]]; then
+        if [[ "$(< "${cover_lock}")" != "${body}$(get_lastfm)" ]]; then
             notify
         fi
     fi
@@ -114,10 +114,10 @@ function show_notify(){
 
 function zshexit(){
     (   
-        hashsum1=$(sha384sum "${image}"|awk '{print $1}')
-        sleep 4s;
-        hashsum2=$(sha384sum "${image}"|awk '{print $1}')
-        [[ ${hashsum1} = ${hashsum2} ]] && rm ${image}
+        hashsum1=$(xxh32sum "${image}"|cut -d ' ' -f1)
+        sleep 4s
+        hashsum2=$(xxh32sum "${image}"|cut -d ' ' -f1)
+        [[ ${hashsum1} = ${hashsum2} ]] && rm -f ${image}
     ) &
 }
 
@@ -140,10 +140,9 @@ function main(){
         if [[ ! -f "${prev}" ]]; then
             show_notify
         else
-            local dunst_picslist_=$(setopt nullglob dotglob; print "${dunst_pics}"/*)
-            local cmp_result="$(cmp_img ${image} "${prev}")"
-            if [[ ${cmp_result} == "False" ]] \
-            && [[ ${#dunst_picslist_[@]} -gt 1 ]]; then
+            local dunst_picslist=$(setopt nullglob dotglob; print "${dunst_pics}"/*)
+            if [[ $(cmp_img ${image} "${prev}") == "False" ]] \
+                && (( ${#dunst_picslist[@]} > 1 )); then
                 show_notify
             fi
         fi
