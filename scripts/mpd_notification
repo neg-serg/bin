@@ -34,7 +34,7 @@ function highlight(){
 }
 
 function notify(){ 
-    local col1=$(highlight 12)
+    local col1=$(highlight 4)
     local col2=$(highlight 8)
 
     local end="</span>"
