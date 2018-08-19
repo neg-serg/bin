@@ -141,7 +141,7 @@ function main(){
             show_notify
         else
             local dunst_picslist=$(setopt nullglob dotglob; print "${dunst_pics}"/*)
-            if [[ $(cmp_img ${image} "${prev}") == "False" ]] \
+            if [[ $(cmp_img "${image}" "${prev}") == "False" ]] \
                 && (( ${#dunst_picslist[@]} > 1 )); then
                 show_notify
             fi
