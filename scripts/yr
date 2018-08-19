@@ -7,9 +7,3 @@ else
 fi
 
 wait
-
-for f in "$@"; do
-    xdotool type --clearmodifiers --delay 0 "$f "
-done
-xdotool type --clearmodifiers --delay 0 ''
-
