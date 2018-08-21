@@ -42,6 +42,46 @@ client=
 client_data=
 
 case $1 in
+    -switch)
+        local sinks=(
+            $(pacmd list-sinks | grep index | \
+            awk '{ if ($1 == "*") print "1",$3; else print "0",$2 }')
+        )
+        local sinks_count=${#sinks[*]}
+        local active_sink_index=$[$(xargs <<< $(pacmd list-sinks | sed -n -e 's/\*[[:space:]]index:[[:space:]]\([[:digit:]]\)/\1/p'))+1]
+        local next_sink_index=${sinks[1]}
+
+        #find the next sink (not always the next index number)
+        local ord=1
+        while [[ $ord -lt $((sinks_count + 1)) ]]; do
+            if [[ ${sinks[$ord]} -gt $((active_sink_index)) ]]; then
+                next_sink_index=$((sinks[$ord]))
+                break
+            fi
+            let ord++
+        done
+
+        inputs=($(pacmd list-sink-inputs | grep index | awk '{print $2}'))
+
+        #change the default sink
+        pacmd "set-default-sink ${next_sink_index}"
+
+        #move all inputs to the new sink
+        for app in ${inputs[*]}; do pacmd move-sink-input ${app} ${next_sink_index} &> /dev/null; done
+
+        #display notification
+        active_sink_index=$[$(xargs <<< $(pacmd list-sinks | sed -n -e 's/\*[[:space:]]index:[[:space:]]\([[:digit:]]\)/\1/p'))+1]
+        local sinks_info=$(pacmd list-sinks | sed -ne 's/device.description[[:space:]]=[[:space:]]"\(.*\)"/\1/p')
+        local sinks_len=$(wc -l <<< ${sinks_info})
+        local info
+        if [[ $active_sink_index > $sinks_len ]]; then
+            info=$(sed ${sinks_len}"!d" <<< ${sinks_info} )
+        else
+            info=$(sed $((active_sink_index))"!d" <<< ${sinks_info} )
+        fi
+        notify-send -u normal -i audio-volume-medium-symbolic "Sound output switched to" "${info}"
+        exit
+    ;;
     -unmute) shift; get_index; pactl set-sink-mute ${index} 0 ;;
     -mute) shift; get_index; pactl set-sink-mute ${index} 1 ;;
     *)  client_data=$(pacmd list-sink-inputs                         | \
@@ -49,7 +89,7 @@ case $1 in
                 awk 'NR % 2 == 1 { o=$0 ; next } { print o " " $0 }' | \
                 awk '{print $2" "substr($0, index($0,$5))}'          | \
                 sed 's/[<>]/#/g')
-        if [[ "${client_data}" != "" ]]; then 
+        if [[ "${client_data}" != "" ]]; then
             client="$(echo "${client_data}" | ${client_runner[@]})"
         fi
         case $1 in
@@ -65,7 +105,7 @@ case $1 in
             ;;
             -sink)
                 shift
-                if [[ "${client}" != "" ]]; then 
+                if [[ "${client}" != "" ]]; then
                     sink=$(pacmd list-sinks | \
                         grep name:          | \
                         awk 'gsub(">$","")' | \
