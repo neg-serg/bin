@@ -127,7 +127,6 @@ function main(){
         )
 
         local -a qemu_consoles=(
-            -balloon none # Windows wont support it and kvm too, anyway
             -qmp tcp:localhost:4444,server,nowait
         )
 
@@ -258,11 +257,13 @@ function main(){
         QEMU_AUDIO_DRV=pa \
         qemu-system-x86_64 "${qemu_params[@]}" \
             "${qemu_nographic[@]}" \
+            "${looking_glass[@]}" \
             "${spice[@]}" \
             "${qemu_emulated_sound[@]}" \
             "${qemu_pass_video[@]}" \
             "${qemu_pass_input[@]}" \
             "${qemu_network[@]}" \
+            "${qemu_consoles[@]}" \
             "${qemu_hugepages_stuff[@]}"
         fi
 
