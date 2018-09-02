@@ -16,7 +16,10 @@ main(){
     data=$(albumdetails ./*)
     artist=$(echo "${data}"|grep "Artist"| cut -d ':' -f 2-|xargs)
     album=$(echo "${data}"|grep "Album"| cut -d ':' -f 2-|xargs)
-    sacad "${artist}" "${album}" "${default_coversize}" "${default_covername}"
+
+    if [[ $1 == '-i' ]]; then
+        sacad "${artist}" "${album}" "${default_coversize}" "${default_covername}"
+    fi
 
     {
         for flac_ in *.flac; do
