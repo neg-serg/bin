@@ -12,7 +12,7 @@ function cmdline(){
 }
 
 function run_kexec(){
-    kernel_cmdline=$(cmdline)
+    kernel_cmdline="$(cmdline) nvidia-drm.modeset=1 vga=0 rdblacklist=nouveau nouveau.modeset=0 rcutree.rcu_idle_gp_delay=1"
     echo "Do you want yo use: [${kernel_cmdline}] ?"
     read ans
     if [[ ${ans} == "y" ]]; then
