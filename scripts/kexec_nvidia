@@ -23,8 +23,8 @@ function run_kexec(){
 }
 
 function update_config(){
-    sudo mv -vi /etc/X11/xorg.conf{bck,} && \
-    sudo systemctl restart lightdm
+    sudo mv -vi /etc/X11/xorg.conf{_bck,}
 }
 
+update_config
 run_kexec "$@"
