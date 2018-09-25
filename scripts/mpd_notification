@@ -33,7 +33,7 @@ function highlight(){
     print "<span weight='bold' color='${msg}'>"
 }
 
-function notify(){ 
+function notify(){
     local col1=$(highlight 4)
     local col2=$(highlight 8)
 
@@ -96,7 +96,7 @@ function notify(){
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
-function cmp_img(){ 
+function cmp_img(){
     ${HOME}/bin/scripts/compare_images.py "$1" "$2" \
         || print "False"
 }
@@ -113,7 +113,7 @@ function show_notify(){
 }
 
 function zshexit(){
-    (   
+    (
         hashsum1=$(xxh32sum "${image}"|cut -d ' ' -f1)
         sleep 4s
         hashsum2=$(xxh32sum "${image}"|cut -d ' ' -f1)
@@ -134,7 +134,7 @@ function main(){
 
     find "${dunst_pics}" -name prev.png -not -newermt '-900 seconds' -delete
     if [[ -f ${image} ]]; then
-        [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}" 
+        [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}"
 
         # send notification with compatible image
         if [[ ! -f "${prev}" ]]; then
