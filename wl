@@ -98,18 +98,26 @@ function main(){
             } &!
             xwinwrap -ov -ni -fs -- mpv -wid WID --keepaspect=no --loop "${current}" &!
             ;;
+        --raw|-R)
+            < ${prev_list[@]}
+            ;;
+        --show|-S)
+            sort -u ${prev_list[@]}|xargs sx
+            ;;
         # Print help
         --help|-h|*) 
             echo "Wallpaper set script.\n" \
                  "\n" \
-                 "  -t      toggle mode\n"  \
-                 "  -o      open in image viewer\n"  \
-                 "  -s      set wallpaper\n" \
-                 "  -r      set wallpaper from prepared list\n" \
-                 "  -v      set random video wallpaper\n" \
-                 "  -d      delete wallpaper with given number\n" \
-                 "  -l      list wallpapers\n" \
-                 "  -c      print wallpaper name and copy it to clipboard"
+                 "  -t          toggle mode\n"  \
+                 "  -o          open in image viewer\n"  \
+                 "  -s          set wallpaper\n" \
+                 "  -r          set wallpaper from prepared list\n" \
+                 "  -v          set random video wallpaper\n" \
+                 "  -d          delete wallpaper with given number\n" \
+                 "  -l          list wallpapers\n" \
+                 "  -R, --raw   list wallpapers in the raw mode\n" \
+                 "  -S, --show  show wallpapers list in sxiv wrapper\n" \
+                 "  -c          print wallpaper name and copy it to clipboard"
         ;;
     esac
 }
