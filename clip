@@ -1,5 +1,4 @@
 #!/bin/zsh
-export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 
 function read_command {
     readonly rofi_cmd=(
@@ -29,10 +28,7 @@ function clipboard_pipe(){
 
     while true; do
         case "$1" in 
-            -p | --paste)
-                paste=true; 
-                shift
-            ;;
+            -p | --paste) paste=true; shift ;;
             -c | -e | --command) 
                 if [[ $2 != "" ]]; then
                     cmd="$2"
@@ -52,7 +48,7 @@ function clipboard_pipe(){
             # read the selection
             selection=$(xclip -o)
             if [[ ${selection} == "" && ${paste} ]]; then
-                builtin printf "no input, aborting..."
+                echo "no input, aborting..."
                 exit 1
             fi
 
@@ -94,7 +90,16 @@ function clip_main(){
     fi
 }
 
+yr(){
+    ${XDG_CONFIG_HOME}/i3/send ns toggle youtube
+    sleep 1s
+    echo "$@" | xsel -i
+    xdotool key shift+Insert
+}
+
 case "$1" in
-    *) clip_main                     ;;
     pipe) shift; clipboard_pipe "$@" ;;
+    youtube-view) shift; yr "$(xclip -o)" ;;
+    youtube-dw) shift; cd ~/vid/new; youtube-dl "$(xclip -o)" ;;
+    *) clip_main  ;;
 esac
