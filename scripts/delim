@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-size=${2:-128}
+size=${2:-200}
 pref="$(basename $PWD)"
 filecount=$(find . ! -name . -prune -print | grep -c /)
 
