@@ -63,6 +63,9 @@ function finish(){
 function main(){
     qemu_run_success=false
     [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
+    if [[ $(lsmod|grep nvidia) ]]; then
+        qemu::msg "You should not use nvidia drivers to run" && exit 0
+    fi
 
     zmodload -aF zsh/system b:zsystem
     lockfile="$(readlink -f ~neg/tmp/)$(basename $0).lock"
@@ -113,7 +116,7 @@ function main(){
             -enable-kvm
             -m "${vm_memory}"
             -smp sockets="${sockets_amount_}",cores="${cores_amount_}",threads="${threads_amount_}"
-            -cpu host,kvm=off
+            -cpu host,kvm=off,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time
             -device virtio-scsi-pci,id=scsi
 
             -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
@@ -136,7 +139,7 @@ function main(){
         )
 
         local -a looking_glass_old=(
-            -device ivshmem-doorbell,chardev=ivshmem,vectors=1
+            -device ivshmem-doorbell,chardev=ivshmem,vectors=8
             -chardev socket,path=/tmp/ivshmem_socket,id=ivshmem
         )
 
