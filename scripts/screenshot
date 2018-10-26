@@ -53,11 +53,11 @@ Menu(){
     local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
     local width_=$[x11_width-70]
     local lines_=10
-    local yoffset_=-22
+    local yoffset=-34
 
     readonly rofi_cmd=(
         rofi
-        -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
+        -theme-str "'#window { width:${width_}; y-offset: ${yoffset}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
         -p "'[screen] >> '"
         -dmenu

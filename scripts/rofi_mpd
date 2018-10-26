@@ -53,7 +53,7 @@ local rofi_options=(
     -b -disable-history -columns 8
     -lines 1
     -width $((${mon_width} - ${gap}))
-    -yoffset -22 -location 6 -p '\>'
+    -yoffset -34 -location 6 -p '\>'
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
 
