@@ -102,9 +102,9 @@ function main(){
         local hugepages_amount=$(printf '%.0f00\n' "$[${vm_memory}*1024./${hugepagesize}*1.075/100]")
 
         local lscpu_info=("$(lscpu)")
-        local sockets_amount_="$(awk -F: '/Socket/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
-        local cores_amount_="$(awk -F:   '/per socket/{print $2}' <<< ${lscpu_info[@]} | tr -d '[:space:]')"
-        local threads_amount_="$(awk -F: '/Thread/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
+        local sockets_amount="$(awk -F: '/Socket/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
+        local cores_amount="$(awk -F:   '/per socket/{print $2}' <<< ${lscpu_info[@]} | tr -d '[:space:]')"
+        local threads_amount="$(awk -F: '/Thread/{print $2}'     <<< ${lscpu_info[@]} | tr -d '[:space:]')"
 
         local qemu_bypass_network=true
         local dynamic_usb_bypass=true
@@ -115,13 +115,13 @@ function main(){
         local -a qemu_params=(
             -enable-kvm
             -m "${vm_memory}"
-            -smp sockets="${sockets_amount_}",cores="${cores_amount_}",threads="${threads_amount_}"
-            -cpu host,kvm=off,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time
-            -device virtio-scsi-pci,id=scsi
+            -smp sockets="${sockets_amount}",cores="${cores_amount}",threads="${threads_amount}"
+            -cpu host,kvm=off
 
             -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
             -drive if=pflash,format=raw,file=${home_}/bin/qemu/ovmf_vars_x64.bin
 
+            -device virtio-scsi-pci,id=scsi
             -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none
         )
 
@@ -192,11 +192,6 @@ function main(){
                 -usbdevice host:046d:c083 # G403 Prodigy Gaming Mouse
                 -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
             )
-            # -usb
-            # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
-            # -usbdevice host:046d:c32b # Logitech G910 [Keyboard]
-            # -usbdevice host:1e7d:2e22 # Roccat kone rtd [ Mouse ]
-            # -usbdevice host:1038:1702 # SteelSeries ApS [ Mouse ]
         fi
 
         local -a qemu_emulated_sound=(
@@ -213,7 +208,7 @@ function main(){
         )
 
         local -a qemu_default_network=(
-            -net nic -net tap,ifname=tap0,script=/home/neg/bin/qemu/qemu-ifup,downscript=/home/neg/bin/qemu/qemu-ifdown
+            -net nic -net tap,ifname=tap0,script=${home_}/bin/qemu/qemu-ifup,downscript=${home_}/bin/qemu/qemu-ifdown
         )
 
         local -a qemu_hugepages_stuff=(
