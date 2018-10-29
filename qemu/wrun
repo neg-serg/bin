@@ -1,25 +1,12 @@
 #!/bin/zsh
 
-# Script to run windows 10 with geforce 980gtx gpu ;)
-function haltcmd(){
-    haltcmd="echo '{ \"execute\": \"qmp_capabilities\" }{ \"execute\": \"system_powerdown\"}' | nc localhost 4444 && \
-    sleep 9;\
-    echo '{ \"execute\": \"qmp_capabilities\" }{ \"execute\": \"system_powerdown\"}' | nc localhost 4444 && \
-    sleep 1;\
-    echo '{ \"execute\": \"qmp_capabilities\" }{ \"execute\": \"system_powerdown\"}' | nc localhost 4444"
-    eval "${haltcmd}"
-}
-
-function zshexit(){
+zshexit(){
     [[ ${qemu_run_success} == true ]] && finish
 }
 
-function qemu::msg(){
-    echo "QEMU :: [$@]"
-    notify-send "QEMU :: [$@]"
-}
+qemu::msg(){ echo "QEMU :: [$@]"; notify-send "QEMU :: [$@]" }
 
-function vfio_binder(){
+vfio_binder(){
     for dev in "$@"; do
         vendor="$(cat /sys/bus/pci/devices/${dev}/vendor)"
         device="$(cat /sys/bus/pci/devices/${dev}/device)"
@@ -32,7 +19,7 @@ function vfio_binder(){
     done
 }
 
-function finish(){
+finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
     sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
@@ -60,7 +47,7 @@ function finish(){
     stig start all > /dev/null 2>&1
 }
 
-function main(){
+main(){
     qemu_run_success=false
     [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
     if [[ $(lsmod|grep nvidia) ]]; then
