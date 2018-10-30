@@ -103,11 +103,15 @@ main(){
             -m "${vm_memory}"
             -smp sockets="${sockets_amount}",cores="${cores_amount}",threads="${threads_amount}"
             -cpu host,kvm=off
+            -machine q35,accel=kvm,usb=off,vmport=off,dump-guest-core=off,kernel-irqchip=on
 
             -vga none
             -nographic
 
             -soundhw ac97
+
+            -global ICH9-LPC.disable_s3=1
+            -global ICH9-LPC.disable_s4=1
 
             -qmp tcp:localhost:4444,server,nowait
 
@@ -141,20 +145,17 @@ main(){
             -boot menu=on
         )
 
-        local -a qemu_vga_spice=(
-            -vga qxl -spice port=5900,addr=127.0.0.1,disable-ticketing
-        )
-
         local -a qemu_pass_video=(
-            -device vfio-pci,host=01:00.0,multifunction=on
-            -device vfio-pci,host=01:00.1
+            -device ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1
+            -device vfio-pci,host=01:00.0,bus=root.1,addr=00.0,multifunction=on
+            -device vfio-pci,host=01:00.1,bus=root.1,addr=00.1
             # -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
             # -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
         )
 
         local -a qemu_pass_network=(
             -net none
-            -device vfio-pci,host=00:19.0
+            -device vfio-pci,host=00:19.0,bus=root.1
         )
 
         local -a qemu_pass_input=()
@@ -203,14 +204,6 @@ main(){
                 qemu::msg "Autostart synergy"
         fi
 
-        local -a qemu_network=()
-        if [[ ${qemu_bypass_network} == true ]]; then
-            vfio_binder "0000:00:19.0"
-            for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
-        else
-            for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
-        fi
-
         # Compact memory for hugepages
         sync && sh -c 'echo 3 > /proc/sys/vm/drop_caches'
         sync && sh -c 'echo 1 > /proc/sys/vm/compact_memory'
@@ -227,6 +220,14 @@ main(){
         fi
 
         systemctl start {sshd,smb}
+
+        local -a qemu_network=()
+        if [[ ${qemu_bypass_network} == true ]]; then
+            vfio_binder "0000:00:19.0"
+            for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
+        else
+            for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
+        fi
 
         QEMU_AUDIO_TIMER_PERIOD=150 \
         QEMU_PA_SAMPLES=1024 \
