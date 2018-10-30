@@ -14,8 +14,8 @@ vfio_binder(){
             echo "${dev}" > /sys/bus/pci/devices/"${dev}"/driver/unbind
             echo "${dev}" '> /sys/bus/pci/devices/'"${dev}"'/driver/unbind'
         fi
-        echo "${vendor}" "${device}" '> /sys/bus/pci/drivers/vfio-pci/new_id'
         echo "${vendor}" "${device}" > /sys/bus/pci/drivers/vfio-pci/new_id
+        echo "${vendor}" "${device}" '> /sys/bus/pci/drivers/vfio-pci/new_id'
     done
 }
 
@@ -23,11 +23,10 @@ finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
     sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
-    
+
     # kill st - dtach window
     ps aux | grep 'dtach -c /tmp/qemu_wrun.session' | awk '{print $2}' | xargs kill
 
-    echo 'wait for keyboard'
     while [[ $(xinput | grep 'Logitech Gaming Keyboard G910' | wc -l) == 0 ]]; do
         echo -n '.'
         sleep 1s
@@ -49,6 +48,7 @@ finish(){
 
 main(){
     qemu_run_success=false
+
     [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
     if [[ $(lsmod|grep nvidia) ]]; then
         qemu::msg "You should not use nvidia drivers to run" && exit 0
@@ -97,7 +97,6 @@ main(){
         local dynamic_usb_bypass=true
         local auto_usb_bypass=false
         local usb_bypass_timeout=40
-        local -a qemu_network=()
 
         local -a qemu_params=(
             -enable-kvm
@@ -105,19 +104,25 @@ main(){
             -smp sockets="${sockets_amount}",cores="${cores_amount}",threads="${threads_amount}"
             -cpu host,kvm=off
 
+            -vga none
+            -nographic
+
+            -soundhw ac97
+
+            -qmp tcp:localhost:4444,server,nowait
+
             -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
             -drive if=pflash,format=raw,file=${home_}/bin/qemu/ovmf_vars_x64.bin
 
             -device virtio-scsi-pci,id=scsi
             -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none
+
+            -mem-prealloc
+            -mem-path /dev/hugepages
         )
 
         local -a spice=(
-            -spice port=5900,addr=127.0.0.1,disable-ticketing   
-        )
-
-        local -a qemu_consoles=(
-            -qmp tcp:localhost:4444,server,nowait
+            -spice port=5900,addr=127.0.0.1,disable-ticketing
         )
 
         local -a looking_glass=(
@@ -136,11 +141,6 @@ main(){
             -boot menu=on
         )
 
-        local -a qemu_nographic=(
-            -vga none
-            -nographic
-        )
-
         local -a qemu_vga_spice=(
             -vga qxl -spice port=5900,addr=127.0.0.1,disable-ticketing
         )
@@ -148,13 +148,9 @@ main(){
         local -a qemu_pass_video=(
             -device vfio-pci,host=01:00.0,multifunction=on
             -device vfio-pci,host=01:00.1
+            # -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
+            # -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
         )
-
-        local -a qemu_pass_video_rom=(
-            -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
-            -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
-        )
-
 
         local -a qemu_pass_network=(
             -net none
@@ -181,10 +177,6 @@ main(){
             )
         fi
 
-        local -a qemu_emulated_sound=(
-            -soundhw ac97
-        )
-
         local -a qemu_share=(
             -nic user,smb="${smb_path}"
         )
@@ -199,18 +191,19 @@ main(){
         )
 
         local -a qemu_hugepages_stuff=(
-            -mem-prealloc 
+            -mem-prealloc
             -mem-path /dev/hugepages
         )
 
         # Disable torrents
-        stig stop all > /dev/null 2>&1
+        # stig stop all > /dev/null 2>&1
 
         if [[ ! $(pidof synergyc) && $(hash synergy 2> /dev/null) ]]; then
             sudo -u neg "synergy" 2>&1 > /dev/null &! \
                 qemu::msg "Autostart synergy"
         fi
 
+        local -a qemu_network=()
         if [[ ${qemu_bypass_network} == true ]]; then
             vfio_binder "0000:00:19.0"
             for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
@@ -241,15 +234,11 @@ main(){
         PULSE_SERVER="[::1]" \
         QEMU_AUDIO_DRV=pa \
         qemu-system-x86_64 "${qemu_params[@]}" \
-            "${qemu_nographic[@]}" \
             "${looking_glass[@]}" \
             "${spice[@]}" \
-            "${qemu_emulated_sound[@]}" \
             "${qemu_pass_video[@]}" \
             "${qemu_pass_input[@]}" \
-            "${qemu_network[@]}" \
-            "${qemu_consoles[@]}" \
-            "${qemu_hugepages_stuff[@]}"
+            "${qemu_network[@]}"
         fi
 
         qemu_run_success=true
