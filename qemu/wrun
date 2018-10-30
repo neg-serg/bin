@@ -102,8 +102,14 @@ main(){
             -enable-kvm
             -m "${vm_memory}"
             -smp sockets="${sockets_amount}",cores="${cores_amount}",threads="${threads_amount}"
-            -cpu host,kvm=off
+            -cpu host,hv_time,hv_vpindex,hv_reset,hv_runtime,hv_crash,hv_synic,hv_stimer,hv_spinlocks=0x1fff,hv_vendor_id=negus9,kvm=off,l3-cache=on,-hypervisor,migratable=no,+invtsc
+            -realtime mlock=on
+            -pidfile /var/run/vm.w10.pid
             -machine q35,accel=kvm,usb=off,vmport=off,dump-guest-core=off,kernel-irqchip=on
+
+            -rtc base=localtime,driftfix=slew
+            -global kvm-pit.lost_tick_policy=discard
+            -no-hpet
 
             -vga none
             -nographic
@@ -180,11 +186,6 @@ main(){
 
         local -a qemu_share=(
             -nic user,smb="${smb_path}"
-        )
-
-        local -a qemu_qmp_socket_console=(
-            -qmp unix:"${qmp_socket_path}",server --monitor stdio \
-            "${qmp_sh_script}" "${qmp_socket_path}"
         )
 
         local -a qemu_default_network=(
