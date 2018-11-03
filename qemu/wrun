@@ -107,6 +107,9 @@ main(){
             -pidfile /var/run/vm.w10.pid
             -machine q35,accel=kvm,usb=off,vmport=off,dump-guest-core=off,kernel-irqchip=on
 
+            -no-user-config
+            -nodefaults
+
             -rtc base=localtime,driftfix=slew
             -global kvm-pit.lost_tick_policy=discard
             -no-hpet
@@ -245,7 +248,7 @@ main(){
 
         qemu_run_success=true
         trap finish EXIT TERM KILL
-    ) &
+    )
     rm -v "${lockfile}"
 
     dummy_var=""
