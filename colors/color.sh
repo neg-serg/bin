@@ -626,31 +626,65 @@ EOF
 
 }
 
+function show_help(){
+echo "Show colorschemes.\n" \
+"Options: \n" \
+    "  -ref           reference\n" \
+    "  -256           256colors\n" \
+    "  -24            24bit\n" \
+    "  -clrv          colorvalues\n" \
+    "  -inv           invader\n" \
+    "  -full          full_ansi\n" \
+    "  -b1            blocks\n" \
+    "  -b2            blocks2\n" \
+    "  -fmt           colorformatting\n" \
+    "  -pac           pacman\n" \
+    "  -l1            list\n" \
+    "  -l2            list '•••' \n" \
+    "  -lslim         list '•' s \n" \
+    "  -all           all\n" \
+    "  -bar           bars\n" \
+    "  -fn            fancy\n" \
+    "  -tmux          tmux_pallete\n" \
+    "  -spectr        spectrum\n" \
+    "  -ls            ls_colors\n" \
+    "  -ira           ira\n" \
+    "  -skull         skulls\n" \
+    "  -poke          poke\n" \
+    "  -ill           illuminate\n" \
+    "  -puke          pukeskull\n" \
+    "  -cr            crunchbang_mini\n" \
+    "  -tspctrm       tiny_spectrum\n" \
+    "  --help         show_help\n"
+}
+
 case "${1}" in
-    ""|ref*) reference                ;;
-    256) 256colors           ; exit 0 ;;
-    24*) 24bit               ; exit 0 ;;
-    clrv*) colorvalues       ; exit 0 ;;
-    inv*) invader            ; exit 0 ;;
-    full*) full_ansi         ; exit 0 ;;
-    b1) blocks               ; exit 0 ;;
-    b2) blocks2              ; exit 0 ;;
-    fmt*) colorformatting    ; exit 0 ;;
-    pac*) pacman             ; exit 0 ;;
-    l1) list                 ; exit 0 ;;
-    l2) list '•••'           ; exit 0 ;;
-    lslim) list '•' "s"      ; exit 0 ;;
-    all*) all                ; exit 0 ;;
-    bar*) bars               ; exit 0 ;;
-    fn*) fancy               ; exit 0 ;;
-    tmux*) tmux_pallete      ; exit 0 ;;
-    spectr*) spectrum        ; exit 0 ;;
-    ls*) ls_colors           ; exit 0 ;;
-    ira*) ira                ; exit 0 ;;
-    skull*) skulls           ; exit 0 ;;
-    poke*) poke              ; exit 0 ;;
-    ill*) illuminate         ; exit 0 ;;
-    puke*) pukeskull         ; exit 0 ;;
-    cr*) crunchbang_mini     ; exit 0 ;;
-    tspctrm*) tiny_spectrum  ; exit 0 ;;
+    -ref) reference         ;;
+    -256) 256colors         ;;
+    -24) 24bit              ;;
+    -clrv) colorvalues      ;;
+    -inv) invader           ;;
+    -full) full_ansi        ;;
+    -b1) blocks             ;;
+    -b2) blocks2            ;;
+    -fmt) colorformatting   ;;
+    -pac) pacman            ;;
+    -l1) list               ;;
+    -l2) list '•••'         ;;
+    -lslim) list '•' "s"    ;;
+    -all) all               ;;
+    -bar) bars              ;;
+    -fn) fancy              ;;
+    -tmux) tmux_pallete     ;;
+    -spectr) spectrum       ;;
+    -ls) ls_colors          ;;
+    -ira) ira               ;;
+    -skull) skulls          ;;
+    -poke) poke             ;;
+    -ill) illuminate        ;;
+    -puke) pukeskull        ;;
+    -cr) crunchbang_mini    ;;
+    -tspctrm) tiny_spectrum ;;
+    -h) show_help           ;;
+    --help) show_help       ;;
 esac
