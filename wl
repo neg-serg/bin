@@ -102,7 +102,7 @@ function main(){
             < ${prev_list[@]}
             ;;
         --show|-S)
-            sort -u ${prev_list[@]}|xargs sx
+            tac ${prev_list[@]}|xargs sxiv -t
             ;;
         # Print help
         --help|-h|*) 
