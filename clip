@@ -101,5 +101,10 @@ case "$1" in
     pipe) shift; clipboard_pipe "$@" ;;
     youtube-view) shift; yr "$(xclip -o)" ;;
     youtube-dw) shift; cd ~/vid/new; youtube-dl "$(xclip -o)" ;;
+    youtube-dw-list) shift;
+        cd ~/vid/new
+        local youtube_url=$(gpaste-client |grep -E 'https.*(youtube|vimeo).com' |cut -f2- -d ' '|rofi -dmenu -p '[youtube video]')
+        youtube-dl "${youtube_url}"
+    ;;
     *) clip_main  ;;
 esac
