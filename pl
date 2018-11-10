@@ -45,6 +45,10 @@ pl_rofi(){
 
 set_maxdepth=false
 if [[ $1 != "rofi" ]]; then
+    if [[ $1 == "1st_level" ]]; then
+        set_maxdepth=true
+        shift
+    fi
     pl "$@"
 else
     shift;
