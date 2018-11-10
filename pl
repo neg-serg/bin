@@ -31,7 +31,7 @@ pl_rofi(){
     fi
     rg_cmd_result=$(eval ${rg_cmd[@]})
     if [[ $#rg_cmd_result > 1 ]]; then
-        find_result=$(rofi -dmenu <<< ${rg_cmd_result})
+        find_result=$(rofi -p '[>>]' -dmenu <<< ${rg_cmd_result})
     else
         find_result=rg_cmd_result
     fi
