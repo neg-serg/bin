@@ -6,6 +6,7 @@ function handle_all_devices(){
         "046d:c083" 
         "046d:c32b"
         "05ac:12a8"
+        "0763:3108"
     )
 
     # G403 Prodigy Gaming Mouse 
