@@ -1,7 +1,17 @@
 #!/bin/zsh
 
-function handle_all_devices(){
+function reset_usb3(){
+    # this script resets all USB3 devices, seems to be necessary sometimes after
+    # stopping a VM
 
+    for i in $(ls /sys/bus/pci/drivers/xhci_hcd/|grep :); do
+        echo $i >/sys/bus/pci/drivers/xhci_hcd/unbind
+        sleep 0.2
+        echo $i >/sys/bus/pci/drivers/xhci_hcd/bind
+    done
+}
+
+function handle_all_devices(){
     USB_DEVICES+=(
         "046d:c083" 
         "046d:c32b"
