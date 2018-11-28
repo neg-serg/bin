@@ -47,6 +47,7 @@ finish(){
 }
 
 main(){
+    ~/bin/qemu/scripts/looking_glass_init
     qemu_run_success=false
 
     [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
