@@ -193,7 +193,7 @@ main(){
         )
 
         local -a qemu_default_network=(
-            -net nic -net tap,ifname=tap0,script=${home_}/bin/qemu/qemu-ifup,downscript=${home_}/bin/qemu/qemu-ifdown
+            -net nic -net tap,ifname=tap0,script=${home_}/bin/qemu/scripts/net/ifup,downscript=${home_}/bin/qemu/scripts/net/ifdown
         )
 
         local -a qemu_hugepages_stuff=(
