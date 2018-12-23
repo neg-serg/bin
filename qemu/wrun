@@ -47,7 +47,6 @@ finish(){
 }
 
 main(){
-    ~/bin/qemu/scripts/looking_glass_init
     qemu_run_success=false
 
     [[ $(id -u) != "0" ]] && qemu::msg "You should run it from root" && exit 0
@@ -72,14 +71,13 @@ main(){
         if zsystem flock -r "${lockfile}"; then
         qemu::msg "Locking to [${lockfile}] qemu_run_success" >&2
 
-        local user_=neg
-        local home_=/home/${user_}
+        local Home=/home/neg
         local disk_name="w10"
-        local win10_iso="${home_}/1st_level/iso/en_windows_10_education_version_1607_updated_jul_2016_x64_dvd_9055880.iso"
-        local virtio_iso="${home_}/1st_level/iso/virtio-win-0.1.137.iso"
+        local win10_iso="${Home}/1st_level/iso/en_windows_10_education_version_1607_updated_jul_2016_x64_dvd_9055880.iso"
+        local virtio_iso="${Home}/1st_level/iso/virtio-win-0.1.137.iso"
         local smb_path="/mnt/qemu"
-        local qmp_socket_path="${home_}/1st_level/qmp.socket"
-        local qmp_sh_script="${home_}/bin/scripts/qmp/qmp-shell"
+        local qmp_socket_path="${Home}/1st_level/qmp.socket"
+        local qmp_sh_script="${Home}/bin/scripts/qmp/qmp-shell"
         local install_iso="${win10_iso}"
 
         local amount_of_mem_="$(free -m|awk '/Mem/{print $2}')"
@@ -125,8 +123,8 @@ main(){
 
             -qmp tcp:localhost:4444,server,nowait
 
-            -drive if=pflash,format=raw,readonly,file=${home_}/bin/qemu/ovmf_code_x64.bin
-            -drive if=pflash,format=raw,file=${home_}/bin/qemu/ovmf_vars_x64.bin
+            -drive if=pflash,format=raw,readonly,file=${Home}/bin/qemu/ovmf_code_x64.bin
+            -drive if=pflash,format=raw,file=${Home}/bin/qemu/ovmf_vars_x64.bin
 
             -device virtio-scsi-pci,id=scsi
             -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none
@@ -193,7 +191,7 @@ main(){
         )
 
         local -a qemu_default_network=(
-            -net nic -net tap,ifname=tap0,script=${home_}/bin/qemu/scripts/net/ifup,downscript=${home_}/bin/qemu/scripts/net/ifdown
+            -net nic -net tap,ifname=tap0,script=${Home}/bin/qemu/scripts/net/ifup,downscript=${Home}/bin/qemu/scripts/net/ifdown
         )
 
         local -a qemu_hugepages_stuff=(
@@ -201,8 +199,7 @@ main(){
             -mem-path /dev/hugepages
         )
 
-        # Disable torrents
-        # stig stop all > /dev/null 2>&1
+        ${Home}/bin/qemu/scripts/looking_glass_init
 
         if [[ ! $(pidof synergyc) && $(hash synergy 2> /dev/null) ]]; then
             sudo -u neg "synergy" 2>&1 > /dev/null &! \
