@@ -155,8 +155,8 @@ main(){
 
         local -a qemu_pass_video=(
             -device ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1
-            -device vfio-pci,host=01:00.0,bus=root.1,addr=00.0,multifunction=on
-            -device vfio-pci,host=01:00.1,bus=root.1,addr=00.1
+            -device vfio-pci,host=01:00.0,bus=root.1,addr=00.0
+            # -device vfio-pci,host=01:00.1,bus=root.1,addr=00.1
             # -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
             # -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
         )
