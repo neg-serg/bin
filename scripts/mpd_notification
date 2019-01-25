@@ -87,17 +87,18 @@ function notify(){
         bodyarr[6]="\n"
 
     local output
-    for i in ${bodyarr[@]}; [[ ${i} != "\n" ]] && output="${output}${i}"
+    for i in ${bodyarr[@]};
+        [[ ${i} != "\n" ]] && output="${output}${i}"
 
-    summary=$'\n'"${col2}$(repeat ${len} print -n "◇")${end}"
-    output="\n${output}$(get_lastfm)\n\n${summary}"
+    summary="${col2}$(repeat ${len} print -n "◇")${end}"
+    output="${output}$(get_lastfm)\n${summary}"
 
     notify-send -h "string:fgcolor:#8DA6C4" -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
 function cmp_img(){
-    ${HOME}/bin/scripts/compare_images.py "$1" "$2" \
+    ${HOME}/bin/scripts/compare_images.py "${1}" "${2}" \
         || print "False"
 }
 
