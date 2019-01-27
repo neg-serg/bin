@@ -99,5 +99,4 @@ function main(){
 prepare "$@"
 main "$@"
 
-source "$(readlink -f ~neg/.zsh/00-common.zsh)"
 source "$(readlink -f ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh)"
