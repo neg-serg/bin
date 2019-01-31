@@ -22,7 +22,7 @@ vfio_binder(){
 finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
-    sysctl -w vm.nr_hugepages=0 # Revert hugepages count to 0(zero)
+    sysctl -w vm.nr_hugepages=0      # Revert hugepages count to 0(zero)
 
     # kill st - dtach window
     ps aux | grep 'dtach -c /tmp/qemu_wrun.session' | awk '{print $2}' | xargs kill
