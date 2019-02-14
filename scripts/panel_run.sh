@@ -11,6 +11,15 @@ export POLYBAR_MPD_FORMAT_ONLINE="<label-song> <label-time>"
 export POLYBAR_LL="%{F#395573}⟬%{F#ccc}"
 export POLYBAR_RR="%{O5}%{F#395573}⟭%{F#ccc}"
 
-if [[ $(pgrep polybar|wc -l) -le 1  ]]; then
-    polybar -c ${XDG_CONFIG_HOME}/polybar/main main &
-fi
+case $1 in
+    "hard")
+        pkill polybar
+
+        if [[ $(pgrep polybar|wc -l) -le 1  ]]; then
+            polybar -c ${XDG_CONFIG_HOME}/polybar/main main &
+        fi
+    ;;
+    "soft")
+        polybar-msg cmd restart
+    ;;
+esac
