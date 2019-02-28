@@ -45,7 +45,7 @@ function main(){
         ;;
         *"Usb"*"pass"*"del"*) 
             do_if_qemu st -c qemu_usb_pass tmux -S ~/1st_level/vm.socket new -n pass "${HOME}/bin/qemu/passthrough del"
-            source ${XDG_CONFIG_HOME}/xinit/keyboard_and_mouse.zsh
+            source ${XDG_CONFIG_HOME}/xinit/xinput.zsh
         ;;
         *"Win"*"10"*)
             os_name=${res:s_Start__}
