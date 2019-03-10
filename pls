@@ -3,8 +3,8 @@
 if [[ ${DISPLAY} ]]; then
     local font='PragmataPro for Powerline 17'
 
-    _v=(-lines 1 -columns 11 -location 6 -font "${font}" -o 90 -yoffset -22 -dmenu)
-    _s=(-location 6 -font "${font}" -o 90 -yoffset -22 -dmenu)
+    _v=(-lines 1 -columns 11 -location 6 -font "${font}" -o 90 -yoffset -22 -dmenu -auto-select)
+    _s=(-location 6 -font "${font}" -o 90 -yoffset -22 -dmenu -auto-select)
 
     client_runner=(rofi ${_s} -dmenu -p "Clients:")
     volume_runner=(rofi ${_v} -p "Volume: ")
