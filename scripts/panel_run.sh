@@ -13,9 +13,9 @@ export POLYBAR_RR="%{O5}%{F#395573}⟭%{F#ccc}"
 
 case $1 in
     "hard")
-        pkill polybar
+        pkill -x polybar
 
-        if [[ $(pgrep polybar|wc -l) -le 1  ]]; then
+        if [[ $(pgrep -x polybar|wc -l) -le 1  ]]; then
             polybar -c ${XDG_CONFIG_HOME}/polybar/main main &
         fi
     ;;
