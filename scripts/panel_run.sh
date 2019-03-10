@@ -19,7 +19,7 @@ case $1 in
             polybar -c ${XDG_CONFIG_HOME}/polybar/main main &
         fi
     ;;
-    "soft")
+    "ipc")
         polybar-msg cmd restart
     ;;
 esac
