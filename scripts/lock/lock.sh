@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+set -o pipefail
+
 icon="$(readlink -f $(dirname $0)/lock.png)"
 tmpbg="/tmp/lock_shot.png"
 
@@ -57,21 +59,23 @@ function i3lock_add_clock(){
 
 function take_shot(){
     case $1 in
-        maim) magick convert "${tmpbg%%.png}.xwd" "${tmpbg}" ;;
+        magick) convert "${tmpbg%%.png}.xwd" "${tmpbg}" ;;
         xdw) xwd -root -silent -out "${tmpbg%%.png}.xwd" ;;
-        *) scrot "${tmpbg}" ;;
+        scrot) scrot "${tmpbg}" ;;
+        *) maim "${tmpbg}" ;;
     esac
 }
 
 function make_blur(){
     case $1 in
-        p*) magick convert "${tmpbg}" -scale 10% -scale 1000% "${tmpbg}";;
-        *) magick convert "${tmpbg}" -blur 0x6 "${tmpbg}";;
+        p*) convert "${tmpbg}" -scale 10% -scale 1000% "${tmpbg}";;
+        n*) convert "${tmpbg}" -interpolate nearest -virtual-pixel mirror -spread 2 "${tmpbg}";;
+        *) convert "${tmpbg}" -blur 0x6 "${tmpbg}";;
     esac
 }
 
 function make_composition(){
-    magick convert "${tmpbg}" "${icon}" -gravity center -composite -matte "${tmpbg}"
+    convert "${tmpbg}" "${icon}" -gravity center -composite -matte "${tmpbg}"
 }
 
 function main(){
@@ -79,9 +83,9 @@ function main(){
     (( $# )) && { icon=$1; shift }
 
     case $1 in
-        imagemagick)
+        img)
             take_shot
-            make_blur
+            make_blur n
             make_composition ;;
         *)
             # gblur
