@@ -1,23 +1,47 @@
-gsettings set org.gnome.desktop.interface gtk-theme Matcha-dark-azul
-gsettings set org.gnome.desktop.interface gtk-key-theme Emacs
-gsettings set org.gnome.desktop.interface icon-theme Paper
-gsettings set org.gnome.desktop.interface cursor-theme Paper
-gsettings set org.gnome.desktop.interface cursor-size 16
+#!/bin/zsh
 
-# Sane settings for Gnome
-gsettings set org.gnome.desktop.background show-desktop-icons true
-gsettings set org.gnome.desktop.interface clock-show-date true
-gsettings set org.gnome.settings-daemon.plugins.xsettings antialiasing 'grayscale'
-gsettings set org.gnome.settings-daemon.plugins.xsettings hinting 'slight'
-gsettings set org.gnome.desktop.interface text-scaling-factor '1.0'
-gsettings set org.gnome.desktop.interface monospace-font-name "Iosevka Term 10"
-gsettings set org.gnome.desktop.interface document-font-name 'Iosevka Term 10'
-gsettings set org.gnome.desktop.interface font-name 'Iosevka Term 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Iosevka Term 10'
+gtk_settings(){
+    gsettings set org.gnome.desktop.interface gtk-theme "$1"
+    gsettings set org.gnome.desktop.interface gtk-key-theme Emacs
+    gsettings set org.gnome.desktop.interface cursor-size 16
 
-# Sane settings for screen lock (screen off: 10 minutes, screen lock: 15 minutes)
-gsettings set org.gnome.desktop.session idle-delay 600
-gsettings set org.gnome.desktop.screensaver idle-activation-enabled 'true'
-gsettings set org.gnome.desktop.screensaver lock-enabled 'true'
-gsettings set org.gnome.desktop.screensaver lock-delay 900
+    gsettings set org.gnome.desktop.interface icon-theme Paper
+    gsettings set org.gnome.desktop.interface cursor-theme Paper
+}
 
+gnome_settings(){
+    gsettings set org.gnome.desktop.background show-desktop-icons true
+    gsettings set org.gnome.desktop.interface clock-show-date true
+    gsettings set org.gnome.settings-daemon.plugins.xsettings antialiasing 'grayscale'
+    gsettings set org.gnome.settings-daemon.plugins.xsettings hinting 'slight'
+    gsettings set org.gnome.desktop.interface text-scaling-factor '1.0'
+}
+
+font_settings(){
+    gsettings set org.gnome.desktop.interface monospace-font-name "Iosevka Term 12"
+    gsettings set org.gnome.desktop.interface document-font-name 'Iosevka Term 12'
+    gsettings set org.gnome.desktop.interface font-name 'Iosevka Term 12'
+    gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Iosevka Term 12'
+}
+
+main(){
+    case $1 in
+        '-a')
+            shift
+            font_settings &
+            gtk_settings "$1" &
+            gnome_settings &
+        ;;
+        '-g')
+            shift
+            gtk_settings "$1" &
+            gnome_settings &
+        ;;
+        '-f')
+            shift
+            font_settings &
+        ;;
+    esac
+}
+
+main "$@"
