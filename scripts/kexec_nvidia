@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-linux=linux-lts
+linux=linux
 esp=/boot
 
 function cmdline(){
