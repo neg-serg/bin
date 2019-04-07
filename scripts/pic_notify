@@ -26,15 +26,13 @@ function send_notify_(){
                   -e "s:\/:${st_}/${cl_}:g" \
                   -e "s:\(⟬\|⟭\):${st3_}\1${cl_}:g" -e "s:~:${st2_}~${cl_}:g" <<< ${header})"
 
-    local info_=$(exiftool -ImageSize -MIMEType -Megapixels ${image_})
+    local info_=$(/usr/bin/vendor_perl/exiftool -ImageSize -MIMEType -Megapixels ${image_})
 
     output=$(xargs -n4 <<< "${info_}" \
         | sed -e 's/^/⟬/' -e 's/$/⟭/' \
         -e "s;\(.*\):;${bold_}\\1${st3_}:${cl_}${cl_};" \
         -e "s:\(⟬\|⟭\):${st3_}\1${cl_}:g"
     )
-    
-    local prefix_=$(wf_ "➣")
     
     wait
     notify-send -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" -i "${new_image}" "${header}" "${output}"
