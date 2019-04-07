@@ -1,12 +1,12 @@
 #!/bin/zsh
 
 gtk_settings(){
-    gsettings set org.gnome.desktop.interface gtk-theme "$1"
+    gsettings set org.gnome.desktop.interface gtk-theme "Matcha-dark-azul"
     gsettings set org.gnome.desktop.interface gtk-key-theme Emacs
-    gsettings set org.gnome.desktop.interface cursor-size 16
 
-    gsettings set org.gnome.desktop.interface icon-theme Paper
-    gsettings set org.gnome.desktop.interface cursor-theme Paper
+    gsettings set org.gnome.desktop.interface icon-theme 'Paper'
+    gsettings set org.gnome.desktop.interface cursor-theme 'Bibata_Oil'
+    gsettings set org.gnome.desktop.interface cursor-size 32
 }
 
 gnome_settings(){
