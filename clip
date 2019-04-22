@@ -73,15 +73,14 @@ function clip_main(){
     local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
     local width_=$[x11_width-70]
     local lines_=10
-    local yoffset_=-22
+    local yoffset_=-38
     readonly rofi_cmd=(
         rofi -dmenu 
         -no-plugins
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
-        "${rofi_pid}" -sort -i -matching fuzzy -dmenu -p '"[>>]"'
-        -async-pre-read 15
+        "${rofi_pid}" -sort -i -matching glob -dmenu -p '"⟬clip⟭ 〉〉"'
     )
     local gpaste_ret=$(gpaste-client --oneline|eval ${rofi_cmd})
     local selection=$(echo "${gpaste_ret}" | cut -d ':' -f1)
@@ -98,18 +97,31 @@ yr(){
 }
 
 case "$1" in
-    pipe) shift; clipboard_pipe "$@" ;;
-    youtube-view) shift; yr "$(xclip -o)" ;;
+    pipe) 
+        shift
+        clipboard_pipe "$@" 
+    ;;
+    youtube-view) 
+        shift
+        yr "$(xclip -o)" 
+    ;;
     translate) 
         shift
         current_clip="$(gpaste-client get 0)"
         notify-send "$(transline ${current_clip})"
     ;;
-    youtube-dw) shift; cd ~/vid/new; youtube-dl "$(xclip -o)" ;;
-    youtube-dw-list) shift;
+    youtube-dw) 
+        shift
+        cd ~/vid/new
+        youtube-dl "$(xclip -o)" 
+    ;;
+    youtube-dw-list) 
+        shift
         cd ~/vid/new
         local youtube_url=$(gpaste-client |grep -E 'https.*(youtube|vimeo).com' |cut -f2- -d ' '|rofi -lines 7 -dmenu -p '[youtube video]')
         youtube-dl "${youtube_url}"
     ;;
-    *) clip_main  ;;
+    *) 
+        clip_main  
+    ;;
 esac
