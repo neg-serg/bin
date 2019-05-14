@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 export POLYBAR_INPUT_FORMAT="input:%layout%"
+export MONITOR="$(polybar -m|tail -1|sed -e 's/:.*$//g')"
 
 if [[ $oldstyle == 'true' ]]; then
     export POLYBAR_MPD_FORMAT_PAUSED="%{F#395573}⟬%{O5}%{F#005f87}paused%{F#395573} %{F#395573}⟭" 
