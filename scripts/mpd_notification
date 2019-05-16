@@ -93,7 +93,10 @@ function notify(){
     summary="${col2}$(repeat ${len} print -n "◇")${end}"
     output="${output}$(get_lastfm)\n${summary}"
 
-    notify-send -h "string:fgcolor:#8DA6C4" -a "mpd_notification" -u "${urgency}" -i "${image}" "${summary}" "${output}"
+    summary=$(echo "${summary}")
+    output=$(echo "${output}")
+
+    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" -u "${urgency}" -i "${image}" "${summary}" "${output}" > /tmp/notify_id
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
@@ -123,12 +126,7 @@ function zshexit(){
 }
 
 function main(){
-    dunst_x11_class="$(< ${XDG_CONFIG_HOME}/dunst/dunstrc awk -F '=' '/class/{print $2}'|tr -d '[[:space:]]')"
-    # force dunst to cleanup notification query
-    while [[ $(xdotool search --onlyvisible --class "${dunst_x11_class}") != "" ]]; do
-        xdotool search --onlyvisible --class "${dunst_x11_class}" \
-            | xargs -I{} dash -c 'xdotool key "Super+space"'
-    done
+    dunstify -C "$(< /tmp/notify_id)"
 
     [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}"
     prev="${dunst_pics}/prev.png"
