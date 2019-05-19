@@ -42,6 +42,7 @@ class pretty_printer(object):
 
     # pretty printing for filename
     def fancy_file(self, filename):
+        filename = re.sub('~', fg(2) + "~" + fg(7), filename)
         filename = re.sub(os.environ["HOME"], fg(2) + "~" + fg(7), filename)
         filename = re.sub("/", fg(4) + "/" + fg(7), filename)
         return self.wrap(filename)
