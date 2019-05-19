@@ -5,53 +5,66 @@ from colored import fg
 
 
 class pretty_printer(object):
-    def __init__(self):
-        self.darkblue = fg(4)
-        self.darkwhite = fg(7)
-        self.darkgray = fg(237)
-        self.cyberblue = fg(200)
-        self.default = fg(0)
+    darkblue = fg(4)
+    darkwhite = fg(7)
+    darkgray = fg(237)
+    cyberblue = fg(200)
+    default = fg(0)
 
-    # generic string wrapper
-    def wrap(self, str):
-        return self.darkblue + "⟬" + self.darkwhite + str + self.darkblue + "⟭"
+    @classmethod
+    def wrap(cls, out):
+        """ generic string wrapper """
+        return cls.darkblue + "⟬" + cls.darkwhite + out + cls.darkblue + "⟭"
 
-    def size(self, sz):
-        return self.wrap(
-            self.darkwhite + "sz" + self.darkgray + "~" +
-            self.darkwhite + str(sz)
+    @classmethod
+    def size(cls, size):
+        """ Print file size """
+        return cls.wrap(
+            cls.darkwhite + "sz" + cls.darkgray + "~" +
+            cls.darkwhite + str(size)
         )
 
-    def filelen(self, len):
-        return self.wrap(
-            self.darkwhite + "len" + self.darkgray + "=" +
-            self.darkwhite + str(len)
+    @classmethod
+    def filelen(cls, length):
+        """ Print file line-length """
+        return cls.wrap(
+            cls.darkwhite + "len" + cls.darkgray + "=" +
+            cls.darkwhite + str(length)
         )
 
-    def newfile(self, filename):
-        return self.wrap(filename)
+    @classmethod
+    def newfile(cls, filename):
+        """ Print the new file """
+        return cls.wrap(filename)
 
-    def dir(self, filename):
-        return self.wrap(filename)
+    @classmethod
+    def dir(cls, filename):
+        """ Print directory """
+        return cls.wrap(filename)
 
-    def prefix(self):
-        return self.wrap(fg(25) + ">" + fg(26) + ">")
+    @classmethod
+    def prefix(cls):
+        """ Print prefix """
+        return cls.wrap(fg(25) + ">" + fg(26) + ">")
 
-    def delim(self):
-        return (self.cyberblue + self.default)
+    @classmethod
+    def delim(cls):
+        """ Print delimiter """
+        return cls.cyberblue + cls.default
 
-    # pretty printing for filename
-    def fancy_file(self, filename):
+    @classmethod
+    def fancy_file(cls, filename):
+        """ Pretty printing for filename """
         filename = re.sub('~', fg(2) + "~" + fg(7), filename)
         filename = re.sub(os.environ["HOME"], fg(2) + "~" + fg(7), filename)
         filename = re.sub("/", fg(4) + "/" + fg(7), filename)
-        return self.wrap(filename)
+        return cls.wrap(filename)
 
 
 # file info printer
 class file_info_printer(object):
     def __init__(self):
-        self.printer = pretty_printer()
+        pass
 
     # counting with external wc is faster than everything else
     def wccount(self, filename):
@@ -65,35 +78,35 @@ class file_info_printer(object):
 
     def nonexistsfile(self, filename):
         print(
-            self.printer.prefix() +
-            self.printer.fancy_file(filename) +
-            self.printer.delim() +
-            self.printer.newfile(filename)
+            pretty_printer.prefix() +
+            pretty_printer.fancy_file(filename) +
+            pretty_printer.delim() +
+            pretty_printer.newfile(filename)
         )
 
     def existsfile(self, filename):
         print(
-            self.printer.prefix() +
-            self.printer.fancy_file(filename) +
-            self.printer.delim() +
-            self.printer.size(os.stat(filename).st_size) +
-            self.printer.delim() +
-            self.printer.filelen(self.wccount(filename))
+            pretty_printer.prefix() +
+            pretty_printer.fancy_file(filename) +
+            pretty_printer.delim() +
+            pretty_printer.size(os.stat(filename).st_size) +
+            pretty_printer.delim() +
+            pretty_printer.filelen(self.wccount(filename))
         )
 
     def currentdir(self, filename):
         print(
-            self.printer.prefix() +
-            self.printer.wrap("current dir") +
-            self.printer.delim() +
-            self.printer.dir(filename)
+            pretty_printer.prefix() +
+            pretty_printer.wrap("current dir") +
+            pretty_printer.delim() +
+            pretty_printer.dir(filename)
         )
 
     def dir(self, filename):
         print(
-            self.printer.prefix() +
-            self.printer.fancy_file(filename) +
-            self.printer.delim() +
-            self.printer.dir(filename)
+            pretty_printer.prefix() +
+            pretty_printer.fancy_file(filename) +
+            pretty_printer.delim() +
+            pretty_printer.dir(filename)
         )
 
