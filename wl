@@ -76,27 +76,21 @@ class wallpaper_manager():
     def get_wall_history(self):
         """ return wallpapers history """
         contents = Path(self.wall_list_path).read_text()
-        return contents.strip().split('\n')
+        contents_list = contents.strip().split('\n')
+        return contents_list
 
     def write_wall_history(self, hist_list):
         """ write wall history to file from list """
         with open(self.wall_list_path, "w") as wall_list:
-            for wall in hist_list:
-                wall_list.write(wall + '\n')
+            if hist_list:
+                for wall in hist_list:
+                    wall_list.write(wall + '\n')
 
     def execute_hsetroot(self):
         """ Execute hsetroot to set wallpape """
         img_to_set = random.choice(self.images)
         subprocess.Popen(['hsetroot', '-full', img_to_set])
         return img_to_set
-
-    def trim_history(self, wall_hist):
-        """ Trim history to the given level """
-        uniq_walls_in_hist = dict.fromkeys(wall_hist).keys()
-        hist = list(uniq_walls_in_hist)[::-1]
-        how_many = self.history_size
-        trimmed_hist = hist[:how_many]
-        return trimmed_hist
 
     def print_wall_history(self, history):
         """ Print wall history """
@@ -112,18 +106,20 @@ class wallpaper_manager():
         """ Set wallpaper """
         wall_img_path = self.execute_hsetroot()
         self.add_wall_history(wall_img_path)
-        trimmed_hist = self.trim_history(self.get_wall_history())
-        self.print_wall_history(trimmed_hist)
-        self.write_wall_history(trimmed_hist)
+        raw_wall_history = self.get_wall_history()
+        self.write_wall_history(raw_wall_history)
 
-    def print_wall_list(self):
+    def print_for_user(self):
         """ Only print wallpaper history """
-        trimmed_hist = self.trim_history(self.get_wall_history())
-        self.print_wall_history(trimmed_hist)
+        raw_wall_history = self.get_wall_history()
+        self.print_wall_history(raw_wall_history)
 
     def open_image_viewer(self):
         """ Open image viewer with wallpapers history """
-        pass
+        file_list = list(reversed(self.get_wall_history()))
+        subprocess.run(
+            ['sxiv', '-Zftoa', '-sd', *file_list],
+            stdout=subprocess.PIPE)
 
 
 def main():
@@ -132,7 +128,7 @@ def main():
     if cmd_args['--random']:
         wall_manager.set_wallpaper()
     elif cmd_args['--list']:
-        wall_manager.print_wall_list()
+        wall_manager.print_for_user()
     elif cmd_args['--show']:
         wall_manager.open_image_viewer()
     else:
