@@ -4,11 +4,20 @@
 This script sets wallpaper and maintain wallpaper history.
 
 Usage:
-    ./wl [--list|--random|--show]
+    wl
+    wl -l | --list
+    wl -r | --random
+    wl -s | --show
+    wl -v | --video
+    wl -c | --copy
+    wl --copy-num=<n>
 
-    --list          print list of wallpaper history.
-    --random        set random picture as wallpaper.
-    --show          open image viewer for the image history
+Options:
+    --list           print list of wallpaper history
+    --random         set random picture as wallpaper
+    --show           open image viewer for the image history
+    --video          set random video wallpaper
+    --copy           copy current wallpaper name to clipboard
 
 Created by :: Neg
 email :: <serg.zorg@gmail.com>
@@ -121,21 +130,39 @@ class wallpaper_manager():
             ['sxiv', '-Zftoa', '-sd', *file_list],
             stdout=subprocess.PIPE)
 
+    def copy_current_to_clipboard(self):
+        """ Copy current wallpaper to X11 clipboard """
+        self.copy_number(-1)
+
+    def copy_number(self, num):
+        """ Copy wallpaper with the given number
+
+            Args:
+                num(int): number in history for image to be removed.
+        """
+        subprocess.run(
+            ['gpaste-client', 'add', self.get_wall_history()[int(num)]],
+            stdout=subprocess.PIPE)
+
 
 def main():
     """ main function """
     wall_manager = wallpaper_manager()
-    if cmd_args['--random']:
+    if cmd_args['-r'] or cmd_args['--random']:
         wall_manager.set_wallpaper()
-    elif cmd_args['--list']:
+    elif cmd_args['-l'] or cmd_args['--list']:
         wall_manager.print_for_user()
-    elif cmd_args['--show']:
+    elif cmd_args['-s'] or cmd_args['--show']:
         wall_manager.open_image_viewer()
+    elif cmd_args['-c'] or cmd_args['--copy']:
+        wall_manager.copy_current_to_clipboard()
+    elif cmd_args['--copy-num']:
+        wall_manager.copy_number(cmd_args['--copy-num'])
     else:
         wall_manager.default_action()
 
 
 if __name__ == '__main__':
-    cmd_args = docopt(__doc__, version='0.8')
+    cmd_args = docopt(__doc__, version='0.1')
     main()
 
