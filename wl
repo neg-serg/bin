@@ -13,6 +13,7 @@ class wallpaper_manager():
 
     def __init__(self):
         self.directory = os.path.expanduser('~/pic/wl')
+        self.history_size = 20
         self.images = []
 
         self.home = Path.home()
@@ -53,8 +54,14 @@ class wallpaper_manager():
             wall_list.write(image_path + '\n')
 
     def get_wall_history(self):
+        """ return wallpapers history """
         contents = Path(self.wall_list_path).read_text()
         return contents.strip().split('\n')
+
+    def write_wall_history(self, hist_list):
+        with open(self.wall_list_path, "w") as wall_list:
+            for wall in hist_list:
+                wall_list.write(wall + '\n')
 
     def execute_hsetroot(self):
         """ Execute hsetroot to set wallpape """
@@ -62,12 +69,16 @@ class wallpaper_manager():
         subprocess.Popen(['hsetroot', '-full', img_to_set])
         return img_to_set
 
-    def trim_history(self, wall_hist, how_many=10):
+    def trim_history(self, wall_hist):
+        """ Trim history to the given level """
         uniq_walls_in_hist = dict.fromkeys(wall_hist).keys()
         hist = list(uniq_walls_in_hist)[::-1]
-        return hist[:10]
+        how_many = self.history_size
+        trimmed_hist = hist[:how_many]
+        return trimmed_hist
 
     def print_wall_history(self, history):
+        """ Print wall history """
         home = str(self.home)
         for num, line in enumerate(history):
             if line.startswith(home):
@@ -78,8 +89,9 @@ class wallpaper_manager():
         """ Set wallpaper """
         wall_img_path = self.execute_hsetroot()
         self.add_wall_history(wall_img_path)
-        wall_hist = self.trim_history(self.get_wall_history())
-        self.print_wall_history(wall_hist)
+        trimmed_hist = self.trim_history(self.get_wall_history())
+        self.print_wall_history(trimmed_hist)
+        self.write_wall_history(trimmed_hist)
 
 
 def main():
