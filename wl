@@ -6,6 +6,7 @@ import errno
 import subprocess
 import random
 from pathlib import Path
+from pretty_printer import pretty_printer
 
 
 class wallpaper_manager():
@@ -14,6 +15,9 @@ class wallpaper_manager():
     def __init__(self):
         self.directory = os.path.expanduser('~/pic/wl')
         self.history_size = 20
+
+        self.pp = pretty_printer()
+
         self.images = []
 
         self.home = Path.home()
@@ -31,8 +35,6 @@ class wallpaper_manager():
         except OSError as makedir_err:
             if makedir_err.errno != errno.EEXIST:
                 raise
-
-        self.set_wallpaper()
 
     def get_wallpapers_python_glob(self):
         """ Returns wallpaper list """
@@ -59,6 +61,7 @@ class wallpaper_manager():
         return contents.strip().split('\n')
 
     def write_wall_history(self, hist_list):
+        """ write wall history to file from list """
         with open(self.wall_list_path, "w") as wall_list:
             for wall in hist_list:
                 wall_list.write(wall + '\n')
@@ -83,20 +86,24 @@ class wallpaper_manager():
         for num, line in enumerate(history):
             if line.startswith(home):
                 line = '~/' + line.split(home)[1]
-                print(f'[{num}] {Path(line)}')
+                number = self.pp.wrap(str(num))
+                file_name = self.pp.fancy_file(str(Path(line)))
+                print(f'{number} {file_name}')
 
-    def set_wallpaper(self):
+    def set_wallpaper(self, with_print=False):
         """ Set wallpaper """
         wall_img_path = self.execute_hsetroot()
         self.add_wall_history(wall_img_path)
         trimmed_hist = self.trim_history(self.get_wall_history())
-        self.print_wall_history(trimmed_hist)
+        if with_print:
+            self.print_wall_history(trimmed_hist)
         self.write_wall_history(trimmed_hist)
 
 
 def main():
     """ main function """
-    wallpaper_manager()
+    wall_manager = wallpaper_manager()
+    wall_manager.set_wallpaper()
 
 
 if __name__ == '__main__':
