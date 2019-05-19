@@ -1,7 +1,11 @@
 #!/bin/zsh
 
 gtk_settings(){
-    gsettings set org.gnome.desktop.interface gtk-theme "Matcha-dark-azul"
+    if [[ $1 == "" ]]; then
+        gsettings set org.gnome.desktop.interface gtk-theme "Matcha-dark-azul"
+    else
+        gsettings set org.gnome.desktop.interface gtk-theme "$1"
+    fi
     gsettings set org.gnome.desktop.interface gtk-key-theme Emacs
 
     gsettings set org.gnome.desktop.interface icon-theme 'Paper'
@@ -24,6 +28,15 @@ font_settings(){
     gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Iosevka Term 12'
 }
 
+icon_settings(){
+    if [[ $1 == "" ]]; then
+        gsettings set org.gnome.desktop.interface icon-theme "Paper"
+    else
+        gsettings set org.gnome.desktop.interface icon-theme "$1"
+    fi
+    gsettings set org.gnome.desktop.background show-desktop-icons true
+}
+
 main(){
     case $1 in
         '-a')
@@ -40,6 +53,10 @@ main(){
         '-f')
             shift
             font_settings &
+        ;;
+        '-i')
+            shift
+            icon_settings "$1" &
         ;;
     esac
 }
