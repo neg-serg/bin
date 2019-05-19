@@ -1,11 +1,29 @@
 #!/usr/bin/python3
-""" Set wallpaper """
+""" wallpaper script.
+
+This script sets wallpaper and maintain wallpaper history.
+
+Usage:
+    ./wl [--list|--random|--show]
+
+    --list          print list of wallpaper history.
+    --random        set random picture as wallpaper.
+    --show          open image viewer for the image history
+
+Created by :: Neg
+email :: <serg.zorg@gmail.com>
+github :: https://github.com/neg-serg
+year :: 2019
+
+"""
 
 import os
 import errno
 import subprocess
 import random
 from pathlib import Path
+
+from docopt import docopt
 from pretty_printer import pretty_printer
 
 
@@ -15,8 +33,6 @@ class wallpaper_manager():
     def __init__(self):
         self.directory = os.path.expanduser('~/pic/wl')
         self.history_size = 20
-
-        self.pp = pretty_printer()
 
         self.images = []
 
@@ -29,6 +45,8 @@ class wallpaper_manager():
 
         wlist_dir = os.path.expanduser("~/.config/wall")
         self.wall_list_path = wlist_dir + '/' + "wallpaper.list"
+
+        self.default_action = self.set_wallpaper
 
         try:
             os.makedirs(wlist_dir)
@@ -86,26 +104,42 @@ class wallpaper_manager():
         for num, line in enumerate(history):
             if line.startswith(home):
                 line = '~/' + line.split(home)[1]
-                number = self.pp.wrap(str(num))
-                file_name = self.pp.fancy_file(str(Path(line)))
+                number = pretty_printer.wrap(str(num))
+                file_name = pretty_printer.fancy_file(str(Path(line)))
                 print(f'{number} {file_name}')
 
-    def set_wallpaper(self, with_print=False):
+    def set_wallpaper(self):
         """ Set wallpaper """
         wall_img_path = self.execute_hsetroot()
         self.add_wall_history(wall_img_path)
         trimmed_hist = self.trim_history(self.get_wall_history())
-        if with_print:
-            self.print_wall_history(trimmed_hist)
+        self.print_wall_history(trimmed_hist)
         self.write_wall_history(trimmed_hist)
+
+    def print_wall_list(self):
+        """ Only print wallpaper history """
+        trimmed_hist = self.trim_history(self.get_wall_history())
+        self.print_wall_history(trimmed_hist)
+
+    def open_image_viewer(self):
+        """ Open image viewer with wallpapers history """
+        pass
 
 
 def main():
     """ main function """
     wall_manager = wallpaper_manager()
-    wall_manager.set_wallpaper()
+    if cmd_args['--random']:
+        wall_manager.set_wallpaper()
+    elif cmd_args['--list']:
+        wall_manager.print_wall_list()
+    elif cmd_args['--show']:
+        wall_manager.open_image_viewer()
+    else:
+        wall_manager.default_action()
 
 
 if __name__ == '__main__':
+    cmd_args = docopt(__doc__, version='0.8')
     main()
 
