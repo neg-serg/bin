@@ -17,52 +17,28 @@ Options:
 Created by :: Neg
 email :: <serg.zorg@gmail.com>
 github :: https://github.com/neg-serg?tab=repositories
-year :: 2018
+year :: 2019
 
 """
 
-from psutil import net_connections
 import subprocess
+import sys
 import time
 import os.path
-import shlex  # shell string to list
-from pathlib import Path  # get corrent path
+import shlex
+from pathlib import Path
 from pretty_printer import file_info_printer
-import sys  # options
 
 
 class wim_runner(object):
+    """ wim runner with only one instance """
+
     def __init__(self):
         self.settings = {
             "debug": False,
         }
 
-        self.font = "Iosevka Term Medium"
-        self.fsize = 20
-
-        self.unix_connections = net_connections(kind='unix')
-        self.sock_path = os.path.realpath(
-            os.path.expandvars("$HOME/1st_level/nvim.socket")
-        )
-        self.tmux_sock_path = os.path.realpath(
-            os.path.expandvars("$HOME/1st_level/tmux_nvim.socket")
-        )
-
         self.args = sys.argv
-
-        if Path(self.sock_path).exists() and \
-            (
-                list(
-                    filter(
-                        lambda i: i.laddr == self.sock_path,
-                        self.unix_connections
-                        )
-                    ) == []
-                ):
-            os.remove(self.sock_path)
-
-        os.environ["NVIM_LISTEN_ADDRESS"] = self.sock_path
-
         self.vim_commands = {
             "to_normal": "<C-\\><C-N>:call<SPACE>foreground()<CR>",
             "dir": "-c 'doautocmd BufEnter'",
@@ -71,20 +47,19 @@ class wim_runner(object):
         }
 
         self.default_cmd = self.vim_commands["rsend"]
-
         self.timeout = .5
         self.cmd = ""
         self.wim_name = "nwim"
         self.printer = file_info_printer()
-
-        self.nvr_env = os.environ.copy()
-        self.nvr_env["NVIM_LISTEN_ADDRESS"] = self.sock_path
+        self.mode = ""
 
     def dprint(self, debug_string):
+        """ Debug printing """
         if self.settings["debug"]:
             print(debug_string)
 
     def dprint_with_args(self, debug_string):
+        """ Debug printing with args """
         def print_args(args):
             self.dprint("[::] Printing args [::]")
             for arg in args:
@@ -93,12 +68,8 @@ class wim_runner(object):
         self.dprint("[ " + debug_string + " ]")
         print_args(self.args)
 
-    def tmux_socket_is_in_use_(self):
-        return bool(list(
-            filter(lambda i: i.laddr ==
-                   self.tmux_sock_path, self.unix_connections)) != [])
-
     def no_wim_x11_win(self):
+        """ Checks for the X11 window """
         nwim_win = subprocess.Popen(
             "wmctrl -xl|awk '{print $3}'|rg nwim",
             stdin=None,
@@ -106,20 +77,20 @@ class wim_runner(object):
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-        our, err = nwim_win.communicate()
-        return "nwim.nwim" != our.decode().strip('\n')
+        our, _ = nwim_win.communicate()
+        return our.decode().strip('\n') != "nwim.nwim"
 
-    # goto neovim window
     def wim_goto(self):
+        """ Goto to the neovim window """
         def there_is(wm_):
             if "DISPLAY" not in os.environ:
                 return False
-            else:
-                pipe = subprocess.Popen(
-                    'pidof {}'.format(wm_).split(), stdout=subprocess.PIPE
-                )
-                pid, _ = pipe.communicate()
-                return pid != b''
+
+            pipe = subprocess.Popen(
+                'pidof {}'.format(wm_).split(), stdout=subprocess.PIPE
+            )
+            pid, _ = pipe.communicate()
+            return pid != b''
 
         if there_is("i3"):
             self.dprint("[i3] :: go to win with it")
@@ -129,42 +100,31 @@ class wim_runner(object):
                 stderr=open(os.devnull, 'w')
             )
 
-    # check wim started or not by internal variable in nvim
     def wim_is_started(self):
+        """ Check wim started or not by internal variable in nvim """
         ret = subprocess.Popen(
             shlex.split(
                 """ nvr --remote-expr "printf(\\"%s\\", g:nvim_is_started)" """
             ),
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            env=self.nvr_env
+            stderr=subprocess.DEVNULL
         ).communicate()[0].decode("utf-8").strip('\n')
         self.dprint("nwim_started=[{}]".format(ret))
         return ret == "on"
 
-    # wait for run
     def wait_for_run(self):
-        while not len(self.nwim_wid()):
+        """ Wait while nvim nwim is run """
+        while not self.nwim_wid():
             self.dprint("wait st from scratch run")
             time.sleep(self.timeout)
         while not self.wim_is_started():
             self.dprint("wait for nvim")
             time.sleep(self.timeout)
 
-    # it is the main function in the past, not sure for now
-    def V(self):
-        self.dprint_with_args("Run V")
-        del self.args[0]
-
-        self.wait_for_run()
-
-        self.dprint("wim is started")
-        self.wim_run()
-        self.wim_goto()
-
-    # It seems that only bash quoting works correctly
-    # Probably this stuff should be replaced with encodef and friends
     def quotestr(self, string):
+        """ It seems that only bash quoting works correctly
+            Probably this stuff should be replaced with encodef and friends
+        """
         quoted_string = subprocess.Popen(
             shlex.split("bash -c \"printf %q '" + string + "'\""),
             stdout=subprocess.PIPE,
@@ -172,9 +132,9 @@ class wim_runner(object):
         ).communicate()[0].decode("utf-8").strip('\n')
         return quoted_string
 
-    # Open file in daemon and print nice file info
-    # Main function with several closures
     def vim_file_open(self, line, edit_file=True):
+        """ Open file in daemon and print nice file info
+            Main function with several closures """
         def remote_edit_file(filename, file):
             # helper for remote_send
             def remote_edit_file_():
@@ -191,8 +151,7 @@ class wim_runner(object):
                         "\""
                     ),
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    env=self.nvr_env
+                    stderr=subprocess.DEVNULL
                 )
                 return ret
 
@@ -224,6 +183,7 @@ class wim_runner(object):
             pass
 
     def process_list(self):
+        """ Process list of files """
         self.wim_goto()
 
         self.cmd = self.vim_commands["to_normal"]
@@ -234,80 +194,58 @@ class wim_runner(object):
         else:
             subprocess.Popen(
                 shlex.split("nvr " + self.default_cmd + self.cmd),
-                stdout=subprocess.PIPE,
-                env=self.nvr_env
+                stdout=subprocess.PIPE
             )
 
             for line in self.args:
                 self.vim_file_open(line)
 
     def eprocess_list(self):
+        """ Process list of files for embedded """
         for line in self.args:
             self.cmd = "nvr " + self.default_cmd + line
             subprocess.call(shlex.split(self.cmd))
 
     def wim_run(self):
+        """ Run command """
         if self.mode == "default":
             proc = self.process_list
         elif self.mode == "embedded":
             self.default_cmd = self.vim_commands["rwait"]
             proc = self.eprocess_list
 
-        if len(self.args):
+        if self.args:
             proc()
 
-    def attach_term_to_tmux_if_needed(self):
-        if self.tmux_socket_is_in_use_() and self.no_wim_x11_win():
-            # do not wait for call result
-            # x11 window is closed, but tmux connection exists
-            subprocess.Popen([
-                "st",
-                "-f", "{}:pixelsize={}".format(self.font, self.fsize),
-                "-c", "{}".format(self.wim_name),
-                "-e", "tmux", "-S", self.tmux_sock_path,
-                "attach-session", "-d", "-t", "nvim"
-            ])
-
     def nwim_wid(self):
+        """ Search for nwim wid """
         return subprocess.Popen(
             'xdotool search --classname {}'.format(self.wim_name).split(),
             stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()[0].decode("utf-8").strip('\n')
 
-    def create_nvim_server_if_needed(self):
-        subprocess.Popen(
-            shlex.split("st " + "-f '{}:pixelsize={}' "
-                        .format(self.font, self.fsize) +
-                        "-c " + self.wim_name +
-                        " -e sh -c \"tmux -S " +
-                        self.tmux_sock_path +
-                        " new -s nvim -n nvim nvim\""
-                        ), stdout=subprocess.PIPE)
-
-        while not len(self.nwim_wid()):
-            self.dprint("wait st from scratch run")
-            time.sleep(self.timeout)
-
     def nvr_for_oni(self):
+        """ Starts nvr for oni """
         subprocess.run(
             ["nvr", "--remote-silent"] + sys.argv[1:],
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            env=run.nvr_env
+            stderr=subprocess.DEVNULL
         )
 
         for line in sys.argv[1:]:
             self.vim_file_open(line, edit_file=False)
 
     def switch_to_oni_window(self):
+        """ Switch to the oni window """
         subprocess.Popen(
             [
-               os.environ["XDG_CONFIG_HOME"] + "/i3/send",
-               "circle", "next", "nwim"
+                os.environ["XDG_CONFIG_HOME"] + "/i3/send",
+                "circle", "next", "nwim"
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
     def spawn_oni(self):
+        """ Spawn oni process """
         subprocess.Popen(
             ["i3-msg", "exec", "oni"],
             stdout=subprocess.PIPE,
@@ -315,14 +253,16 @@ class wim_runner(object):
         )
 
     def wait_for_oni(self):
-        t = subprocess.check_output(['pgrep', 'oni$']) \
-                      .decode('UTF-8').strip('\n')
-        while not len(t):
-            t = subprocess.check_output(['pgrep', 'oni$']) \
-                          .decode('UTF-8').strip('\n')
+        """ Wait for the oni process to run """
+        out = subprocess.check_output(['pgrep', '-f', '/opt/oni/oni']) \
+            .decode('UTF-8').strip('\n')
+        while not out:
+            out = subprocess.check_output(['pgrep', '-f', '/opt/oni/oni']) \
+                .decode('UTF-8').strip('\n')
             time.sleep(self.timeout)
 
     def wait_for_nvr(self):
+        """ Wait for the nvr to run """
         counter = 0
         nvim_server_is_here = subprocess.Popen(
             ['nvr', '--serverlist'],
@@ -330,7 +270,7 @@ class wim_runner(object):
             stderr=subprocess.DEVNULL
         ).communicate()[0].decode('UTF-8').strip('\n')
 
-        while not len(nvim_server_is_here):
+        while not nvim_server_is_here:
             nvim_server_is_here = subprocess.Popen(
                 ['nvr', '--serverlist'],
                 stdout=subprocess.PIPE,
@@ -343,21 +283,24 @@ class wim_runner(object):
         return True
 
     def main(self, mode="default"):
+        """ Main function """
         self.mode = mode
 
-        if not self.tmux_socket_is_in_use_():
-            self.create_nvim_server_if_needed()
-        self.attach_term_to_tmux_if_needed()
+        self.dprint_with_args("Run V")
+        del self.args[0]
 
-        self.V()
+        self.wait_for_run()
+
+        self.dprint("wim is started")
+        self.wim_run()
+        self.wim_goto()
 
 
 if __name__ == '__main__':
     run = wim_runner()
-    tmux_nvim = False
 
     oni_is_here = subprocess.Popen(
-        ['pgrep', 'oni$'],
+        ['pgrep', '-f', '/opt/oni/oni'],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL
     ).communicate()[0].decode('UTF-8').strip('\n')
@@ -370,10 +313,4 @@ if __name__ == '__main__':
         run.nvr_for_oni()
         run.switch_to_oni_window()
         sys.exit(0)
-
-    if tmux_nvim:
-        if os.environ.get("NWIM_STANDALONE"):
-            run.main("embedded")
-        else:
-            run.main()
 
