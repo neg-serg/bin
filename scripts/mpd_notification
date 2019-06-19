@@ -91,12 +91,11 @@ function notify(){
         [[ ${i} != "\n" ]] && output="${output}${i}"
 
     summary="${col2}$(repeat ${len} print -n "◇")${end}"
-    output="${output}$(get_lastfm)\n${summary}"
+    output="${summary}\n${output}$(get_lastfm)\n${summary}"
 
-    summary=$(echo "${summary}")
     output=$(echo "${output}")
 
-    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" -u "${urgency}" -i "${image}" "${summary}" "${output}" > /tmp/notify_id
+    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" -u "${urgency}" -i "${image}" "" "${output}" "" > /tmp/notify_id
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
