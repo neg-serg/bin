@@ -22,7 +22,6 @@ vfio_binder(){
 finish(){
     # Restore settings
     killall synergy 2>/dev/null      # Kill synergy client
-    sysctl -w vm.nr_hugepages=0      # Revert hugepages count to 0(zero)
 
     # kill st - dtach window
     ps aux | grep 'dtach -c /tmp/qemu_wrun.session' | awk '{print $2}' | xargs kill
@@ -128,9 +127,6 @@ main(){
 
             -device virtio-scsi-pci,id=scsi
             -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none
-
-            -mem-prealloc
-            -mem-path /dev/hugepages
         )
 
         local -a spice=(
@@ -156,9 +152,6 @@ main(){
         local -a qemu_pass_video=(
             -device ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1
             -device vfio-pci,host=01:00.0,bus=root.1,addr=00.0
-            # -device vfio-pci,host=01:00.1,bus=root.1,addr=00.1
-            # -device vfio-pci,host=01:00.0,multifunction=on,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
-            # -device vfio-pci,host=01:00.1,rombar=0,romfile=/home/neg/bin/qemu/Gigabyte.GTX980.4096.140826.rom
         )
 
         local -a qemu_pass_network=(
@@ -210,8 +203,13 @@ main(){
         sync && sh -c 'echo 3 > /proc/sys/vm/drop_caches'
         sync && sh -c 'echo 1 > /proc/sys/vm/compact_memory'
 
-        # Setup hugepages
-        sysctl -w vm.nr_hugepages="${hugepages_amount}" 2> /dev/null
+        local -a qemu_network=()
+        if [[ ${qemu_bypass_network} == true ]]; then
+            vfio_binder "0000:00:19.0"
+            for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
+        else
+            for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
+        fi
 
         if [[ ${dynamic_usb_bypass} == true && ${auto_usb_bypass} == true ]]; then
             {
@@ -221,15 +219,7 @@ main(){
             } &
         fi
 
-        systemctl start {sshd,smb}
-
-        local -a qemu_network=()
-        if [[ ${qemu_bypass_network} == true ]]; then
-            vfio_binder "0000:00:19.0"
-            for arg in ${qemu_pass_network[@]}; qemu_network+="${arg}"
-        else
-            for arg in ${qemu_default_network[@]}; qemu_network+="${arg}"
-        fi
+        sudo systemctl start {sshd,smb}
 
         QEMU_AUDIO_TIMER_PERIOD=150 \
         QEMU_PA_SAMPLES=1024 \
