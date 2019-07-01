@@ -24,7 +24,7 @@ finish(){
     killall synergy 2>/dev/null      # Kill synergy client
 
     # kill st - dtach window
-    ps aux | grep 'dtach -c /tmp/qemu_wrun.session' | awk '{print $2}' | xargs kill
+    ps aux | grep 'dtach -c /tmp/qemu.session' | awk '{print $2}' | xargs kill
 
     while [[ $(xinput | grep 'Logitech Gaming Keyboard G910' | wc -l) == 0 ]]; do
         echo -n '.'
@@ -122,8 +122,8 @@ main(){
 
             -qmp tcp:localhost:4444,server,nowait
 
-            -drive if=pflash,format=raw,readonly,file=${Home}/bin/qemu/ovmf_code_x64.bin
-            -drive if=pflash,format=raw,file=${Home}/bin/qemu/ovmf_vars_x64.bin
+            -drive if=pflash,format=raw,readonly,file=${Home}/bin/qemu/ovmf/ovmf_code_x64.bin
+            -drive if=pflash,format=raw,file=${Home}/bin/qemu/ovmf/ovmf_vars_x64.bin
 
             -device virtio-scsi-pci,id=scsi
             -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none

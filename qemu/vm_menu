@@ -10,7 +10,7 @@ do_if_qemu(){
 
 check_qemu(){
     local cmd=(sudo ~neg/bin/qemu/wrun)
-    st -c qemu_run dtach -c /tmp/qemu_wrun.session -Ez "${cmd[@]}"
+    st -c qemu_run dtach -c /tmp/qemu.session -Ez "${cmd[@]}"
 }
 
 msg(){ notify-send "$@" }

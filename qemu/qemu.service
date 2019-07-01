@@ -9,7 +9,7 @@ Environment="type=system-x86_64" "haltcmd=kill -INT $MAINPID" \
 	    "QEMU_PA_SERVER=localhost" \
 	    "PULSE_SERVER=localhost"
 #EnvironmentFile=/etc/conf.d/qemu.d/%i
-ExecStart=/home/neg/bin/qemu/wrun
+ExecStart=/home/neg/bin/qemu/win10_run
 ExecStop=/bin/sh -c ${haltcmd}
 TimeoutStopSec=30
 KillSignal=SIGCONT
