@@ -6,7 +6,7 @@ function read_command {
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
-        "${rofi_pid}" -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
+        -i -levenshtein-sort -matching glob -dmenu -p '"[>>]"'
     )
     cmd_=$(echo -n "${cmds}"| tr -s ' ' '\n' | eval ${rofi_cmd[@]})
     echo ${cmd_}
@@ -68,7 +68,6 @@ function clipboard_pipe(){
 }
 
 function clip_main(){
-    local rofi_pid=" -pid /run/user/$(id -u)/rofi_clip.pid"
     declare -a rofi_opts_
     local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
     local width_=$[x11_width-70]
@@ -80,7 +79,7 @@ function clip_main(){
         -opacity "${opacity_}"
         -theme-str "'#window { width:${width_}; y-offset: ${yoffset_}; location: south; anchor: south; }'"
         -theme-str "'#listview { lines:${lines_}; }'"
-        "${rofi_pid}" -sort -i -matching glob -dmenu -p '"⟬clip⟭ 〉〉"'
+        -sort -i -matching glob -dmenu -p '"⟬clip⟭ 〉〉"'
     )
     local gpaste_ret=$(gpaste-client --oneline|eval ${rofi_cmd})
     local selection=$(echo "${gpaste_ret}" | cut -d ':' -f1)
