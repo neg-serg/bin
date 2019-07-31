@@ -5,3 +5,4 @@ bios.bin
 ovmf_code_x64.bin
 ovmf_vars_x64.bin
 vbios.bin
+__pycache__
