@@ -35,7 +35,7 @@ function send_notify_(){
     )
     
     wait
-    dunstify -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" -i "${new_image}" "Making shot" "${header}\n${output}"
+    dunstify -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" -i "${new_image}" ' ' "${header}\n${output}"
 }
 
 function highlight(){
