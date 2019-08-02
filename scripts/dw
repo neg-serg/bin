@@ -115,7 +115,7 @@ wf(){
 }
 
 send_notify(){ 
-    notify-send -h "string:fgcolor:$(xrq foreground)" "$(wf "mv")$(wf "${file}")->$(wf ${HOME}/tmp)"
+    dunstify -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" ' ' "$(wf "mv")$(wf "${file}")->$(wf ${HOME}/tmp)"
 }
 
 main "$@"
