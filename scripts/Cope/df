@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use App::Cope;
-use App::Cope::Extra qw[percent_b percent_c];
+use App::Cope::Extra qw[percent_b];
 
 my @headers = (
   'Filesystem', 
@@ -51,7 +51,7 @@ sub process {
     for my $h (@headers) { mark $h => 'white underline'; }
   }
   else {
-    line qr{(\d+%)\s+(\S+)$} => \&{ percent_c 10, 25, 50, 75 }, 'bold';
+    line qr{(\d+%)\s+(\S+)$} => \&{ percent_b 10, 25, 50, 75 }, 'bold';
     line qr{(\d+\.?\d+)(K)} => 'bold blue', 'white';
     line qr{(\d+\.?\d+)(M)} => 'bold blue', 'cyan';
     line qr{(\d+\.?\d+)(G)} => 'bold blue', 'yellow';
