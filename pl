@@ -41,7 +41,7 @@ pl(){
         rg -g \"'!{.git,node_modules}/*'\" -g \"'!*.srt'\"
         --files --hidden --follow
     )
-    run_command=(sk-tmux -c \'${rg_cmd[@]}\' -d 40% -- ${SKIM_DEFAULT_OPTIONS})
+    run_command=(fzf-tmux)
     find_result="$(eval ${run_command[@]})"
     xsel <<< "${find_result}"
     if [[ ! -z ${find_result} ]]; then
