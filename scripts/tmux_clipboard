@@ -1,7 +1,7 @@
 #!/bin/bash
 tmux -S /dev/shm/tmux_sockets/term.socket 'capture-pane'
 tmux -S /dev/shm/tmux_sockets/term.socket 'save-buffer' /tmp/tmux-buffer
-tmux_clipboard=$(xurls -m '(git@.*|[a-z]+://\w+)' /tmp/tmux-buffer|sort -r|uniq)
+tmux_clipboard=$(xurls -m '(git@.*|[a-z]+://\w+)' /tmp/tmux-buffer|sort -r|uniq|tac)
 if [[ ${tmux_clipboard} != "" ]]; then
     echo "${tmux_clipboard}"|rofi -p url -dmenu -l 4|xclip
 fi
