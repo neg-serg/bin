@@ -8,18 +8,18 @@ dunst_pics="$(readlink -f ${HOME}/tmp/dunst-images)"
 cover_lock="${dunst_pics}/notify.lock"
 image="/tmp/.mpd-notification-artwork.png"
 
-function wf(){
+wf(){
     print "${col1}⟬${end}${bold}$1${end}${col1}⟭${end} "
 }
 
-function get_pid(){
+get_pid(){
     local mpdsc="$(which mpdscribble) --conf"
     local mpdas="${XDG_CONFIG_HOME}/mpdas"
     pgrep -f "${mpdsc} ${XDG_CONFIG_HOME}/mpdscribble/${1}.conf --no-daemon" || \
     pgrep -f "${mpdas}/${1}.rc"
 }
 
-function get_lastfm(){
+get_lastfm(){
     for pid in neg hextrick; do
         if [[ $(get_pid "${pid}") != "" ]]; then
             printf "%s\n" "$(wf "L")$(sed 's:^.:\U&:g' <<< ${pid}) last.fm"
@@ -28,12 +28,12 @@ function get_lastfm(){
     done
 }
 
-function highlight(){
+highlight(){
     local msg="$(xrq color${1})"
     print "<span weight='bold' color='${msg}'>"
 }
 
-function notify(){
+notify(){
     local col1=$(highlight 4)
     local col2=$(highlight 8)
 
@@ -99,12 +99,12 @@ function notify(){
     echo "${body}$(get_lastfm)" > "${cover_lock}"
 }
 
-function cmp_img(){
+cmp_img(){
     ${HOME}/bin/scripts/compare_images.py "${1}" "${2}" \
         || print "False"
 }
 
-function show_notify(){
+show_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
         notify
     elif [[ -s "${cover_lock}" ]]; then
@@ -115,16 +115,16 @@ function show_notify(){
     cp "${image}" "${prev}"
 }
 
-function zshexit(){
+zshexit(){
     (
         hashsum1=$(xxh32sum "${image}"|cut -d ' ' -f1)
-        sleep 4s
+        sleep 2s
         hashsum2=$(xxh32sum "${image}"|cut -d ' ' -f1)
         [[ ${hashsum1} = ${hashsum2} ]] && rm -f ${image}
     ) &
 }
 
-function main(){
+main(){
     dunstify -C "$(< /tmp/notify_id)"
 
     [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}"
