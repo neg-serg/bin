@@ -64,7 +64,7 @@ main(){
         c*) 
             shift
             # Transmission-related stuff
-            inotifywait -m -q -e close_write --format "%f" ${XDG_DOWNLOAD_DIR}/ | xargs \
+            inotifywait -m -q -e close --format "%f" ${XDG_DOWNLOAD_DIR}/ \
             | while IFS= read -r file_; do
                 file=$(readlink -f ${XDG_DOWNLOAD_DIR}/${file_})
                 if [[ "${file}" =~ ".torrent.added"$ ]]; then
