@@ -4,29 +4,21 @@ import codecs
 
 from subprocess import check_output
 
-def oauth2_client_id():
-    return check_output("pass oauth2_client_id", shell=True).strip("\n")
-
-def oauth2_client_secret():
-    return check_output("pass oauth2_client_secret", shell=True).strip("\n")
-
-def oauth2_request_url():
-    return "https://accounts.google.com/o/oauth2/token"
-
-def oauth2_refresh_token():
-    return check_output("pass oauth2_refresh_token", shell=True).strip("\n")
 
 def get_pass():
-    return check_output("pass gmail", shell=True).strip("\n")
+    return check_output("pass gmail", shell=True).splitlines()[0]
+
 
 def modified_base64(s):
     s = s.encode('utf-16be')
     return binascii.b2a_base64(s).rstrip('\n=').replace('/', ',')
 
+
 def doB64(_in, r):
     if _in:
         r.append('&%s-' % modified_base64(''.join(_in)))
         del _in[:]
+
 
 def encoder(s):
     r = []
@@ -46,7 +38,6 @@ def encoder(s):
 
 
 # decoding
-
 def modified_unbase64(s):
     b = binascii.a2b_base64(s.replace(',', '/') + '===')
     return unicode(b, 'utf-16be')
