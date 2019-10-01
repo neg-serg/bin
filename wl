@@ -165,4 +165,3 @@ def main():
 if __name__ == '__main__':
     cmd_args = docopt(__doc__, version='0.1')
     main()
-
