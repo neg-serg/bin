@@ -47,26 +47,16 @@ local neg_rofi_hlbg="#194558"
 local neg_rofi_bc="#202020"
 
 local pref="${blue}⟬${close}MPD action${blue}⟭${close}"
-local rofi_font="Iosevka Term Medium 17"
-local rofi_colors=(
-    -fg '${neg_rofi_fg}'
-    -bg '${neg_rofi_bg}'
-    -hlfg '${neg_rofi_hlfg}'
-    -hlbg '${neg_rofi_hlbg}'
-    -bc '${neg_rofi_bc}'
-)
 local mon_width=$(xrandr -q |awk '/Screen/{print $8}')
-local gap="70"
 local rofi_options=(
+    -theme-str "'* { font: \"Iosevka Term Medium 12\"; }'"
+    -theme-str "'#window { width: $(( (${mon_width}) / 2 )); y-offset: -34; location: south west; anchor: south west; }'"
     -markup-rows
-    -mesg \"${pref}\"
     -dmenu
     -auto-select
-    -font '${rofi_font}'
     -b -disable-history -columns 8
     -lines 1
-    -width $((${mon_width} - ${gap}))
-    -yoffset -34 -location 6 -p '\>'
+    -p "\>"
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
 
