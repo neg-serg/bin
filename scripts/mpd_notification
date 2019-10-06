@@ -90,7 +90,7 @@ notify(){
     for i in ${bodyarr[@]};
         [[ ${i} != "\n" ]] && output="${output}${i}"
 
-    summary="${col2}$(repeat ${len} print -n "◇")${end}"
+    summary=""
     output="${summary}\n${output}$(get_lastfm)\n${summary}"
 
     output=$(echo "${output}")
