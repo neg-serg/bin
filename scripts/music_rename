@@ -1,14 +1,15 @@
 #!/bin/zsh
 
+set -e
+
 typeset -A conv_table
 
 trim() {
-    local var="$*"
+    local var="$@"
     # remove leading whitespace characters
     var="${var#"${var%%[![:space:]]*}"}"
     # remove trailing whitespace characters
-    var="${var%"${var##*[![:space:]]}"}"   
-    echo -n "${var}"
+    echo -n "${var%"${var##*[![:space:]]}"}"   
 }
 
 generate_convert_table() {
@@ -23,10 +24,10 @@ generate_convert_table() {
     done
     
     i="000"
-    num=$(sed "s/^000/0/" <<< $i)
+    num=$(sed "s/^000/0/" <<< "${i}")
     conv_table[2$i]="2x${num}"
-    for i in {001..025}; do
-        num=$(sed "s/^0*//" <<< $i)
+    for i in {001..035}; do
+        num=$(sed "s/^0*//" <<< "${i}")
         if [[ ${num} -lt 10 ]]; then
             conv_table[2$i]="2x${num}"
         else
@@ -41,12 +42,8 @@ generate_convert_table() {
     done
 }
 
-debug_print_convert_table() {
-    for key in "${(@k)conv_table}"; echo "${key} -> ${conv_table[${key}]}"|sort -h
-}
-
 apply_rename_files() {
-    Data=$(albumdetails "$@" 2>/dev/null)
+    Data=$(albumdetails "$@")
     apply_rename_ "$@"
 }
 
@@ -56,12 +53,12 @@ apply_rename_dir() {
 }
 
 extract_field() {
-    trim "$(echo "${Data}"|grep "$1"| cut -d ':' -f 2-)"
+    grep "^$1:" <<< "${Data}" | cut -d ':' -f 2-
 }
 
 apply_rename_() {
-    artist=$(extract_field "Artist")
-    year=$(extract_field "Year")
+    artist="$(extract_field 'Artist')"
+    year="$(extract_field 'Year')"
 
     generate_convert_table
 
@@ -69,15 +66,19 @@ apply_rename_() {
     year=$(awk '{print $1}' <<< "${year}")
     year=${year//$year/$conv_table[$year]}
 
-    album=$(extract_field "Album")
+    album="$(extract_field 'Album')"
 
-    if [[ -d "$1" ]]; then
-        src="$1"
+    if [[ -d "${1}" ]]; then
+        src="${1}"
     else
         src="$(builtin print "$(dirname ${1})")"
     fi
 
-    if [[ $(trim "${artist}") != "" && $(trim "${year}") != "" && $(trim "${album}") != "" ]]; then
+    artist=$(trim "${artist}")
+    album=$(trim "${album}")
+    year=$(trim "${year}")
+
+    if [[ ${artist} != "" && ${year} != "" && ${album} != "" ]]; then
         music_dirname="$(awk '/music_directory/{print $2}' ${HOME}/.mpd.conf|tr -d '"'|sed 's:^~:'${HOME}':')"
         if [[ ${src} =~ "^${music_dirname}/new.*" ]]; then
             result="${music_dirname}/new/$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")"
@@ -91,12 +92,12 @@ apply_rename_() {
 }
 
 main(){
-    case "$1" in
-        "current")
+    case "${1}" in
+        c*)
             dirname="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')/$(dirname "$(mpc -f '%file%'|head -1)")"
             apply_rename_dir "${dirname}"
         ;;
-        "files")
+        f*)
             shift
             apply_rename_files "$@"
         ;;
