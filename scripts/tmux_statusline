@@ -1,0 +1,18 @@
+#!/bin/python3 -u
+
+
+def proc():
+    with open(loadavg_path, "r") as fp:
+        loadavg_data = fp.readlines()[0].split()[:3]
+        output = ''
+        for lavg_val in loadavg_data:
+            if float(lavg_val) / 4.0 > 1.0:
+                output += f'#[fg=red]{lavg_val}#[fg=default] '
+            else:
+                output += f'#[fg=green]{lavg_val}#[fg=default] '
+        print(output[:-1])
+        fp.flush()
+
+
+loadavg_path = '/proc/loadavg'
+proc()
