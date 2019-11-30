@@ -17,7 +17,7 @@ function zrcautoload() {
     return 0
 }
 
-source ~/.zsh/03-helpers.zsh
+source "${ZDOTDIR}/03-helpers.zsh"
 
 function mp(){
     vdpau=false
