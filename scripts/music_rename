@@ -79,7 +79,7 @@ apply_rename_() {
     year=$(trim "${year}")
 
     if [[ ${artist} != "" && ${year} != "" && ${album} != "" ]]; then
-        music_dirname="$(awk '/music_directory/{print $2}' ${HOME}/.mpd.conf|tr -d '"'|sed 's:^~:'${HOME}':')"
+        music_dirname="$(awk '/music_directory/{print $2}' "${HOME}/.mpd.conf"|tr -d '"'|sed 's:^~:'${HOME}':')"
         if [[ ${src} =~ "^${music_dirname}/new.*" ]]; then
             result="${music_dirname}/new/$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")"
         else
@@ -94,7 +94,7 @@ apply_rename_() {
 main(){
     case "${1}" in
         c*)
-            dirname="$(awk '/music_directory/{print $2}' /etc/mpd.conf|tr -d '"')/$(dirname "$(mpc -f '%file%'|head -1)")"
+            dirname="$(awk '/music_directory/{print $2}' "${HOME}/.mpd.conf"|tr -d '"'|sed 's:^~:'${HOME}':')/$(dirname "$(mpc -f '%file%'|head -1)")"
             apply_rename_dir "${dirname}"
         ;;
         f*)
