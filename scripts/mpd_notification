@@ -12,6 +12,10 @@ wf(){
     print "${col1}⟬${end}${bold}$1${end}${col1}⟭${end} "
 }
 
+nr(){ print "<span weight='Medium' color='#88aabb'>$1${end}" }
+
+delimiter(){ repeat ${len} print -n "◇" }
+
 get_pid(){
     local mpdsc="$(which mpdscribble) --conf"
     local mpdas="${XDG_CONFIG_HOME}/mpdas"
@@ -22,23 +26,21 @@ get_pid(){
 get_lastfm(){
     for pid in neg hextrick; do
         if [[ $(get_pid "${pid}") != "" ]]; then
-            printf "%s\n" "$(wf "L")$(sed 's:^.:\U&:g' <<< ${pid}) last.fm"
+            printf "%s\n" "$(wf "L")$(nr $(sed 's:^.:\U&:g' <<< ${pid}) last.fm)"
             break
         fi
     done
 }
 
 highlight(){
-    local msg="$(xrq color${1})"
-    print "<span weight='bold' color='${msg}'>"
+    print "<span weight='Medium' color='$(xrq color$1)'>"
 }
 
 notify(){
     local col1=$(highlight 4)
-    local col2=$(highlight 8)
 
     local end="</span>"
-    local bold="<span weight='bold'>"
+    local bold="<span weight='bold' color='#88aabb'>"
     local -a bodyarr
     while read line; do
         bodyarr+="${line}"
@@ -56,7 +58,7 @@ notify(){
 
     for i in {1..$#fancy_table}; do
         if [[ ${bodyarr[i]} != "" ]]; then
-            bodyarr[i]=$(wf ${fancy_table[i]})"${bodyarr[i]}\n"
+            bodyarr[i]=$(wf ${fancy_table[i]})"$(nr ${bodyarr[i]})\n"
         else
             bodyarr[i]="\n"
         fi
@@ -78,29 +80,29 @@ notify(){
         print br"·"sr"K/"pr"·"ch}' <<< ${sox_metadata})"
 
     local year="$(awk -F '=' '/^YEAR/{print $2}' <<< ${sox_metadata})"
-    local label=$(awk -F '=' '/^LABEL/{print $2}' <<< $sox_metadata)
+    local label="$(awk -F '=' '/^LABEL/{print $2}' <<< ${sox_metadata})"
 
     [[ ${audio_quality// } != "·K/·" ]] && \
-        bodyarr[5]=$(wf '')"${audio_quality}\n" || \
+        bodyarr[5]=$(wf '')"$(nr ${audio_quality})\n" || \
         bodyarr[5]="\n"
 
     [[ ${label// } != "" ]] && \
-        bodyarr[6]=$(wf '©')"${label}\n" || \
+        bodyarr[6]=$(wf '©')"$(nr ${label})\n" || \
         bodyarr[6]="\n"
 
     [[ ${year// } != "" ]] && \
-        bodyarr[7]=$(wf 'Y')"${year}\n" || \
+        bodyarr[7]=$(wf 'Y')"$(nr ${year})\n" || \
         bodyarr[7]="\n"
 
     local output
     for i in ${bodyarr[@]};
         [[ ${i} != "\n" ]] && output="${output}${i}"
 
-    output="${output}$(get_lastfm)"
-
-    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" \
+    output="${output}$(get_lastfm)\n$(delimiter)"
+    summary="$(delimiter)"
+    dunstify -p -a "mpd_notification" -h "string:fgcolor:#17272D" \
         -u "${urgency}" \
-        -i "${image}" "" "${output}" "" > /tmp/notify_id
+        -i "${image}" "${summary}" "${output}" > /tmp/notify_id
     sed '1d' <<< $(echo -n "${body}") > "${cover_lock}"
 }
 
