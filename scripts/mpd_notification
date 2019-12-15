@@ -64,26 +64,33 @@ notify(){
 
     local current_file="$(mpc -f '%file%'|head -1)"
     local current_dirname="${mpd_music_dir}/$(dirname "${current_file}")"
+    local sox_metadata="$(sox --i "${mpd_music_dir}/${current_file}" 2> /dev/null)"
+    local audio_quality="$(awk -F '\\s*:\\s*' \
+        'BEGIN {} /^Channels/{ch=$2} \
+        /^Sample Encoding/{se=$2} \
+        /^Bit Rate/{br=$2} \
+        /^Sample Rate/{sr=$2/1000} \
+        /^Precision/{pr=$2} \
+    END { \
+    if (se ~ /FLAC/) printf "FLAC·"; \
+    if (se ~ /MPEG/) printf "mpeg·"; \
+    if (se ~ /Direct Stream Digital/) printf "dsd·"; \
+        print br"·"sr"K/"pr"·"ch}' <<< ${sox_metadata})"
 
-    albumdetails_metadata="$(find "${current_dirname}" -exec albumdetails '{}' + 2>&1 >/dev/null \
-        | awk -F ': ' '/Quality/{print $2}' \
-        | sed -e 's; / ;·;g' -e 's; channels;;')"
-    sox_metadata="$(sox --i "${mpd_music_dir}/${current_file}" 2> /dev/null)"
-    if [[ ! -z "${sox_metadata// }" ]]; then
-        media_file_encoding="$(awk -F': ' '/Sample Encoding/{print $2}' <<< "${sox_metadata}")"
-        case "${media_file_encoding}" in
-            *FLAC*) file_enc="flac" ;;
-            *MPEG*) file_enc="mp3" ;;
-        esac
-        file_enc="${file_enc}:$(awk -F': ' '/Precision/{print $2}' <<< ${sox_metadata})"
-    fi
+    local year="$(awk -F '=' '/^YEAR/{print $2}' <<< ${sox_metadata})"
+    local label=$(awk -F '=' '/^LABEL/{print $2}' <<< $sox_metadata)
 
-    [[ ${file_enc// } != "" ]] && \
-        bodyarr[5]=$(wf '')"${file_enc}\n" || \
+    [[ ${audio_quality// } != "·K/·" ]] && \
+        bodyarr[5]=$(wf '')"${audio_quality}\n" || \
         bodyarr[5]="\n"
-    [[ ${albumdetails_metadata// } != "" ]] && \
-        bodyarr[6]=$(wf '')"${albumdetails_metadata}\n" || \
+
+    [[ ${label// } != "" ]] && \
+        bodyarr[6]=$(wf '©')"${label}\n" || \
         bodyarr[6]="\n"
+
+    [[ ${year// } != "" ]] && \
+        bodyarr[7]=$(wf 'Y')"${year}\n" || \
+        bodyarr[7]="\n"
 
     local output
     for i in ${bodyarr[@]};
@@ -91,22 +98,21 @@ notify(){
 
     output="${output}$(get_lastfm)"
 
-    output=$(echo -n "${output}")
-
-    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" -u "${urgency}" -i "${image}" "" "${output}" "" > /tmp/notify_id
-    echo "${body}$(get_lastfm)" > "${cover_lock}"
+    dunstify -p -a "mpd_notification" -h "string:fgcolor:#8DA6C4" \
+        -u "${urgency}" \
+        -i "${image}" "" "${output}" "" > /tmp/notify_id
+    sed '1d' <<< $(echo -n "${body}") > "${cover_lock}"
 }
 
 cmp_img(){
-    ${HOME}/bin/scripts/compare_images.py "${1}" "${2}" \
-        || print "False"
+    ${HOME}/bin/scripts/compare_images.py "${1}" "${2}"
 }
 
 show_notify(){
     if [[ ! -f "${cover_lock}" ]]; then
         notify
     elif [[ -s "${cover_lock}" ]]; then
-        if [[ "$(< "${cover_lock}")" != "${body}$(get_lastfm)" ]]; then
+        if [[ "$(< "${cover_lock}")" !=  "$(sed '1d' <<< $(echo -n "${body}"))" ]]; then
             notify
         fi
     fi
@@ -124,7 +130,6 @@ zshexit(){
 
 main(){
     dunstify -C "$(< /tmp/notify_id)"
-
     [[ ! -d "${dunst_pics}" ]] && mkdir -p "${dunst_pics}"
     prev="${dunst_pics}/prev.png"
 
