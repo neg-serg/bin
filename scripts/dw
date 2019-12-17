@@ -101,21 +101,21 @@ main(){
     esac
 }
 
-hi(){
-    local msg="$(xrq color$1)"
-    builtin print "<span weight='bold' color='${msg}'>"
+highlight(){
+    print "<span weight='Medium' color='$(xrq color$1)'>"
 }
 
-st=$(hi 4)
+st="$(highlight 4)"
 cl="</span>"
-bold="<span weight='bold'>"
+bold="<span weight='bold' color='#88aabb'>"
 
 wf(){
-    builtin print "${st}⟬${cl}${bold}$1${cl}${st}⟭${cl}"
+    print "${st}⟬${cl}${bold}$1${cl}${st}⟭${cl}"
 }
 
 send_notify(){ 
-    dunstify -h "string:fgcolor:$(xrq foreground)" -a "pic_notify" ' ' "$(wf "mv")$(wf "${file}")->$(wf ${HOME}/tmp)"
+    dunstify -h "string:fgcolor:$(xrq foreground)" \
+             ' ' "$(wf "mv")$(wf "${file}")->$(wf ~/tmp)"
 }
 
 main "$@"
