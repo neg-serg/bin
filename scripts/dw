@@ -114,8 +114,15 @@ wf(){
 }
 
 send_notify(){ 
+    prefix="$(wf "mv")"
+    output="⟬${file} -> ~/tmp⟭"
+    file_path="$(sed -e "s:${HOME}:~:" \
+                -e "s:\/:${st}/${cl}:g" \
+                -e "s:\(⟬\|⟭\):${st}\1${cl}:g" -e "s:~:${st}~${cl}:g" <<< ${output})"
+    body="${prefix}${file_path}"
+
     dunstify -h "string:fgcolor:$(xrq foreground)" \
-             ' ' "$(wf "mv")$(wf "${file}")->$(wf ~/tmp)"
+             ' ' "${body}"
 }
 
 main "$@"
