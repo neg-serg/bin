@@ -57,7 +57,14 @@ class pretty_printer():
         """ Pretty printing for filename """
         filename = re.sub('~', fg(2) + "~" + fg(7), filename)
         filename = re.sub(os.environ["HOME"], fg(2) + "~" + fg(7), filename)
-        filename = re.sub("/", fg(4) + "/" + fg(7), filename)
+        filename = re.sub("([/·])", fg(4) + r"\1" + fg(7), filename)
+        filename = re.sub(
+            "(-\[)([0-9]+)(x)([0-9A-Z]+)(\]-)",
+            fg(4) + r"\1" + fg(7) + r"\2" + \
+            fg(6) + r"\3" + \
+            fg(7) + r"\4" + fg(4) + r"\5" + fg(7),
+            filename
+        )
         return cls.wrap(filename)
 
 
