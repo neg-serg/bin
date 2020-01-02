@@ -81,7 +81,9 @@ apply_rename_() {
     if [[ ${artist} != "" && ${year} != "" && ${album} != "" ]]; then
         music_dirname="$(awk '/music_directory/{print $2}' "${HOME}/.mpd.conf"|tr -d '"'|sed 's:^~:'${HOME}':')"
         result="${music_dirname}/$(basename "$(sed 's;/;·;g' <<< "${artist}-[${year}]-${album}")")"
-        mv -i "${src}" "${result}"
+        if [[ $(readlink -f "${src}") != $(readlink -f "${result}") ]]; then
+            mv -i "${src}" "${result}"
+        fi
         fix_names -i "${result}"
         rmdir "${src}" 2> /dev/null
     fi
