@@ -6,7 +6,7 @@ Usage:
     ./fix_names.py -i FILES ...
 
 Options:
-    FILES   input file
+    FILES   input file list
     -i      change file name, not print only.
 
 Created by :: Neg
@@ -25,14 +25,14 @@ def fancy_name(filename):
     l = filename
 
     l = re.sub('[ _\t\.]+', "·", l)
-    l = re.sub('·-·', '-', l)
+    l = re.sub('·*-·*', '-', l)
     l = re.sub('\,[_-]', '-', l)
     l = re.sub('[+·\.]*-[+·\.]*', '-', l)
     l = re.sub('[+·\.]*:[+·\.]*', ':', l)
 
-    l = re.sub('[><\\\]', "", l)
-    l = re.sub('\(', "[", l)
-    l = re.sub('\)', "]", l)
+    l = re.sub('[><\\\]+', "", l)
+    l = re.sub('\(+', "[", l)
+    l = re.sub('\)+', "]", l)
     l = re.sub('[\'\`]', "=", l)
     l = re.sub('^[-.()+·\.]+', "", l)
     l = re.sub('[-.()+·\.]+$', "", l)
@@ -46,7 +46,7 @@ def main():
     file_rename = cmd_args['-i']
 
     for fname in files:
-        if not os.path.isfile(fname):
+        if not (os.path.exists(fname) and os.path.isdir(fname)):
             break
         dir_name = os.path.dirname(fname)
         input_name = os.path.basename(fname)
