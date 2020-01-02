@@ -4,7 +4,7 @@ import subprocess
 from colored import fg
 
 
-class pretty_printer(object):
+class pretty_printer():
     darkblue = fg(4)
     darkwhite = fg(7)
     darkgray = fg(237)
