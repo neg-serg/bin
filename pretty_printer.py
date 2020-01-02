@@ -69,7 +69,7 @@ class pretty_printer():
 
 
 # file info printer
-class file_info_printer(object):
+class file_info_printer():
     def __init__(self):
         pass
 
