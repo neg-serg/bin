@@ -58,8 +58,7 @@ def main():
             os.rename(pref + input_name, pref + output_name)
         pp = pretty_printer
         print(
-            f'{pp.prefix()}{pp.fancy_file(dir_name)}\
-            {pp.fancy_file(input_name)} -> {pp.fancy_file(output_name)}'
+            f'{pp.prefix()}{pp.fancy_file(dir_name)}{pp.fancy_file(input_name)} -> {pp.fancy_file(output_name)}'
         )
 
 main()
