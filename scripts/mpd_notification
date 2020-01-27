@@ -25,7 +25,7 @@ get_pid(){
 
 get_lastfm(){
     for pid in neg hextrick; do
-        if [[ $(get_pid "${pid}") != "" ]]; then
+        if [[ ! -z $(get_pid "${pid}") ]]; then
             printf "%s\n" "$(wf "L")$(nr $(sed 's:^.:\U&:g' <<< ${pid}) last.fm)"
             break
         fi
@@ -57,7 +57,7 @@ notify(){
     local -a fancy_table=('' '♫' '⟫' '')
 
     for i in {1..$#fancy_table}; do
-        if [[ ${bodyarr[i]} != "" ]]; then
+        if [[ ! -z "${bodyarr[i]}" ]]; then
             bodyarr[i]=$(wf ${fancy_table[i]})"$(nr ${bodyarr[i]})\n"
         else
             bodyarr[i]="\n"
@@ -86,11 +86,11 @@ notify(){
         bodyarr[5]=$(wf '')"$(nr ${audio_quality})\n" || \
         bodyarr[5]="\n"
 
-    [[ ${label// } != "" ]] && \
+    [[ ! -z "${label// }" ]] && \
         bodyarr[6]=$(wf '©')"$(nr ${label})\n" || \
         bodyarr[6]="\n"
 
-    [[ ${year// } != "" ]] && \
+    [[ ! -z "${year// }" ]] && \
         bodyarr[7]=$(wf 'Y')"$(nr ${year})\n" || \
         bodyarr[7]="\n"
 
