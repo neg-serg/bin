@@ -54,7 +54,7 @@ notify(){
     len=$[${(@)len[1]}]
     [[ ${len} > ${max_len} ]] && len=${max_len}
 
-    local -a fancy_table=('' '♫' '⟫' '')
+    local -a fancy_table=('⚌' '♫' '⟫' '|')
 
     for i in {1..$#fancy_table}; do
         if [[ ! -z "${bodyarr[i]}" ]]; then
@@ -83,7 +83,7 @@ notify(){
     local label="$(awk -F '=' '/^LABEL/{print $2}' <<< ${sox_metadata})"
 
     [[ ${audio_quality// } != "·K/·" ]] && \
-        bodyarr[5]=$(wf '')"$(nr ${audio_quality})\n" || \
+        bodyarr[5]=$(wf '❯')"$(nr ${audio_quality})\n" || \
         bodyarr[5]="\n"
 
     [[ ! -z "${label// }" ]] && \
