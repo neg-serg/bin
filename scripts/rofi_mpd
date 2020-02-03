@@ -15,7 +15,7 @@ function generate(){
 }
 
 function handler(){
-    local bitperfect_output_name='x20 - USB Audio'
+    local bitperfect_output_name='VMV D1 USB2.0'
     local timeout="5s"
     while IFS= read -r arg; do
         if [[ ${arg} =~ ".*title_copy.*" ]]; then
