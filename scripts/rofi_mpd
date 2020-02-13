@@ -51,12 +51,12 @@ local mon_width=$(xrandr -q |awk '/Screen/{print $8}')
 local rofi_options=(
     -theme-str "'* { font: \"Iosevka Term Medium 12\"; }'"
     -theme-str "'#window { width: $(( (${mon_width}) / 2 )); y-offset: -34; location: south west; anchor: south west; }'"
-    -markup-rows
-    -dmenu
     -auto-select
+    -markup-rows
     -b -disable-history -columns 8
     -lines 1
-    -p "\>"
+    -dmenu
+    -p '"❯>"'
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
 
