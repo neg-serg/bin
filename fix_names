@@ -21,7 +21,7 @@ from docopt import docopt
 
 from pretty_printer import pretty_printer
 
-def fancy_name(filename):
+def fancy_name(filename, file=False):
     l = filename
 
     l = re.sub('[ _\t\.]+', "·", l)
@@ -37,6 +37,9 @@ def fancy_name(filename):
     l = re.sub('^[-.()+·\.]+', "", l)
     l = re.sub('[-.()+·\.]+$', "", l)
 
+    if file:
+        return '.'.join(l.rsplit('·', 1))
+
     return l
 
 def main():
@@ -44,21 +47,25 @@ def main():
 
     files =  cmd_args['FILES']
     file_rename = cmd_args['-i']
-
     for fname in files:
-        if not (os.path.exists(fname) and os.path.isdir(fname)):
+        if not os.path.exists(fname):
             break
         dir_name = os.path.dirname(fname)
         input_name = os.path.basename(fname)
 
-        output_name = fancy_name(input_name)
+        if os.path.isdir(fname):
+            output_name = fancy_name(input_name)
+        else:
+            output_name = fancy_name(input_name, file=True)
 
         if file_rename:
-            pref = dir_name + '/'
+            pref = ''
+            if dir_name:
+                pref = dir_name + '/'
             os.rename(pref + input_name, pref + output_name)
         pp = pretty_printer
-        print(
-            f'{pp.prefix()}{pp.fancy_file(dir_name)}{pp.fancy_file(input_name)} -> {pp.fancy_file(output_name)}'
+        print(f'{pp.prefix()}{pp.fancy_file(dir_name)}'
+            f'{pp.fancy_file(input_name)} -> {pp.fancy_file(output_name)}'
         )
 
 main()
