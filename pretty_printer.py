@@ -45,7 +45,7 @@ class pretty_printer():
     @classmethod
     def prefix(cls):
         """ Print prefix """
-        return cls.wrap(fg(25) + ">" + fg(26) + ">")
+        return cls.wrap(fg(25) + "❯" + fg(26) + ">")
 
     @classmethod
     def delim(cls):
