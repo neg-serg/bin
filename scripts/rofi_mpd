@@ -6,7 +6,7 @@ blue="<span weight='bold' color='$(xrq color4)'>"
 norm="<span weight='bold' color='$(xrq foreground)'>"
 close="</span>"
 
-function generate(){
+generate_menu() {
     local count=0
     for item in ${mpd_menu[@]}; do
         (( count++ ))
@@ -14,7 +14,7 @@ function generate(){
     done
 }
 
-function handler(){
+handler() {
     local bitperfect_output_name='VMV D1 USB2.0'
     local timeout="5s"
     while IFS= read -r arg; do
@@ -60,4 +60,4 @@ local rofi_options=(
 )
 local rofi_pid=" -pid /run/user/$(id -u)/rofi_mpd.pid"
 
-generate | eval "rofi ${rofi_colors} ${rofi_options} ${rofi_pid}" | handler
+generate_menu | eval "rofi ${rofi_colors} ${rofi_options} ${rofi_pid}" | handler
