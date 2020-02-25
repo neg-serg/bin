@@ -7,28 +7,61 @@ from colored import fg
 class pretty_printer():
     darkblue = fg(4)
     darkwhite = fg(7)
-    darkgray = fg(237)
-    cyberblue = fg(200)
+    almostgray = fg(243)
+    nicecyan = fg(24)
     default = fg(0)
 
     @classmethod
-    def wrap(cls, out):
+    def fg(cls, color: int):
+        return fg(color)
+
+    @classmethod
+    def _wrap(cls, out):
         """ generic string wrapper """
         return cls.darkblue + "⟬" + cls.darkwhite + out + cls.darkblue + "⟭"
 
     @classmethod
-    def size(cls, size):
+    def wrap(cls, text, delim='', postfix=''):
+        if delim:
+            delim = cls.nicecyan + delim
+        if postfix:
+            postfix = cls.almostgray + postfix
+        return cls._wrap(text + delim + postfix)
+
+    @classmethod
+    def size(cls, size, unit=None, pref='', wrap=True):
         """ Print file size """
-        return cls.wrap(
-            cls.darkwhite + "sz" + cls.darkgray + "~" +
-            cls.darkwhite + str(size)
+        def nop(out):
+            return out
+
+        if pref is None:
+            pref = ''
+        elif not pref:
+            pref = "sz"
+
+        if pref:
+            pref = pref + cls.almostgray + ":"
+
+        if wrap:
+            do_wrap = cls.wrap
+        else:
+            do_wrap = nop
+
+        if unit is None:
+            return do_wrap(
+                cls.darkwhite + pref + cls.darkwhite + str(size)
+            )
+
+        return do_wrap(
+            cls.darkwhite + pref + cls.darkwhite +
+            str(size) + cls.almostgray + unit
         )
 
     @classmethod
     def filelen(cls, length):
         """ Print file line-length """
         return cls.wrap(
-            cls.darkwhite + "len" + cls.darkgray + "=" +
+            cls.darkwhite + "len" + cls.almostgray + "=" +
             cls.darkwhite + str(length)
         )
 
@@ -50,7 +83,7 @@ class pretty_printer():
     @classmethod
     def delim(cls):
         """ Print delimiter """
-        return cls.cyberblue + cls.default
+        return cls.nicecyan + cls.default
 
     @classmethod
     def fancy_file(cls, filename):
