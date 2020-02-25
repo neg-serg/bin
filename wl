@@ -33,7 +33,6 @@ import random
 from pathlib import Path
 
 from docopt import docopt
-from pretty_printer import pretty_printer
 
 
 class wallpaper_manager():
@@ -104,6 +103,7 @@ class wallpaper_manager():
     def print_wall_history(self, history):
         """ Print wall history """
         home = str(self.home)
+        from scripts.pretty_printer import pretty_printer
         for num, line in enumerate(history):
             if line.startswith(home):
                 line = '~/' + line.split(home)[1]
