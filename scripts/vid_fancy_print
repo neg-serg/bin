@@ -99,19 +99,23 @@ def media_info(filename):
 def main():
     cmd_args = docopt(__doc__, version='1.0')
     files =  cmd_args['FILES']
+    print_cwd = False
+    dir_name = ""
 
     for fname in files:
         if not os.path.exists(fname):
             break
         if os.path.dirname(fname):
             dir_name = os.path.dirname(fname)
-        else:
+        elif print_cwd:
             dir_name = os.getcwd()
+
+        dir_name_out = ""
+        if dir_name:
+            dir_name_out = pp.fancy_file(dir_name)
         input_name = os.path.basename(fname)
-        media_info(fname)
         pp = pretty_printer
-        print(f'{pp.prefix()}{pp.fancy_file(dir_name)}'
-              f'{pp.fancy_file(input_name)}'
-        )
+        print(f'{pp.prefix()}{dir_name_out}{pp.fancy_file(input_name)}', end='')
+        media_info(fname)
 
 main()
