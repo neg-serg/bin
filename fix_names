@@ -19,7 +19,7 @@ import os
 import re
 from docopt import docopt
 
-from pretty_printer import pretty_printer
+from scripts.pretty_printer import pretty_printer
 
 def fancy_name(filename, file=False):
     l = filename
