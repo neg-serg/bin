@@ -99,6 +99,8 @@ def media_info(filename):
 def main():
     cmd_args = docopt(__doc__, version='1.0')
     files =  cmd_args['FILES']
+    pp = pretty_printer
+
     print_cwd = False
     dir_name = ""
 
@@ -111,10 +113,9 @@ def main():
             dir_name = os.getcwd()
 
         dir_name_out = ""
-        if dir_name:
+        if dir_name and dir_name != '.':
             dir_name_out = pp.fancy_file(dir_name)
         input_name = os.path.basename(fname)
-        pp = pretty_printer
         print(f'{pp.prefix()}{dir_name_out}{pp.fancy_file(input_name)}', end='')
         media_info(fname)
 
