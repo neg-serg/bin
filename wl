@@ -126,6 +126,7 @@ class wallpaper_manager():
     def open_image_viewer(self):
         """ Open image viewer with wallpapers history """
         file_list = list(reversed(self.get_wall_history()))
+        file_list = [i.replace('\x00','') for i in file_list]
         subprocess.run(
             ['sxiv', '-Zftoa', '-sd', *file_list],
             stdout=subprocess.PIPE)
