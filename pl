@@ -17,11 +17,9 @@ function zrcautoload() {
     return 0
 }
 
-source "${ZDOTDIR}/03-helpers.zsh"
-
 function mp(){
     vdpau=false
-    for i; do vid_fancy_print "${i}"; done
+    for i; do ~/bin/scripts/vid_info "${i}"; done
     if lsmod |& rg -i nvidia > /dev/null; then
         if [[ ${vdpau} == false ]]; then
             mpv --input-ipc-server=/tmp/mpvsocket --vo=opengl --vd-lavc-dr=yes "$@" > ${HOME}/tmp/mpv.log
