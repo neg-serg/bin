@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-function reset_usb3(){
+reset_usb3() {
     # this script resets all USB3 devices, seems to be necessary sometimes after
     # stopping a VM
 
@@ -11,7 +11,7 @@ function reset_usb3(){
     done
 }
 
-function handle_all_devices(){
+handle_all_devices() {
     USB_DEVICES+=(
         "046d:c083" 
         "046d:c32b"
@@ -31,7 +31,7 @@ function handle_all_devices(){
     # 1038:1702 # SteelSeries ApS [ Mouse ]
 }
 
-function prepare(){
+prepare() {
     trap "exit 1" TERM
     export TOP_PID=$$
 
@@ -48,7 +48,7 @@ function prepare(){
     fi
 }
 
-function main(){
+main() {
     # loop over given search strings
     for i in "${USB_DEVICES[@]}"; do
         # loop over results of search string
@@ -60,12 +60,12 @@ function main(){
             guestbus="xhci.0"
 
             if hash jq 2> /dev/null; then
-                function bpasscmd(){
+                bpasscmd() {
                     for i in "$@";
                         echo "${i}" | nc -q "${sec_wait}" "${netcat_host}" "${netcat_port}" | jq -c
                 }
             else
-                function bpasscmd(){
+                bpasscmd() {
                     for i in "$@";
                         echo "${i}" | nc -q "${sec_wait}" "${netcat_host}" "${netcat_port}"
                 }

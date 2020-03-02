@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-do_if_qemu(){
+do_if_qemu() {
     if pidof qemu-system-x86_64 2>/dev/null; then
         eval "$@"
     else
@@ -8,12 +8,12 @@ do_if_qemu(){
     fi
 }
 
-check_qemu(){
+check_qemu() {
     local cmd=(sudo ~neg/bin/qemu/win10_run)
     st -c qemu_run dtach -c /tmp/qemu.session -Ez "${cmd[@]}"
 }
 
-start_win10(){
+start_win10() {
     os_name=${res:s_Start__}
     msg "Starting ... ${os_name}"
     if ! check_qemu; then
@@ -24,10 +24,10 @@ start_win10(){
     fi
 }
 
-msg(){ notify-send "$@" }
-no_qemu_msg(){ msg "There is no QEMU" }
+msg() { notify-send "$@" }
+no_qemu_msg() { msg "There is no QEMU" }
 
-function main(){
+main() {
     if [[ $1 == 'start_win10' ]]; then
         start_win10
         exit
