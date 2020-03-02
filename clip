@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-function read_command {
+read_command() {
     readonly rofi_cmd=(
         rofi -dmenu 
         -opacity "${opacity_}"
@@ -12,12 +12,12 @@ function read_command {
     echo ${cmd_}
 }
 
-function send_key(){
+send_key() {
     local key="$1"
     xdotool key --window "${window}" "${key}"
 }
 
-function clipboard_pipe(){
+clipboard_pipe() {
     local cmd=""
     local selection=""
     local out=""
@@ -67,7 +67,7 @@ function clipboard_pipe(){
     done
 }
 
-function clip_main(){
+clip_main() {
     declare -a rofi_opts_
     local x11_width="$(xrandr -q |awk '/Screen/{print $8}')"
     local width_=$[x11_width-70]
@@ -88,39 +88,25 @@ function clip_main(){
     fi
 }
 
-yr(){
+yr() {
     ${XDG_CONFIG_HOME}/i3/bin/send bscratch toggle youtube
     sleep 1s
     echo "$@" | xsel -i
     xdotool key shift+Insert
 }
 
+youtube_url() {
+    gpaste-client \
+        | grep -E 'https.*(youtube|vimeo).com' \
+        | cut -f2- -d ' ' \
+        | rofi -lines 7 -dmenu -p '⟬youtube⟭ ❯>'
+}
+
 case "$1" in
-    pipe) 
-        shift
-        clipboard_pipe "$@" 
-    ;;
-    youtube-view) 
-        shift
-        yr "$(xclip -o)" 
-    ;;
-    translate) 
-        shift
-        current_clip="$(gpaste-client get 0)"
-        notify-send "$(transline ${current_clip})"
-    ;;
-    youtube-dw) 
-        shift
-        cd ~/vid/new
-        youtube-dl "$(xclip -o)" 
-    ;;
-    youtube-dw-list) 
-        shift
-        cd ~/vid/new
-        local youtube_url=$(gpaste-client |grep -E 'https.*(youtube|vimeo).com' |cut -f2- -d ' '|rofi -lines 7 -dmenu -p '[youtube video]')
-        youtube-dl "${youtube_url}"
-    ;;
-    *) 
-        clip_main  
-    ;;
+    pipe) shift; clipboard_pipe "$@" ;;
+    youtube-view) shift; yr "$(xclip -o)" ;;
+    translate) shift; current_clip="$(gpaste-client get 0)"; notify-send "$(transline ${current_clip})" ;;
+    youtube-dw) shift; cd ~/vid/new; youtube-dl "$(xclip -o)" ;;
+    youtube-dw-list) shift; cd ~/vid/new; youtube-dl "$(youtube_url)" ;;
+    *) clip_main ;;
 esac
