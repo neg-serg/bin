@@ -1,37 +1,18 @@
 #!/bin/zsh
 
-function zrcautoload() {
-    emulate -L zsh
-    setopt extended_glob
-    local fdir ffile
-    local -i ffound
-
-    ffile=$1
-    (( ffound = 0 ))
-    for fdir in ${fpath} ; do
-        [[ -e ${fdir}/${ffile} ]] && (( ffound = 1 ))
-    done
-
-    (( ffound == 0 )) && return 1
-    autoload -U ${ffile} || return 1
-    return 0
-}
-
-function mp(){
-    vdpau=false
-    for i; do ~/bin/scripts/vid_info "${i}"; done
-    if lsmod |& rg -i nvidia > /dev/null; then
-        if [[ ${vdpau} == false ]]; then
-            mpv --input-ipc-server=/tmp/mpvsocket --vo=opengl --vd-lavc-dr=yes "$@" > ${HOME}/tmp/mpv.log
-        else
-            mpv --input-ipc-server=/tmp/mpvsocket --vo=vdpau --hwdec=vdpau "$@" > ${HOME}/tmp/mpv.log
+mp() {
+    local args=""
+    for arg; do
+        if [[ -d ${arg} ]]; then
+            {find "${arg}" -maxdepth 1 -type f -print0 | xargs -0n10 -P 10 ~/bin/scripts/vid_info} &
         fi
-    else
-        mpv --input-ipc-server=/tmp/mpvsocket --vo=vaapi --hwdec=vaapi "$@" > ${HOME}/tmp/mpv.log
-    fi
+    done
+    {for arg; [[ -f "${arg}" ]] && args+="$(printf '%s\0' "${arg}")";
+    xargs -0n10 -P 10 ~/bin/scripts/vid_info <<< "${args}"} &
+    mpv --input-ipc-server=/tmp/mpvsocket --vo=gpu "$@" > ${HOME}/tmp/mpv.log
 }
 
-pl(){
+pl() {
     [[ -e "$1" ]] && arg_="$1"
     [[ -z "${arg_}" ]] && arg_="${XDG_VIDEOS_DIR}/"
     pushd ${arg_}
@@ -48,7 +29,7 @@ pl(){
     popd
 }
 
-pl_rofi(){
+pl_rofi() {
     [[ -e "$1" ]] && arg_="$1"
     [[ -z "${arg_}" ]] && arg_="${XDG_VIDEOS_DIR}/"
     pushd ${arg_}
@@ -72,20 +53,24 @@ pl_rofi(){
     popd
 }
 
-set_maxdepth=false
-if [[ $1 != "rofi" ]]; then
-    if [[ $1 == "1st_level" ]]; then
-        set_maxdepth=true
-        shift
+main() {
+    set_maxdepth=false
+    if [[ $1 != "rofi" ]]; then
+        if [[ $1 == "1st_level" ]]; then
+            set_maxdepth=true
+            shift
+        fi
+        pl "$@"
+        exit
+    else
+        shift;
+        if [[ $1 == "1st_level" ]]; then
+            set_maxdepth=true
+            shift
+        fi
+        pl_rofi "$@"
+        exit
     fi
-    pl "$@"
-    exit
-else
-    shift;
-    if [[ $1 == "1st_level" ]]; then
-        set_maxdepth=true
-        shift
-    fi
-    pl_rofi "$@"
-    exit
-fi
+}
+
+main "$@"
