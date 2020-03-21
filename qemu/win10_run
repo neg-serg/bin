@@ -72,8 +72,8 @@ main(){
 
         local Home=/home/neg
         local disk_name="w10"
-        local win10_iso="${Home}/1st_level/iso/en_windows_10_education_version_1607_updated_jul_2016_x64_dvd_9055880.iso"
-        local virtio_iso="${Home}/1st_level/iso/virtio-win-0.1.137.iso"
+        local win10_iso="${Home}/1st_level/iso/win10.iso"
+        local virtio_iso="${Home}/1st_level/iso/virtio-win-0.1.171.iso"
         local smb_path="/mnt/qemu"
         local qmp_socket_path="${Home}/1st_level/qmp.socket"
         local qmp_sh_script="${Home}/bin/scripts/qmp/qmp-shell"
@@ -115,7 +115,7 @@ main(){
             -vga none
             -nographic
 
-            -soundhw ac97
+            -soundhw hda
 
             -global ICH9-LPC.disable_s3=1
             -global ICH9-LPC.disable_s4=1
@@ -126,7 +126,7 @@ main(){
             -drive if=pflash,format=raw,file=${Home}/bin/qemu/ovmf/ovmf_vars_x64.bin
 
             -device virtio-scsi-pci,id=scsi
-            -drive file=/dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3YANB0K801279P,format=raw,if=virtio,cache=none
+            -drive file=/fire/win10.img,format=raw,if=virtio,cache=none
         )
 
         local -a spice=(
@@ -151,7 +151,7 @@ main(){
 
         local -a qemu_pass_video=(
             -device ioh3420,bus=pcie.0,addr=1c.0,port=1,chassis=1,id=root.1
-            -device vfio-pci,host=02:00.0,bus=root.1,addr=00.0
+            -device vfio-pci,host=01:00.0,bus=root.1,addr=00.0
         )
 
         local -a qemu_pass_network=(
