@@ -101,7 +101,6 @@ main(){
             -m "${vm_memory}"
             -smp sockets="${sockets_amount}",cores="${cores_amount}",threads="${threads_amount}"
             -cpu host,hv_time,hv_vpindex,hv_reset,hv_runtime,hv_crash,hv_synic,hv_stimer,hv_spinlocks=0x1fff,hv_vendor_id=negus9,kvm=off,l3-cache=on,-hypervisor,migratable=no,+invtsc
-            -realtime mlock=on
             -pidfile /var/run/vm.w10.pid
             -machine q35,accel=kvm,usb=off,vmport=off,dump-guest-core=off,kernel-irqchip=on
 
@@ -147,6 +146,10 @@ main(){
             -drive file="${install_iso},index=0,media=cdrom"
             -drive file="${virtio_iso},index=1,media=cdrom"
             -boot menu=on
+        )
+
+        local -a qemu_memory_overcommit=(
+            -overcommit mem-lock=on
         )
 
         local -a qemu_pass_video=(
