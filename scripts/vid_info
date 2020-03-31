@@ -63,6 +63,8 @@ def media_info(filename):
     out = ""
     vid_frame_rate = ""
     audio_bitrate, audio_sample_rate = "", ""
+    if not ret.get('streams', []):
+        os._exit(0)
     for stream in ret['streams']:
         if stream['codec_type'] == 'video':
             out += pp.wrap(str(stream['width']) + 'x' + str(stream['height']))
